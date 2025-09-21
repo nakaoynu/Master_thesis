@@ -1,28 +1,37 @@
-\documentclass[a4paper, 12pt]{jsarticle}
+% Preamble (文書クラスやパッケージの読み込み)
+\documentclass[a4paper, 12pt, dvipdfmx]{jsbook}
 \usepackage{amsmath}
+\usepackage{graphicx}
 \usepackage{cite}
+% \includeonlyを使う場合はここに書く（後述）
 
-\title{修士論文のタイトル}
+% 図の検索パスを指定しておくと便利
+\graphicspath{{figures/}}
+
+\title{$\mathrm{Gd_{3}Ga_{5}O_{12}}$のTHz磁気光学応答のベイズ統計的モデル比較に基づく超放射相転移の発現可能性の考察}
 \author{中尾 太一}
 \date{\today}
 
+% Document Body
 \begin{document}
 
 \maketitle
+\tableofcontents % 目次を生成
 
-\section{緒言}
+% \include{フォルダ名/ファイル名} で各章を読み込む
+% 注意：拡張子 .tex は付けない！
+\include{chapters/introduction}
+\include{chapters/theory}
+\include{chapters/method}
+\include{chapters/results}
+\include{chapters/experiment}
+\include{chapters/conclusion}
 
-これはVSCodeとLaTeX Workshopの動作確認テストです。
-時間依存シュレーディンガー方程式は次式で与えられます。
+\appendix
+% \include{chapters/appendix_A} % 付録なども同様
 
-\begin{equation}
-    i\hbar \frac{\partial}{\partial t} |\Psi(t)\rangle = \hat{H} |\Psi(t)\rangle
-    \label{eq:schrodinger}
-\end{equation}
-
-式\eqref{eq:schrodinger}は参考文献 \cite{dirac1958} で詳しく論じられています。
-
+\nocite{*}
 \bibliographystyle{junsrt}
-\bibliography{reference}
+\bibliography{bib/reference} % .bibファイルのパスを正しく指定
 
-\end{document}  
+\end{document}
