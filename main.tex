@@ -1,0 +1,28 @@
+\documentclass[a4paper, 12pt]{jsarticle}
+\usepackage{amsmath}
+\usepackage{cite}
+
+\title{修士論文のタイトル}
+\author{中尾 太一}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{緒言}
+
+これはVSCodeとLaTeX Workshopの動作確認テストです。
+時間依存シュレーディンガー方程式は次式で与えられます。
+
+\begin{equation}
+    i\hbar \frac{\partial}{\partial t} |\Psi(t)\rangle = \hat{H} |\Psi(t)\rangle
+    \label{eq:schrodinger}
+\end{equation}
+
+式\eqref{eq:schrodinger}は参考文献 \cite{dirac1958} で詳しく論じられています。
+
+\bibliographystyle{junsrt}
+\bibliography{reference}
+
+\end{document}  
