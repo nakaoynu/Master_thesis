@@ -1,0 +1,135 @@
+% chapters/theory.tex の中身
+
+\chapter{理論}
+\label{chap:theory} % 後で参照するためにラベルを付ける
+本章では, 本研究で用いる理論的背景について述べる. 
+まず, GGG中のGd$^{3+}$イオンのスピン状態を記述するハミルトニアンを定義し, 線形応答理論を用いて磁気感受率を導出する. 次に, H形式およびB形式における比透磁率の定式化を行い, GGGの透過スペクトル計算モデルを説明する. 最後に, これらの理論モデルを実験データと照らし合わせて評価するための, ベイズ推定の統計的枠組みについて述べる. 
+
+\section{ハミルトニアン}
+\label{sec:theory_hamiltonian}
+GGG結晶中の磁性イオンGd$^{3+}$ ($4f^7, L=0, S=7/2$) のスピン状態は, 主に結晶場相互作用と外部磁場によるゼーマン相互作用によって記述される. 全ハミルトニアン $\hat{H}$ は以下のように表される [引用]. 
+    
+\begin{equation}
+\hat{H} =\hat{H}_{0} + \hat{H}_{\text{\text{CF}}} + \hat{H}_{\text{\text{Zeeman}}}
+\end{equation}
+
+ここで, 第2項$\hat{H}_{\text{CF}}$は結晶場ハミルトニアンであり, スティーブンス演算子$\hat{O}_{n,m}$と結晶場パラメータ $B_{n,m}$を用いて展開される. 
+
+\begin{equation}
+\hat{H}_{\text{CF}} = \sum_{n,m} B_{n,m} \hat{O}_{n,m}
+\end{equation}
+
+第3項$\hat{H}_{\text{Zeeman}}$は, 外部磁場$\hat{B}_{ext}$とスピン演算子$\hat{S}$の相互作用を表すゼーマン項である. 
+\begin{equation}
+\hat{H}_{\text{Zeeman}} = g \mu_{B} \hat{S} \cdot \hat{B}_{ext}
+\end{equation}
+
+ここで, $g$はg因子, $\mu_{B}$はボーア磁子である. この全ハミルトニアン$\hat{H}$を対角化することで, 磁場中のエネルギー固有値（ゼーマン準位）$E_{n}$と固有状態$\ket{\psi_{n}}$が得られる. 
+
+\section{線形応答理論}
+\label{sec:linear_response}
+周波数 $\omega$ の交流磁場に対するスピン系の応答は, 線形応答理論の久保公式 [引用: Kubo] を用いて, 磁気感受率テンソル $\chi_{ij}(\omega)$ として記述される. 
+
+\begin{equation}
+\chi_{ij}(\omega) = - \frac{N \mu_{0}}{i \hbar} \int_{0}^{\infty} dt e^{i \omega t} \langle [\hat{d}_{i}(t), \hat{d}_{j}] \rangle
+\end{equation}
+
+ハミルトニアンの固有状態$\ket{\psi_n}$を用いて磁気感受率を計算すると, 以下の形式で与えられる [引用]. 
+\begin{equation}
+\chi_{ij}(\omega) = - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{\langle \psi_{n}| \hat{d}_{i} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{j} | \psi_n \rangle}{\omega + i \gamma - \Delta \omega} - \frac{\langle \psi_{n}| \hat{d}_{j} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{i} | \psi_n \rangle}{\omega + i \gamma + \Delta \omega} \}
+\end{equation}
+
+ただし, $$\Delta \omega = (E_{n'} - E_{n})/\hbar$$
+$$P_{n} = \frac{e^{-\frac{E_{n}}{k_{B}T}}}{Z}$$, $$Z = \sum_{n} e^{-\frac{E_{n}}{k_{B}T}}$$
+ここで, $N$はスピン密度, $P_{n}$はボルツマン分布に従う準位$n$の占有確率, $\Delta \omega$は準位$n, n'$間のエネルギー差,  $\gamma$は緩和レート（スペクトルの線幅に対応）, $\hat{d}_i$は磁気モーメント演算子の$i$成分である. \\
+
+固有状態$\ket{\psi_n}$は, スピン$s$の磁気量子数$m$を用いて, 各準位$\ket{m}$の重ね合わせとして表される. すなわち, 
+\begin{equation}
+  \ket{\psi_n} = \sum_{m} c_{n,m} \ket{m} (m = -s, -s+1, \ldots, s-1, s)
+\end{equation} 
+である.
+
+磁気モーメント演算子$\hat{d}_{i}$はスピン演算子$\hat{S}_{i}$を用いて以下のように表される.
+\begin{equation}
+\langle m | \hat{d}_{i,j} | m' \rangle = \mu_{B} g \langle m | \hat{S}_{i,j} | m' \rangle
+\end{equation}
+
+また, スピン演算子は昇降演算子$\hat{S}_{\pm}$を用いて以下のように表される.
+\begin{equation*}
+\hat{S}_{x} = \frac{1}{2} (\hat{S}_{+} + \hat{S}_{-}), \quad \hat{S}_{y} = \frac{1}{2i} (\hat{S}_{+} - \hat{S}_{-}), \quad \hat{S}_{z} = m
+\end{equation*}
+以上より, 
+
+\begin{equation}
+\langle m | \hat{d}_{x} | m' \rangle = \frac{\mu_{B} g \hbar}{2} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} + \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+\end{equation}
+
+\begin{equation}
+\langle m | \hat{d}_{y} | m' \rangle = \frac{\mu_{B} g \hbar}{2i} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} - \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+\end{equation}
+
+計算の見通しを良くするために, 次のように$F_{\pm}, K$を定義する.
+
+\begin{align}
+F_{+} &= \sum_{m} C_{n,m} C_{n',m-1} \sqrt{(s + m)(s - m + 1)}, \\ 
+F_{-} &= \sum_{m} C_{n,m} C_{n',m+1}\sqrt{(s - m)(s + m + 1)}, \\
+F_z &= \sum_{m} C_{n,m} C_{n',m} m, \\
+K &= \left(\frac{\mu_{B} g \hbar}{2}\right)^2 
+\end{align}
+
+これらを用いると, 磁気モーメント演算子の各成分は以下のように表される.
+\begin{align}
+\langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle &= K (F_{+} + F_{-}), \\
+\langle \psi_{n} | \hat{d}_{y} | \psi _{n'} \rangle &= K (F_{+} - F_{-}), \\
+\langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle &= K F_z 
+\end{align}
+
+エルミート演算子の性質より, $\langle \psi_{n'} | \hat{d}_{i} | \psi_{n} \rangle = \langle \psi_{n} | \hat{d}_{i} | \psi_{n'} \rangle^{*}$であることに注意すると, 
+\begin{align}
+\langle \psi_{n'} | \hat{d}_{x} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle = K (F_{+} + F_{-}), \\
+\langle \psi_{n'} | \hat{d}_{y} | \psi _{n} \rangle &= \langle \psi_{n} | \hat{d}_{y} | \psi_{n'} \rangle = K (F_{+} - F_{-}), \\
+\langle \psi_{n'} | \hat{d}_{z} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle = K F_z
+\end{align}
+
+以上より, 磁気感受率テンソルの各成分は以下のように表される.
+\begin{align}
+\chi_{xx}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{zz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 F_z^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 F_z^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{xy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yx}(\omega) &= \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma + \Delta \omega} \}\notag \\ &= -\chi_{xy}(\omega), \\
+\chi_{xz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}
+\end{align}
+
+\section{ベイズ推定}
+\label{sec:method_bayesian}
+ベイズ推定は, 事前分布と尤度に基づいてパラメータの事後分布を推定する手法である. 特に, 観測データが少ない場合やノイズが多い場合に有効である. 
+
+\section{マルコフ連鎖モンテカルロ法}
+\label{sec:method_mcmc}
+マルコフ連鎖モンテカルロ法（MCMC）は, 複雑な確率分布からサンプリングするための手法である. 特に, ベイズ推定において事後分布が解析的に求められない場合に用いられる. 
+
+\section{LOO-CV}
+\label{sec:method_loo_cv}
+Leave-One-Out Cross-Validation（LOO-CV）は, モデルの汎化性能を評価するための手法である. 特に, データセットが小さい場合に有効である. 
+
+\section{WAIC}
+\label{sec:method_waic}
+Widely Applicable Information Criterion（WAIC）は, ベイズモデルの適合度を評価するための情報量規準である. 特に, モデルの複雑さを考慮した評価が可能である. 
+...
+
+- H形式とB形式をモデル記述に使った理由
+    - Dickeモデルではなく, これら（比透磁率を通して磁気感受率）を使う理由はなぜ？
+    - 磁性体の影響も十分に考慮しているから
+        - スピン-スピン相互作用の有無
+    - 磁気感受率→Maxwell eq
+        - SRPT**有無**にのみ関心がある（相転移後には関心がない）
+            - LP=0が確認できれば十分
+        - 物質のパラメータ（屈折率, 透磁率, 膜厚…）に基づいた解析
+            - CavityQEDよりも設定すべきパラメータが少ない→信頼性の高い解析
+    - cavityQED
+        - SRPT**後**にも関心がある（スクイージング）
+        - モデル化しているので単純化されている
+            - 物質に基づくパラメータの設定が難しい
+                - 共振器モード毎に緩和レート, 膜厚…が設定できる

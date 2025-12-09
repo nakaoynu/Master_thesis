@@ -2,6 +2,7 @@
 \documentclass[a4paper, 12pt, dvipdfmx]{jsbook}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{physics}
 \usepackage{cite}
 % \includeonlyを使う場合はここに書く（後述）
 
@@ -16,6 +17,7 @@
 \begin{document}
 
 \maketitle
+\setcounter{tocdepth}{2} % subsectionまで目次に表示
 \tableofcontents % 目次を生成
 
 % \include{フォルダ名/ファイル名} で各章を読み込む
@@ -24,11 +26,10 @@
 \include{chapters/theory}
 \include{chapters/method}
 \include{chapters/results}
-\include{chapters/experiment}
 \include{chapters/conclusion}
 
 \appendix
-% \include{chapters/appendix_A} % 付録なども同様
+\include{chapters/appendix_A}
 
 \nocite{*}
 \bibliographystyle{junsrt}
