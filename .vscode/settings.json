@@ -5,8 +5,7 @@
             "command": "latexmk",
             "args": [
                 "-e", "$latex=q/uplatex %O -kanji=utf8 -no-guess-input-enc -synctex=1 -interaction=nonstopmode -file-line-error %S/",
-                "-e", "$bibtex=q/upbibtex %O %B/", 
-                "-e", "$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/",
+                "-e", "$bibtex=q/upbibtex %O %B/",
                 "-e", "$makeindex=q/upmendex %O -o %D %S/",
                 "-e", "$dvipdf=q/dvipdfmx %O -o %D %S/",
                 "-norc",
@@ -20,14 +19,23 @@
     "latex-workshop.latex.recipes": [
         {
             "name": "toolchain: latexmk",
-            "tools": [
-                "latexmk"
-            ]
+            "tools": ["latexmk"]
         }
     ],
+    "latex-workshop.latex.recipe.default": "first",
     "latex-workshop.latex.autoBuild.run": "onFileChange",
     "latex-workshop.view.pdf.viewer": "tab",
-    "latex-workshop.latex.autoClean.run": "never",
-    
-    "git.ignoreLimitWarning": true
+    "latex-workshop.latex.autoClean.run": "onFailed",
+    "latex-workshop.linting.chktex.enabled": true,
+    "files.exclude": {
+        "**/*.aux": true,
+        "**/*.bbl": true,
+        "**/*.blg": true,
+        "**/*.log": true,
+        "**/*.out": true,
+        "**/*.toc": true,
+        "**/*.synctex.gz": true,
+        "**/*.fdb_latexmk": true,
+        "**/*.fls": true
+    }
 }
