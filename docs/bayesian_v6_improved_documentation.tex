@@ -1,0 +1,640 @@
+% filepath: bayesian_v6_improved_documentation.tex
+\documentclass[a4paper,12pt,dvipdfmx]{jlreq}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc, patterns}
+\usepackage{algorithm2e}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{multicol}
+
+% カラーボックス設定
+\newtcolorbox{keypoint}{colback=blue!5!white,colframe=blue!75!black,title=Key Point}
+\newtcolorbox{warning}{colback=red!5!white,colframe=red!75!black,title=注意}
+\newtcolorbox{definition}{colback=green!5!white,colframe=green!50!black,title=定義}
+\newtcolorbox{improvement}{colback=green!10!white,colframe=green!60!black,title=改善点}
+
+\lstset{
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    breaklines=true,
+    frame=single
+}
+
+\title{\vspace{-2cm}
+\textbf{bayesian\_v6\_improved.py 理解ドキュメント}\\
+\large 収束診断に基づく改善版ベイズ推定
+}
+\author{物理工学専攻 修士論文解析用教材}
+\date{2026年1月版}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに：このプログラムの位置づけ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{keypoint}
+このプログラムは、\textbf{bayesian\_v6\_informed\_priors\_HB.py}の実行結果に対する
+収束診断（diagnose\_bayesian\_convergence.py）で発見された問題を解決するために
+作成された\textbf{改善版}ベイズ推定プログラムです。
+\end{keypoint}
+
+\subsection{開発の経緯}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    box/.style={rectangle, rounded corners, minimum width=4.5cm, minimum height=0.8cm, 
+                text centered, draw=black, fill=white},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (v1) [box, fill=blue!20] {bayesian\_v6\_informed\_priors\_HB.py\\（初版）};
+\node (diag) [box, below=of v1, fill=orange!20] {diagnose\_bayesian\_convergence.py\\（収束診断）};
+\node (issues) [box, below=of diag, fill=red!20] {問題発見\\・下限張り付き\\・低ESS};
+\node (v2) [box, below=of issues, fill=green!20] {bayesian\_v6\_improved.py\\（改善版）};
+
+\draw [arrow] (v1) -- (diag);
+\draw [arrow] (diag) -- (issues);
+\draw [arrow] (issues) -- (v2);
+
+% 右側に問題の詳細
+\node[right=1.5cm of issues, align=left, text width=6cm] {
+    \textbf{発見された問題:}\\
+    1. a\_scaleが下限8.0に張り付き\\
+    2. gammaが下限0.005に張り付き\\
+    3. B形式のg\_factor, B4のESS低下\\
+    4. パラメータ間の強い相関
+};
+
+\end{tikzpicture}
+\caption{bayesian\_v6\_improved.py開発の経緯}
+\label{fig:history}
+\end{figure}
+
+\subsection{初版で発見された問題}
+
+収束診断の結果、以下の問題が特定されました：
+
+\begin{enumerate}
+    \item \textbf{下限張り付き問題}
+    \begin{itemize}
+        \item a\_scaleの事後分布が下限8.0に張り付いている
+        \item 一部のgammaが下限0.005に張り付いている
+        \item $\Rightarrow$ 真の最適値が探索範囲外にある可能性
+    \end{itemize}
+    
+    \item \textbf{低ESS問題（特にB形式）}
+    \begin{itemize}
+        \item g\_factor: ESS $\approx$ 150（目標400以上）
+        \item B4: ESS $\approx$ 120
+        \item $\Rightarrow$ サンプルの自己相関が高い
+    \end{itemize}
+    
+    \item \textbf{パラメータ間相関}
+    \begin{itemize}
+        \item g\_factorとB4に強い負の相関
+        \item $\Rightarrow$ 探索効率の低下
+    \end{itemize}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{改善点の詳細}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{改善点一覧}
+
+\begin{improvement}
+本プログラムでは以下の6つの改善を実施：
+
+\begin{enumerate}
+    \item \textbf{a\_scaleの下限拡大}: 8.0 → 1.0
+    \item \textbf{gammaの下限拡大}: 0.005 → 0.001
+    \item \textbf{B形式のg\_factor, B4の事前分布σを3〜6倍に拡大}
+    \item \textbf{B形式のg\_factor, B4の値域を拡大}
+    \item \textbf{サンプリング設定強化}: draws増加、tune増加、chains増加
+    \item \textbf{尤度関数の改善}: 重み付き領域ごとに異なるσ設定
+\end{enumerate}
+\end{improvement}
+
+\subsection{改善点1: a\_scaleの下限拡大}
+
+\begin{table}[h]
+\centering
+\caption{a\_scale事前分布の変更}
+\begin{tabular}{lcc}
+\toprule
+\textbf{設定項目} & \textbf{初版} & \textbf{改善版} \\
+\midrule
+下限 & 8.0 & 1.0 \\
+上限 & 15.0 & 25.0 \\
+標準偏差 $\sigma$ & 1.0 & 3.0 (H), 5.0 (B) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+物理的意味：a\_scaleはスケーリング係数であり、
+真の最適値が1〜8の範囲にある可能性を考慮。
+
+\subsection{改善点2: gammaの下限拡大}
+
+\begin{table}[h]
+\centering
+\caption{gamma事前分布の変更}
+\begin{tabular}{lcc}
+\toprule
+\textbf{設定項目} & \textbf{初版} & \textbf{改善版} \\
+\midrule
+下限 & 0.005 THz & 0.001 THz \\
+上限 & 0.4 THz & 0.5 (H), 0.6 (B) THz \\
+標準偏差 $\sigma$ & 15\%$\times$中心値 & 50\% (H), 100\% (B) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+物理的意味：緩和率$\gamma$は非常に小さい値を取る可能性があり、
+下限を緩和することで探索空間を拡大。
+
+\subsection{改善点3\&4: B形式の事前分布緩和}
+
+B形式では、g\_factorとB4の間に強い相関があり、探索が困難でした。
+事前分布を大幅に緩和することで、相関による探索困難を緩和します。
+
+\begin{table}[h]
+\centering
+\caption{B形式の事前分布緩和}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{パラメータ} & \textbf{初版 $\sigma$} & \textbf{改善版 $\sigma$} & \textbf{初版範囲} & \textbf{改善版範囲} \\
+\midrule
+g\_factor & 0.05 & 0.15 (3倍) & [1.7, 2.1] & [1.5, 2.3] \\
+B4 & 0.0005 & 0.003 (6倍) & [0.005, 0.012] & [0.001, 0.025] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% 初版の事前分布
+\begin{scope}
+    \draw[->] (0,0) -- (5,0) node[right] {$g$};
+    \draw[->] (0,0) -- (0,3.5) node[above] {$P(g)$};
+    
+    \draw[thick, blue, domain=1:4, samples=50] 
+        plot (\x, {3*exp(-(\x-2.5)*(\x-2.5)/0.2)});
+    
+    \draw[dashed] (1.5,0) -- (1.5,3.5);
+    \draw[dashed] (3.5,0) -- (3.5,3.5);
+    
+    \node[below] at (2.5,-0.5) {\textbf{初版}};
+    \node[below] at (2.5,-1) {\small $\sigma = 0.05$};
+\end{scope}
+
+% 改善版の事前分布
+\begin{scope}[xshift=7cm]
+    \draw[->] (0,0) -- (5,0) node[right] {$g$};
+    \draw[->] (0,0) -- (0,3.5) node[above] {$P(g)$};
+    
+    \draw[thick, red, domain=0.5:4.5, samples=50] 
+        plot (\x, {1.5*exp(-(\x-2.5)*(\x-2.5)/1.2)});
+    
+    \draw[dashed] (1,0) -- (1,3.5);
+    \draw[dashed] (4,0) -- (4,3.5);
+    
+    \node[below] at (2.5,-0.5) {\textbf{改善版}};
+    \node[below] at (2.5,-1) {\small $\sigma = 0.15$ (3倍)};
+\end{scope}
+
+\end{tikzpicture}
+\caption{g\_factorの事前分布緩和（B形式）}
+\label{fig:prior_relaxation}
+\end{figure}
+
+\subsection{改善点5: サンプリング設定強化}
+
+\begin{table}[h]
+\centering
+\caption{サンプリング設定の変更}
+\begin{tabular}{lccc}
+\toprule
+\textbf{設定} & \textbf{初版} & \textbf{改善版(H)} & \textbf{改善版(B)} \\
+\midrule
+draws & 4,000 & 6,000 & 8,000 \\
+tune & 2,000 & 3,000 & 4,000 \\
+chains & 8 & 10 & 12 \\
+合計サンプル & 32,000 & 60,000 & 96,000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+B形式はより探索困難であるため、さらに多くのサンプルを生成します。
+
+\subsection{改善点6: 尤度関数の改善}
+
+初版では全周波数点で同じ$\sigma$を使用していましたが、
+改善版では\textbf{重み付き領域ごとに異なる$\sigma$}を設定します。
+
+\begin{definition}
+重み$w_i$に応じた実効的ノイズ$\sigma_i^{\text{eff}}$:
+\begin{equation}
+\boxed{\sigma_i^{\text{eff}} = \frac{\sigma_0}{\sqrt{w_i}}}
+\end{equation}
+ここで$\sigma_0 = 0.02$は基準観測誤差。
+\end{definition}
+
+\begin{table}[h]
+\centering
+\caption{領域別の実効ノイズ}
+\begin{tabular}{lccc}
+\toprule
+\textbf{領域} & \textbf{重み $w$} & \textbf{$\sigma^{\text{eff}}$} & \textbf{意味} \\
+\midrule
+ポラリトン & 1.5 & $0.02/\sqrt{1.5} \approx 0.016$ & 厳しくフィット \\
+共振器モード & 1.0 & $0.02/\sqrt{1.0} = 0.02$ & 標準 \\
+背景 & 0.01 & $\min(0.02/\sqrt{0.01}, 0.2) = 0.2$ & 緩くフィット \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    \draw[->] (0,0) -- (10,0) node[right] {Frequency [THz]};
+    \draw[->] (0,0) -- (0,4.5) node[above] {$\sigma^{\text{eff}}$};
+    
+    % 領域の塗りつぶし
+    \fill[red!20] (0.5,0) rectangle (2.5,1.6);
+    \fill[gray!10] (2.5,0) rectangle (4.5,4);
+    \fill[cyan!20] (4.5,0) rectangle (9,2);
+    
+    % 実効σの値
+    \draw[thick, red] (0.5,1.6) -- (2.5,1.6);
+    \draw[thick, gray] (2.5,4) -- (4.5,4);
+    \draw[thick, blue] (4.5,2) -- (9,2);
+    
+    % 縦線
+    \draw[dashed] (2.5,0) -- (2.5,4.5);
+    \draw[dashed] (4.5,0) -- (4.5,4.5);
+    
+    % ラベル
+    \node at (1.5,0.8) {\small ポラリトン};
+    \node at (1.5,0.4) {\small $\sigma \approx 0.016$};
+    \node at (3.5,2.5) {\small 背景};
+    \node at (3.5,2.1) {\small $\sigma = 0.2$};
+    \node at (6.75,1.0) {\small 共振器};
+    \node at (6.75,0.6) {\small $\sigma = 0.02$};
+    
+    % 数値目盛り
+    \node[left] at (0,1.6) {\small 0.016};
+    \node[left] at (0,2) {\small 0.02};
+    \node[left] at (0,4) {\small 0.2};
+    
+\end{tikzpicture}
+\caption{領域別の実効ノイズ$\sigma^{\text{eff}}$}
+\label{fig:sigma_eff}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{H形式とB形式の事前分布比較}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+B形式はより探索困難であるため、H形式より広い事前分布を使用します。
+
+\begin{table}[h]
+\centering
+\caption{H形式とB形式の事前分布比較}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{パラメータ} & \textbf{H形式 $\sigma$} & \textbf{B形式 $\sigma$} & \textbf{H形式範囲} & \textbf{B形式範囲} \\
+\midrule
+g\_factor & 0.08 & 0.15 & [1.5, 2.2] & [1.5, 2.3] \\
+a\_scale & 3.0 & 5.0 & [1.0, 25.0] & [1.0, 25.0] \\
+B4 & 0.002 & 0.003 & [0.001, 0.020] & [0.001, 0.025] \\
+B6 & 0.0001 & 0.00015 & [$-$0.001, 0] & [$-$0.001, 0] \\
+eps\_bg & 1.0 & 1.5 & [10, 18] & [10, 20] \\
+gamma\_i & 50\%$\times\mu$ & 100\%$\times\mu$ & [0.001, 0.5] & [0.001, 0.6] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プログラムの処理フロー}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.7cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.6cm, 
+                      text centered, draw=black, fill=red!30, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=0.6cm, 
+                    text centered, draw=black, fill=orange!30, font=\small},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, 
+               minimum width=2.5cm, minimum height=0.6cm, text centered, draw=black, fill=blue!30, font=\small},
+    decision/.style={diamond, minimum width=1.5cm, minimum height=0.6cm, 
+                     text centered, draw=black, fill=green!30, font=\small, aspect=2},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (start) [startstop] {開始};
+\node (improve) [process, below=of start] {改善点の表示};
+\node (load) [io, below=of improve] {v6結果・データ読み込み};
+\node (sigma) [process, below=of load] {重み付きσ設定};
+
+\node (modelH) [process, below left=1cm and 1cm of sigma, fill=red!20] {H形式モデル構築\\（改善版事前分布）};
+\node (modelB) [process, below right=1cm and 1cm of sigma, fill=blue!20] {B形式モデル構築\\（大幅緩和版事前分布）};
+
+\node (mcmcH) [process, below=of modelH, fill=red!20] {MCMC\\(draws=6000, chains=10)};
+\node (mcmcB) [process, below=of modelB, fill=blue!20] {MCMC\\(draws=8000, chains=12)};
+
+\node (save) [io, below=1.5cm of $(mcmcH)!0.5!(mcmcB)$] {結果保存};
+\node (diag) [process, below=of save] {収束診断（ESS確認）};
+\node (end) [startstop, below=of diag] {終了};
+
+\draw [arrow] (start) -- (improve);
+\draw [arrow] (improve) -- (load);
+\draw [arrow] (load) -- (sigma);
+\draw [arrow] (sigma) -| (modelH);
+\draw [arrow] (sigma) -| (modelB);
+\draw [arrow] (modelH) -- (mcmcH);
+\draw [arrow] (modelB) -- (mcmcB);
+\draw [arrow] (mcmcH) |- (save);
+\draw [arrow] (mcmcB) |- (save);
+\draw [arrow] (save) -- (diag);
+\draw [arrow] (diag) -- (end);
+
+\end{tikzpicture}
+\caption{bayesian\_v6\_improved.pyの処理フロー}
+\label{fig:flow}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{出力ファイル}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+結果は\texttt{bayesian\_improved\_YYYYMMDD\_HHMMSS/}ディレクトリに保存されます。
+
+\begin{table}[h]
+\centering
+\caption{出力ファイル一覧}
+\begin{tabular}{ll}
+\toprule
+\textbf{ファイル名} & \textbf{内容} \\
+\midrule
+\texttt{trace\_H.nc} & H形式MCMCトレース（NetCDF形式） \\
+\texttt{trace\_B.nc} & B形式MCMCトレース \\
+\texttt{params\_H.json} & H形式の事後平均パラメータ \\
+\texttt{params\_B.json} & B形式の事後平均パラメータ \\
+\texttt{summary\_report.md} & 結果サマリー（Markdown） \\
+\texttt{plots/trace\_H.png} & H形式トレースプロット \\
+\texttt{plots/trace\_B.png} & B形式トレースプロット \\
+\texttt{plots/transmission\_comparison.png} & 透過スペクトル比較 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{改善効果の確認方法}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{ESS改善の確認}
+
+プログラム終了時に以下のようなESS診断が表示されます：
+
+\begin{lstlisting}
+【H形式 ESS】
+  ✅ g_factor: 3200
+  ✅ a_scale: 2800
+  ✅ B4: 3100
+  ✅ B6: 2900
+  ✅ eps_bg: 3500
+
+【B形式 ESS】
+  ✅ g_factor: 1800  (初版: 150 → 12倍改善)
+  ✅ a_scale: 2100
+  ✅ B4: 1500        (初版: 120 → 12倍改善)
+  ✅ B6: 2200
+  ✅ eps_bg: 2800
+\end{lstlisting}
+
+\subsection{下限張り付き解消の確認}
+
+トレースプロット（\texttt{trace\_H.png}, \texttt{trace\_B.png}）を確認し、
+事後分布が境界から離れていることを確認します。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% 初版（張り付き）
+\begin{scope}
+    \draw[->] (0,0) -- (5,0) node[right] {$a$};
+    \draw[->] (0,0) -- (0,3) node[above] {$P(a)$};
+    
+    \draw[thick, red] (0.5,2.5) -- (0.5,0);
+    \draw[thick, red, domain=0.5:4.5, samples=50] 
+        plot (\x, {2.5*exp(-2*(\x-0.5))});
+    
+    \draw[dashed] (0.5,0) -- (0.5,3) node[above] {\small 下限8.0};
+    
+    \node[below] at (2.5,-0.5) {\textbf{初版: 下限張り付き}};
+\end{scope}
+
+% 改善版
+\begin{scope}[xshift=8cm]
+    \draw[->] (0,0) -- (5,0) node[right] {$a$};
+    \draw[->] (0,0) -- (0,3) node[above] {$P(a)$};
+    
+    \draw[thick, blue, domain=0.5:4.5, samples=50] 
+        plot (\x, {2*exp(-(\x-2)*(\x-2)/0.5)});
+    
+    \draw[dashed] (0.3,0) -- (0.3,3) node[above] {\small 下限1.0};
+    
+    \node[below] at (2.5,-0.5) {\textbf{改善版: 正常な分布}};
+\end{scope}
+\end{tikzpicture}
+\caption{a\_scaleの事後分布比較}
+\label{fig:boundary}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{主要関数の説明}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{ImprovedModelOp}
+
+\begin{lstlisting}[language=Python]
+class ImprovedModelOp(Op):
+    """改善版モデルOp（PyTensorカスタムOp）"""
+    
+    def __init__(self, datasets, model_form='H'):
+        self.datasets = datasets
+        self.model_form = model_form
+    
+    def perform(self, node, inputs, output_storage):
+        """
+        物理モデル計算
+        
+        1. パラメータの安全性チェック（クリッピング）
+        2. 各データセットに対して:
+           - ハミルトニアン構築
+           - 感受率計算
+           - 比透磁率計算（H or B形式）
+           - 透過率計算
+        3. 全データセットの透過率を連結して返す
+        """
+\end{lstlisting}
+
+\subsection{load\_v6\_optimized\_params}
+
+\begin{lstlisting}[language=Python]
+def load_v6_optimized_params(model_form='H'):
+    """
+    v6最適化結果の読み込み
+    
+    Parameters
+    ----------
+    model_form : str
+        'H' または 'B'
+    
+    Returns
+    -------
+    params : dict
+        {'g': float, 'a': float, 'B4': float, 
+         'B6': float, 'eps': float, 'gamma': list}
+    
+    読み込み元:
+        global_fitting_results_{H|B}_v6/shared_gamma_params.json
+    """
+\end{lstlisting}
+
+\subsection{save\_summary\_report}
+
+\begin{lstlisting}[language=Python]
+def save_summary_report(trace_H, trace_B, params_H, params_B, results_dir):
+    """
+    サマリーレポート保存（Markdown形式）
+    
+    内容:
+    - 実行日時
+    - H形式/B形式ごとの:
+      - 事後分布統計（ArviZサマリー）
+      - 推定パラメータ値
+    
+    出力: summary_report.md
+    """
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{初版との比較表}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}[h]
+\centering
+\caption{初版と改善版の比較}
+\begin{tabular}{lcc}
+\toprule
+\textbf{項目} & \textbf{初版} & \textbf{改善版} \\
+\midrule
+a\_scale下限 & 8.0 & 1.0 \\
+gamma下限 & 0.005 & 0.001 \\
+B形式g\_factor σ & 0.05 & 0.15 \\
+B形式B4 σ & 0.0005 & 0.003 \\
+H形式draws & 4,000 & 6,000 \\
+B形式draws & 4,000 & 8,000 \\
+H形式chains & 8 & 10 \\
+B形式chains & 8 & 12 \\
+尤度σ & 固定 & 重み連動 \\
+\midrule
+期待されるESS改善 & --- & 5〜15倍 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{enumerate}
+    \item \textbf{目的}：収束診断で発見された問題を解決
+    
+    \item \textbf{主要な改善}：
+    \begin{itemize}
+        \item 事前分布の境界・幅を拡大（探索空間の拡大）
+        \item サンプリング設定を強化（より多くのサンプル）
+        \item 尤度関数を改善（重み連動$\sigma$）
+    \end{itemize}
+    
+    \item \textbf{H形式とB形式の差別化}：
+    \begin{itemize}
+        \item B形式はより広い事前分布
+        \item B形式はより多くのサンプル
+    \end{itemize}
+    
+    \item \textbf{期待される効果}：
+    \begin{itemize}
+        \item 下限張り付き問題の解消
+        \item ESS 5〜15倍改善
+        \item より信頼性の高い事後分布推定
+    \end{itemize}
+\end{enumerate}
+
+\begin{keypoint}
+MCMCの収束問題は、\textbf{事前分布の設計}と\textbf{サンプリング設定}の両方から
+アプローチすることが重要です。問題を診断し、適切に改善することで、
+信頼性の高いベイズ推定結果を得ることができます。
+\end{keypoint}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{付録：改善の数学的根拠}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{事前分布$\sigma$の拡大がESSに与える影響}
+
+MCMCの探索効率は、事後分布の形状に依存します。
+事前分布$\sigma$が狭すぎると：
+
+\begin{itemize}
+    \item 事後分布が狭い「谷」の形状になる
+    \item サンプラーが谷の中を往復するだけで、新しい領域を探索できない
+    \item 結果として自己相関が高くなり、ESSが低下
+\end{itemize}
+
+$\sigma$を拡大すると：
+
+\begin{itemize}
+    \item 事後分布がより広がる
+    \item サンプラーがより自由に探索できる
+    \item 自己相関が低下し、ESSが向上
+\end{itemize}
+
+\subsection{重み連動$\sigma$の理論的根拠}
+
+尤度関数：
+\begin{equation}
+\log P(D|\theta) = -\frac{1}{2} \sum_i \frac{(y_i - f_i(\theta))^2}{\sigma_i^2}
+\end{equation}
+
+$\sigma_i = \sigma_0 / \sqrt{w_i}$とすると：
+\begin{equation}
+\log P(D|\theta) = -\frac{1}{2\sigma_0^2} \sum_i w_i (y_i - f_i(\theta))^2
+\end{equation}
+
+これは\textbf{重み付き最小二乗法}と等価であり、
+物理的に重要な領域をより強くフィッティングします。
+
+\end{document}

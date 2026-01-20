@@ -1,0 +1,62 @@
+\chapter{磁気感受率テンソルの計算}
+\label{chap:appendix_F}
+本付録では, \ref{sec:linear_response}節で導出した磁気感受率テンソルの計算において, Zeeman準位の重ね合わせ準位による厳密な固有状態を用いて詳細に計算した結果を示す. 具体的には, 外部磁場下での\(\text{Gd}^{3+}\)イオンのスピン状態をZeeman準位\(\ket{m_S}\) (\(m_S = -7/2, -5/2, \ldots, 7/2\)) の線形結合として表現し, 磁気感受率テンソル\(\chi_{ij} (\omega)\)を求めた. これにより, 各固有状態がどのようなZeeman準位の重ね合わせで構成されているかを明らかにした.\\
+
+固有状態\(\ket{\psi_n}\)は, スピン\(s\)の磁気量子数\(m\)を用いて, 各準位\(\ket{m}\)の重ね合わせとして表される. すなわち, 
+\begin{equation}
+  \ket{\psi_n} = \sum_{m} c_{n,m} \ket{m} (m = -s, -s+1, \ldots, s-1, s)
+\end{equation} 
+である.
+
+磁気モーメント演算子\(\hat{d}_{i}\)はスピン演算子\(\hat{S}_{i}\)を用いて以下のように表される.
+\begin{equation}
+\langle m | \hat{d}_{i,j} | m' \rangle = \mu_{B} g \langle m | \hat{S}_{i,j} | m' \rangle
+\end{equation}
+
+また, スピン演算子は昇降演算子\(\hat{S}_{\pm}\)を用いて以下のように表される.
+\begin{equation*}
+\hat{S}_{x} = \frac{1}{2} (\hat{S}_{+} + \hat{S}_{-}), \quad \hat{S}_{y} = \frac{1}{2i} (\hat{S}_{+} - \hat{S}_{-}), \quad \hat{S}_{z} = m
+\end{equation*}
+以上より, 
+
+\begin{equation}
+\langle m | \hat{d}_{x} | m' \rangle = \frac{\mu_{B} g \hbar}{2} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} + \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+\end{equation}
+
+\begin{equation}
+\langle m | \hat{d}_{y} | m' \rangle = \frac{\mu_{B} g \hbar}{2i} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} - \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+\end{equation}
+
+計算の見通しを良くするために, 次のように\(F_{\pm}, K\)を定義する.
+
+\begin{align}
+F_{+} &= \sum_{m} C_{n,m} C_{n',m-1} \sqrt{(s + m)(s - m + 1)}, \\ 
+F_{-} &= \sum_{m} C_{n,m} C_{n',m+1}\sqrt{(s - m)(s + m + 1)}, \\
+F_z &= \sum_{m} C_{n,m} C_{n',m} m, \\
+K &= \left(\frac{\mu_{B} g \hbar}{2}\right)^2 
+\end{align}
+
+これらを用いると, 磁気モーメント演算子の各成分は以下のように表される.
+\begin{align}
+\langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle &= K (F_{+} + F_{-}), \\
+\langle \psi_{n} | \hat{d}_{y} | \psi _{n'} \rangle &= K (F_{+} - F_{-}), \\
+\langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle &= K F_z 
+\end{align}
+
+エルミート演算子の性質より, \(\langle \psi_{n'} | \hat{d}_{i} | \psi_{n} \rangle = \langle \psi_{n} | \hat{d}_{i} | \psi_{n'} \rangle^{*}\)であることに注意すると, 
+\begin{align}
+\langle \psi_{n'} | \hat{d}_{x} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle = K (F_{+} + F_{-}), \\
+\langle \psi_{n'} | \hat{d}_{y} | \psi _{n} \rangle &= \langle \psi_{n} | \hat{d}_{y} | \psi_{n'} \rangle = K (F_{+} - F_{-}), \\
+\langle \psi_{n'} | \hat{d}_{z} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle = K F_z
+\end{align}
+
+以上より, 磁気感受率テンソルの各成分は以下のように表される.
+\begin{align}
+\chi_{xx}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{zz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 F_z^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 F_z^2}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{xy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yx}(\omega) &= \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma + \Delta \omega} \}\notag \\ &= -\chi_{xy}(\omega), \\
+\chi_{xz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}, \\
+\chi_{yz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}
+\end{align}

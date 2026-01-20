@@ -1,16 +1,47 @@
 % Preamble (文書クラスやパッケージの読み込み)
 \documentclass[a4paper, 12pt, dvipdfmx]{jsbook}
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{physics}
-\usepackage{cite}
+% --- パッケージ設定 ---
+% \usepackage[top=25truemm,bottom=25truemm,left=25truemm,right=25truemm]{geometry} % 余白2.5cm
+\usepackage[T1]{fontenc} 
+\usepackage{textcomp} % (推奨) T1と一緒に使うと警告が減ります
+\usepackage{hyperref} % ハイパーリンク用
+
+% --- 数式用マクロ定義 ---
+\newcommand{\Ham}{\mathcal{H}}
+\newcommand{\kB}{k_{\vb*{B}}}
+\newcommand{\muB}{\mu_{\vb*{B}}}
+\newcommand{\muzero}{\mu_{0}}
+
+% 【重要】数式系パッケージ
+\usepackage{amsmath, amssymb} 
+\usepackage{bm}           % 太字ベクトル用
+\usepackage{physics}      % 【追加】量子力学用 (ket, bra, expval等)
+\usepackage{siunitx}      % 【追加】単位記述用 (例: \SI{10}{GHz})
+
+% 【重要】フォント系パッケージ
+\usepackage{newtxtext, newtxmath} % 英文・数式をTimes系にする
+\usepackage{graphicx}  % 画像挿入用
+\usepackage{secdot}    % セクション番号の後のドット
+
+% --- フォント・レイアウト調整 ---
+\usepackage{titlesec}
+\titleformat*{\section}{\gtfamily\bfseries\large}
+\titleformat*{\subsection}{\gtfamily\bfseries\normalsize}
+\usepackage{bm}
+\usepackage{geometry}
+\usepackage{tikz}
+\usetikzlibrary{arrows,arrows.meta, decorations.pathreplacing, calc, bending, shapes.geometric, positioning, fit, backgrounds}
+\usepackage{booktabs} % 表の罫線用
+\usepackage{url}
+\usepackage{multirow} % 表内での結合用
 % \includeonlyを使う場合はここに書く（後述）
 
 % 図の検索パスを指定しておくと便利
 \graphicspath{{figures/}}
 
-\title{$\mathrm{Gd_{3}Ga_{5}O_{12}}$のTHz磁気光学応答のベイズ統計的モデル比較に基づく超放射相転移の発現可能性の考察}
-\author{中尾 太一}
+% --- 文書情報 ---
+\title{\(\text{Gd}_{3}\text{Ga}_{5}\text{O}_{12}\)のTHz磁気光学応答のベイズ統計的モデル比較に基づく超放射相転移の発現可能性の考察}
+\author{24NC230 中尾 太一\\指導教員: 馬場 基彰}
 \date{\today}
 
 % Document Body
@@ -27,12 +58,22 @@
 \include{chapters/method}
 \include{chapters/results}
 \include{chapters/conclusion}
+\include{chapters/acknowledgments}
+% \include{chapters/thesis_chapter_bayes}
+% \include{chapters/thesis_chapter_v6_analysis}
 
 \appendix
 \include{chapters/appendix_A}
+\include{chapters/appendix_B}
+\include{chapters/appendix_D}
+\include{chapters/appendix_E}
+\include{chapters/appendix_C}
+\include{chapters/appendix_F}
+\include{chapters/appendix_G}
+\include{chapters/appendix_circular}
 
 \nocite{*}
-\bibliographystyle{junsrt}
+\bibliographystyle{naturemag} % 参考文献のスタイルを指定
 \bibliography{bib/reference} % .bibファイルのパスを正しく指定
 
 \end{document}

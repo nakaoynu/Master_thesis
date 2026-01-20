@@ -1,0 +1,38 @@
+{
+  "H_form": {
+    "model_name": "H-form",
+    "n_params": 40,
+    "mean_rhat": 1.00125,
+    "mean_ess": 22687.225,
+    "elpd_waic": -2965.9353437844525,
+    "se_waic": 166.1040554559338,
+    "p_waic": 61.84379956374845,
+    "has_waic": true,
+    "n_chains": 8,
+    "n_draws": 5000,
+    "total_samples": 40000
+  },
+  "B_form": {
+    "model_name": "B-form",
+    "n_params": 40,
+    "mean_rhat": 1.0175,
+    "mean_ess": 16767.85,
+    "elpd_waic": -3350.186470645739,
+    "se_waic": 162.70792626437682,
+    "p_waic": 78.44660803203003,
+    "has_waic": true,
+    "n_chains": 16,
+    "n_draws": 10000,
+    "total_samples": 160000
+  },
+  "comparison": {
+    "elpd_diff": 384.2511268612866,
+    "se_diff": 232.51758322363887,
+    "winner": "\u5f15\u304d\u5206\u3051",
+    "method": "WAIC"
+  },
+  "timestamp": "20260118_231153",
+  "sampler": "SMC",
+  "likelihood": "studentt",
+  "hierarchical_gamma": true
+}

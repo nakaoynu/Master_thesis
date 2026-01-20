@@ -1,0 +1,86 @@
+\documentclass[a4paper,11pt]{jsarticle}
+\usepackage[top=25truemm,bottom=25truemm,left=25truemm,right=25truemm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{physics} % 物理演算子用 (\ket, \bra, \dag, \grad etc.)
+\usepackage{bm}      % ベクトル太字用
+
+\title{磁場の量子化と磁気双極子相互作用の導出ノート}
+\author{量子光学研究ノート}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\subsection{序論}
+本ノートでは, キャビティ内電磁場を量子化し, その量子化磁場とスピン集団との相互作用ハミルトニアンを第一原理的に導出する. 特に, 超強結合（USC）領域において重要となる反回転項（Counter-rotating terms）が, 磁気双極子相互作用から自然に導かれる過程を明示する. 
+
+\subsection{電磁場の量子化}
+\subsubsection{ベクトルポテンシャルの導入}
+クーロンゲージ（\(\nabla \cdot \vb*{A} = 0\)）を採用し, 体積 \(V\) のキャビティ内における単一モードの電磁場を考える. 
+ベクトルポテンシャル \(\hat{\vb*{A}}(\vb*{r}, t)\) を, キャビティの固有モード関数 \(\vb*{u}(\vb*{r})\) を用いて以下のように量子化する. 
+\begin{equation}
+    \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} \vb*{u}(\vb*{r}) + \hat{a}^\dagger \vb*{u}^*(\vb*{r}) \right)
+\end{equation}
+ここで, \(\hat{a}, \hat{a}^\dagger\) はそれぞれ光子の消滅・生成演算子であり, 交換関係 \([\hat{a}, \hat{a}^\dagger] = 1\) を満たす. \(\omega_c\) はキャビティの共鳴角周波数である. 
+
+\subsubsection{磁場演算子の導出}
+磁束密度演算子 \(\hat{\vb*{B}}(\vb*{r})\) は, ベクトルポテンシャルの回転として定義される. 
+\begin{equation}
+    \hat{\vb*{B}}(\vb*{r}) = \nabla \times \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} (\nabla \times \vb*{u}(\vb*{r})) + \hat{a}^\dagger (\nabla \times \vb*{u}^*(\vb*{r})) \right)
+\end{equation}
+
+\subsubsection{ファラデー配置におけるモード設定}
+本実験系（ファラデー配置）に合わせ, 以下の幾何学的条件を設定する. 
+\begin{itemize}
+    \item 光の伝搬方向（波数ベクトル）: \(\vb*{k} \parallel z\)
+    \item 静磁場方向: \(\vb*{B}_{\text{DC}} \parallel z\)
+    \item キャビティモード: \(z\) 軸方向に定在波を形成する直線偏光モード
+\end{itemize}
+ここで, 磁場が \(x\) 軸方向に偏光している（\(\vb*{B} \parallel x\)）ようなモードを考える. 電磁波の横波性により電場は \(y\) 方向成分を持つため, ベクトルポテンシャルのモード関数を以下のように仮定できる. 
+\begin{equation}
+    \vb*{u}(\vb*{r}) = u(z) \vb*{e}_y
+\end{equation}
+これの回転をとると, 
+\begin{equation}
+    \nabla \times \vb*{u}(\vb*{r}) = \mqty|\vb*{e}_x & \vb*{e}_y & \vb*{e}_z \\ \partial_x & \partial_y & \partial_z \\ 0 & u(z) & 0| = -\frac{d u(z)}{dz} \vb*{e}_x
+\end{equation}
+となる. スピン集団が配置されている位置（例えば \(z=0\)）において磁場が腹（最大振幅）になると仮定し, その局所的な空間微分値を定数 \(C\) （無次元量のオーダー）として扱うと, 
+\begin{equation}
+    \hat{\vb*{B}} = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \frac{k c}{\omega_c} C (\hat{a} + \hat{a}^\dagger) \vb*{e}_x
+\end{equation}
+のように整理できる. ここで \(\omega_c = c k, c=\frac{1}{\sqrt{\epsilon_0 \mu_0}}\) の関係を用い, すべての定数を真空磁場揺らぎ振幅 \(B_{\text{vac}}\) に押し込めると, 最終的に以下の簡潔な形を得る. 
+\begin{equation}
+    \hat{\vb*{B}} = B_{\text{vac}} (\hat{a} + \hat{a}^\dagger) \vb*{e}_x, \quad B_{\text{vac}} \equiv C \sqrt{\frac{\hbar \omega_c \mu_0}{2V}}
+    \label{eq:B_field}
+\end{equation}
+これにより, 直線偏光モードの量子化磁場が定義された. 
+
+\subsection{磁気双極子相互作用}
+\subsubsection{ハミルトニアンの定義}
+\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) は, ゼーマン・エネルギーの形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = - \sum_{i=1}^N \hat{\boldsymbol{\mu}}_i \cdot \hat{\vb*{B}}
+\end{equation}
+磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_L \mu_B \hat{\vb*{S}}_i\) である（\(g_L\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = g_L \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
+\end{equation}
+
+\subsubsection{昇降演算子による展開と反回転項}
+スピン演算子の \(x\) 成分を昇降演算子 \(\hat{S}_\pm^i = \hat{S}_x^i \pm i \hat{S}_y^i\) を用いて \(\hat{S}_x^i = \frac{1}{2}(\hat{S}_+^i + \hat{S}_-^i)\) と書き換える. 
+さらに, 集団スピン演算子 \(\hat{J}_\pm = \sum_i \hat{S}_\pm^i\) を導入する. 
+\begin{align}
+    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_L \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
+    &= \frac{g_L \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{Rotating terms (RWA)}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{Counter-rotating terms}} \right]
+\end{align}
+この式変形により, エネルギー保存則を一見破るように見える項（光子生成かつスピン励起 \(\hat{a}^\dagger \hat{J}_+\), およびその逆過程）が自然に出現することがわかる. これらがUSC領域で重要となる反回転項である. 
+
+\subsection{結論：Dickeモデルハミルトニアン}
+単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_L \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g_{\text{eff}} = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g_{\text{eff}}}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-)
+\end{equation}
+ここで \(\omega_s\) は静磁場によるLarmor周波数である. 
+以上より, 直線偏光モードを持つキャビティ場とスピン系の磁気双極子相互作用から, 反回転項を含むDickeハミルトニアンが第一原理的に導出された. 
+
+\end{document}

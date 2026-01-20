@@ -1,0 +1,561 @@
+% filepath: test_hdi_plot_documentation.tex
+\documentclass[a4paper,12pt,dvipdfmx]{jlreq}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc, patterns}
+\usepackage{algorithm2e}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{multicol}
+
+% カラーボックス設定
+\newtcolorbox{keypoint}{colback=blue!5!white,colframe=blue!75!black,title=Key Point}
+\newtcolorbox{warning}{colback=red!5!white,colframe=red!75!black,title=注意}
+\newtcolorbox{definition}{colback=green!5!white,colframe=green!50!black,title=定義}
+\newtcolorbox{diagnostic}{colback=orange!5!white,colframe=orange!75!black,title=診断項目}
+
+\lstset{
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    breaklines=true,
+    frame=single
+}
+
+\title{\vspace{-2cm}
+\textbf{test\_hdi\_plot.py 理解ドキュメント}\\
+\large HDI信頼区間プロットの診断ツール
+}
+\author{物理工学専攻 修士論文解析用教材}
+\date{2026年1月版}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに：このプログラムの目的}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{keypoint}
+このプログラムは、ベイズ推定結果から計算される\textbf{HDI（Highest Density Interval）信頼区間}が
+正しく計算・描画されているかを診断するためのツールです。
+透過スペクトルの不確かさを可視化する際の問題を特定します。
+\end{keypoint}
+
+\subsection{背景：なぜこのツールが必要か？}
+
+ベイズ推定の重要な利点は、パラメータだけでなく\textbf{予測の不確かさ}も定量化できることです。
+しかし、以下の問題が発生することがあります：
+
+\begin{enumerate}
+    \item HDI区間の幅が極端に狭く、可視化できない
+    \item 事後分布の分散が小さすぎて、信頼区間が意味をなさない
+    \item プロットの線が重なって境界線が見えない
+\end{enumerate}
+
+\subsection{使用方法}
+
+\begin{lstlisting}[language=bash]
+python test_hdi_plot.py <結果ディレクトリ>
+
+# 例:
+python test_hdi_plot.py bayesian_results_v6_informed_HB_20260108_013540
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{HDI（Highest Density Interval）とは}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{定義}
+
+\begin{definition}
+\textbf{HDI（Highest Density Interval）}は、事後分布において確率密度が最も高い領域を
+囲む信頼区間です。95\% HDIは、事後分布の95\%の確率質量を含む最小幅の区間です。
+\end{definition}
+
+HDIは従来の\textbf{パーセンタイル区間}（2.5\%〜97.5\%）と類似していますが、
+非対称な分布では異なる結果を与えます。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.85]
+% 対称分布
+\begin{scope}
+    \draw[->] (0,0) -- (6,0) node[right] {$\theta$};
+    \draw[->] (0,0) -- (0,3.5) node[above] {$P(\theta)$};
+    
+    % 正規分布
+    \draw[thick, blue, domain=0.5:5.5, samples=50] 
+        plot (\x, {3*exp(-(\x-3)*(\x-3)/0.8)});
+    
+    % HDI区間
+    \fill[blue!20, domain=1.3:4.7, samples=50] 
+        (1.3,0) -- plot (\x, {3*exp(-(\x-3)*(\x-3)/0.8)}) -- (4.7,0) -- cycle;
+    
+    \draw[<->, thick, red] (1.3,0.2) -- (4.7,0.2);
+    \node[below, red] at (3,0) {\small 95\% HDI};
+    
+    \node[below] at (3,-0.7) {\textbf{対称分布}};
+    \node[below] at (3,-1.2) {\small HDI = パーセンタイル区間};
+\end{scope}
+
+% 非対称分布
+\begin{scope}[xshift=8cm]
+    \draw[->] (0,0) -- (6,0) node[right] {$\theta$};
+    \draw[->] (0,0) -- (0,3.5) node[above] {$P(\theta)$};
+    
+    % 歪んだ分布
+    \draw[thick, blue, domain=0.5:5.5, samples=50] 
+        plot (\x, {2.5*(\x-0.3)*exp(-0.7*(\x-0.3))});
+    
+    % HDI区間
+    \fill[blue!20, domain=0.8:3.8, samples=50] 
+        (0.8,0) -- plot (\x, {2.5*(\x-0.3)*exp(-0.7*(\x-0.3))}) -- (3.8,0) -- cycle;
+    
+    \draw[<->, thick, red] (0.8,0.2) -- (3.8,0.2);
+    \node[below, red] at (2.3,0) {\small 95\% HDI};
+    
+    \node[below] at (3,-0.7) {\textbf{非対称分布}};
+    \node[below] at (3,-1.2) {\small HDI $\neq$ パーセンタイル区間};
+\end{scope}
+\end{tikzpicture}
+\caption{対称分布と非対称分布におけるHDI}
+\label{fig:hdi}
+\end{figure}
+
+\subsection{透過スペクトルへの適用}
+
+各周波数点$\omega_i$において、事後サンプルから透過率$T(\omega_i)$を計算し、
+その分布の95\% HDIを求めます：
+
+\begin{equation}
+\boxed{
+\text{95\% HDI at } \omega_i = \left[ T_{2.5\%}(\omega_i), \; T_{97.5\%}(\omega_i) \right]
+}
+\end{equation}
+
+ここで$T_{p\%}$は$p$パーセンタイル値。
+
+\subsection{HDI帯の可視化}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    \draw[->] (0,0) -- (10,0) node[right] {Frequency [THz]};
+    \draw[->] (0,0) -- (0,5) node[above] {Transmittance};
+    
+    % HDI帯
+    \fill[red!20] 
+        plot[domain=0.5:9.5, samples=50] (\x, {3.5 + 0.8*sin(60*\x) + 0.3})
+        -- plot[domain=9.5:0.5, samples=50] (\x, {3.5 + 0.8*sin(60*\x) - 0.3})
+        -- cycle;
+    
+    % 下限境界線
+    \draw[dashed, red, thick] 
+        plot[domain=0.5:9.5, samples=50] (\x, {3.5 + 0.8*sin(60*\x) - 0.3});
+    
+    % 上限境界線
+    \draw[dashed, red, thick] 
+        plot[domain=0.5:9.5, samples=50] (\x, {3.5 + 0.8*sin(60*\x) + 0.3});
+    
+    % 平均線
+    \draw[thick, darkgray] 
+        plot[domain=0.5:9.5, samples=50] (\x, {3.5 + 0.8*sin(60*\x)});
+    
+    % データ点
+    \foreach \x in {1,2,...,9} {
+        \fill[blue] (\x, {3.5 + 0.8*sin(60*\x) + 0.15*rand}) circle (2pt);
+    }
+    
+    % 凡例
+    \node[right] at (6,4.8) {\small \textcolor{blue}{●} データ};
+    \node[right] at (6,4.4) {\small ─ 事後平均};
+    \node[right] at (6,4.0) {\small \textcolor{red}{- -} 95\% HDI境界};
+    \node[right] at (6,3.6) {\small \colorbox{red!20}{　} HDI帯};
+\end{tikzpicture}
+\caption{透過スペクトルのHDI可視化}
+\label{fig:hdi_spectrum}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{診断項目}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{診断される項目}
+
+\begin{table}[h]
+\centering
+\caption{HDI診断項目}
+\begin{tabular}{lll}
+\toprule
+\textbf{項目} & \textbf{健全な値} & \textbf{問題となる値} \\
+\midrule
+HDI幅の平均 & $> 0.01$ & $< 0.001$ \\
+HDI幅の最大 & $> 0.05$ & $< 0.01$ \\
+標準偏差の平均 & $> 0.005$ & $< 0.001$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{問題の原因と対処}
+
+\begin{diagnostic}
+\textbf{HDI幅が極端に狭い場合}（平均 $< 0.001$）
+
+原因：
+\begin{itemize}
+    \item 事前分布が狭すぎる（$\sigma$が小さい）
+    \item データの情報量が強すぎる（過度に制約される）
+    \item サンプル数が少なく、分散が過小評価されている
+\end{itemize}
+
+対処法：
+\begin{itemize}
+    \item 事前分布の$\sigma$を3〜5倍に拡大
+    \item より弱い情報的事前分布を使用
+    \item サンプル数を増やす（100 $\to$ 500〜1000）
+\end{itemize}
+\end{diagnostic}
+
+\begin{diagnostic}
+\textbf{HDI境界線が見えない場合}
+
+原因：
+\begin{itemize}
+    \item HDI幅が小さく、平均線と重なっている
+    \item 線の太さ（linewidth）が細すぎる
+    \item 色のコントラストが不足
+\end{itemize}
+
+対処法：
+\begin{itemize}
+    \item linewidthを2.0 $\to$ 3.0に増加
+    \item 破線スタイルを明確化
+    \item 色を濃くする
+\end{itemize}
+\end{diagnostic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プログラムの処理フロー}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.9cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.7cm, 
+                      text centered, draw=black, fill=red!30},
+    process/.style={rectangle, minimum width=4cm, minimum height=0.7cm, 
+                    text centered, draw=black, fill=orange!30},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, 
+               minimum width=2.5cm, minimum height=0.7cm, text centered, draw=black, fill=blue!30},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (start) [startstop] {開始};
+\node (load) [io, below=of start] {トレース・データ読み込み};
+\node (sample) [process, below=of load] {事後サンプル取得 (n=100)};
+\node (param) [process, below=of sample] {パラメータ統計表示};
+\node (calc) [process, below=of param] {各サンプルで透過スペクトル計算};
+\node (stat) [process, below=of calc] {統計量計算 (平均, SD, HDI)};
+\node (diag) [process, below=of stat] {診断判定};
+\node (plot) [io, below=of diag] {テストプロット生成};
+\node (end) [startstop, below=of plot] {終了};
+
+\draw [arrow] (start) -- (load);
+\draw [arrow] (load) -- (sample);
+\draw [arrow] (sample) -- (param);
+\draw [arrow] (param) -- (calc);
+\draw [arrow] (calc) -- (stat);
+\draw [arrow] (stat) -- (diag);
+\draw [arrow] (diag) -- (plot);
+\draw [arrow] (plot) -- (end);
+
+% 注釈
+\node[right=0.5cm of calc, align=left] {\small ループ処理\\(サンプル×周波数点)};
+
+\end{tikzpicture}
+\caption{test\_hdi\_plot.pyの処理フロー}
+\label{fig:flow}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{透過スペクトル計算}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{事後サンプルからの計算}
+
+各事後サンプル$s = 1, 2, \ldots, N_{\text{samples}}$について：
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{事後サンプル $\{\bm{\theta}^{(s)}\}$、周波数配列 $\{\omega_i\}$}
+\KwOut{透過スペクトルサンプル $\{T^{(s)}(\omega_i)\}$}
+
+\For{$s = 1$ \KwTo $N_{\text{samples}}$}{
+    パラメータ抽出: $g^{(s)}, a^{(s)}, B_4^{(s)}, B_6^{(s)}, \varepsilon^{(s)}, \gamma^{(s)}$\;
+    
+    ハミルトニアン構築: $\hat{H}^{(s)} = \hat{H}_{\text{CF}}(B_4^{(s)}, B_6^{(s)}) + \hat{H}_{\text{Zee}}(g^{(s)}, B)$\;
+    
+    感受率計算: $\chi^{(s)}(\omega) = \text{calculate\_susceptibility}(\omega, \hat{H}^{(s)}, T, \gamma^{(s)})$\;
+    
+    透過率計算: $T^{(s)}(\omega) = \text{calculate\_transmission}(\omega, \chi^{(s)}, \varepsilon^{(s)})$\;
+}
+
+\Return{$\{T^{(s)}(\omega_i)\}_{s,i}$}
+\caption{透過スペクトルの事後サンプル計算}
+\end{algorithm}
+
+\subsection{統計量の計算}
+
+各周波数点$\omega_i$において：
+
+\begin{align}
+\text{事後平均}: \quad & \bar{T}(\omega_i) = \frac{1}{N} \sum_{s=1}^{N} T^{(s)}(\omega_i) \\
+\text{標準偏差}: \quad & \text{SD}(\omega_i) = \sqrt{\frac{1}{N-1} \sum_{s=1}^{N} (T^{(s)}(\omega_i) - \bar{T}(\omega_i))^2} \\
+\text{HDI下限}: \quad & T_{2.5\%}(\omega_i) = \text{percentile}(\{T^{(s)}(\omega_i)\}, 2.5) \\
+\text{HDI上限}: \quad & T_{97.5\%}(\omega_i) = \text{percentile}(\{T^{(s)}(\omega_i)\}, 97.5) \\
+\text{HDI幅}: \quad & \Delta T(\omega_i) = T_{97.5\%}(\omega_i) - T_{2.5\%}(\omega_i)
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{生成されるテストプロット}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+出力ファイル: \texttt{plots/hdi\_test\_diagnostic.png}
+
+\subsection{4パネル構成}
+
+\begin{enumerate}
+    \item \textbf{全体図}（左上）
+    \begin{itemize}
+        \item データ点（灰色○）
+        \item 95\% HDI帯（薄赤の塗りつぶし）
+        \item HDI下限・上限（赤破線）
+        \item 事後平均（濃赤実線）
+    \end{itemize}
+    
+    \item \textbf{HDI幅の周波数依存性}（右上）
+    \begin{itemize}
+        \item $\Delta T(\omega)$ vs $\omega$
+        \item 平均HDI幅を赤破線で表示
+    \end{itemize}
+    
+    \item \textbf{標準偏差の周波数依存性}（左下）
+    \begin{itemize}
+        \item SD$(\omega)$ vs $\omega$
+        \item 平均SDを赤破線で表示
+    \end{itemize}
+    
+    \item \textbf{拡大図}（右下）
+    \begin{itemize}
+        \item 0.25〜0.35 THz領域を拡大
+        \item HDI境界線の視認性確認
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.6]
+% 4パネルレイアウト
+\draw[thick] (0,0) rectangle (6,4);
+\draw[thick] (7,0) rectangle (13,4);
+\draw[thick] (0,-5) rectangle (6,-1);
+\draw[thick] (7,-5) rectangle (13,-1);
+
+% ラベル
+\node at (3,3.5) {\small \textbf{全体図}};
+\node at (10,3.5) {\small \textbf{HDI幅}};
+\node at (3,-1.5) {\small \textbf{標準偏差}};
+\node at (10,-1.5) {\small \textbf{拡大図}};
+
+% 簡易的な図示
+% 全体図
+\draw[gray!50] (0.5,1) -- (5.5,1);
+\fill[red!20] (0.5,1.5) -- (5.5,1.8) -- (5.5,2.2) -- (0.5,2.5) -- cycle;
+\draw[red, dashed] (0.5,1.5) -- (5.5,1.8);
+\draw[red, dashed] (0.5,2.5) -- (5.5,2.2);
+\draw[darkgray, thick] (0.5,2) -- (5.5,2);
+
+% HDI幅
+\draw[blue] (7.5,2) sin (8.5,2.5) cos (9.5,2) sin (10.5,2.5) cos (11.5,2) sin (12.5,2.5);
+\draw[red, dashed] (7.5,2.2) -- (12.5,2.2);
+
+% 標準偏差
+\draw[green!60!black] (0.5,-3) sin (1.5,-2.5) cos (2.5,-3) sin (3.5,-2.5) cos (4.5,-3) sin (5.5,-2.5);
+\draw[red, dashed] (0.5,-2.8) -- (5.5,-2.8);
+
+% 拡大図
+\fill[red!20] (7.5,-2.5) rectangle (12.5,-3.5);
+\draw[red, dashed, thick] (7.5,-2.5) -- (12.5,-2.5);
+\draw[red, dashed, thick] (7.5,-3.5) -- (12.5,-3.5);
+\draw[darkgray, thick] (7.5,-3) -- (12.5,-3);
+
+\end{tikzpicture}
+\caption{テストプロットの4パネル構成}
+\label{fig:panels}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{診断結果の解釈}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{正常な場合}
+
+\begin{lstlisting}
+🔍 診断結果
+======================================================================
+✅ HDI区間は正しく計算されています
+✅ 破線は描画されていますが、HDI幅が非常に狭いため
+   平均値の線と重なって見えにくい可能性があります
+\end{lstlisting}
+
+この場合、計算は正しく行われており、HDI幅が狭いのは
+事後分布の分散が小さいためです。物理的に意味がある結果かもしれません。
+
+\subsection{問題がある場合}
+
+\begin{lstlisting}
+🔍 診断結果
+======================================================================
+⚠️ HDI幅が極端に狭い（平均 < 0.001）
+   → 事後分布の分散が小さすぎる可能性があります
+   → 事前分布が狭すぎるか、データの情報量が強すぎる可能性
+⚠️ 標準偏差が極端に小さい（平均 < 0.001）
+   → サンプル間の揺らぎがほとんどない
+
+問題が検出されました:
+  ⚠️ HDI幅が極端に狭い（平均 < 0.001）
+  ⚠️ 標準偏差が極端に小さい（平均 < 0.001）
+\end{lstlisting}
+
+\subsection{推奨事項}
+
+問題がある場合の対処法：
+
+\begin{enumerate}
+    \item \textbf{事前分布の$\sigma$を拡大}（3〜5倍）
+    \begin{lstlisting}[language=Python]
+# 変更前
+sigma=0.05
+# 変更後
+sigma=0.15  # 3倍に拡大
+    \end{lstlisting}
+    
+    \item \textbf{サンプル数を増加}
+    \begin{lstlisting}[language=Python]
+# 変更前
+n_samples=100
+# 変更後
+n_samples=500  # 5倍に増加
+    \end{lstlisting}
+    
+    \item \textbf{プロットの線幅を増加}
+    \begin{lstlisting}[language=Python]
+# 変更前
+linewidth=2.0
+# 変更後
+linewidth=3.0
+    \end{lstlisting}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{主要関数の説明}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{calculate\_transmission\_for\_params}
+
+\begin{lstlisting}[language=Python]
+def calculate_transmission_for_params(freq, B, T, g, a, B4, B6, 
+                                       eps, gamma_array, model_form='H'):
+    """
+    指定パラメータで透過スペクトルを計算
+    
+    Parameters
+    ----------
+    freq : array
+        周波数配列 [THz]
+    B : float
+        磁場 [T]
+    T : float
+        温度 [K]
+    g, a, B4, B6, eps : float
+        物理パラメータ
+    gamma_array : array
+        7個の緩和率 [THz]
+    model_form : str
+        'H' または 'B'
+    
+    Returns
+    -------
+    trans : array
+        透過率配列
+    """
+\end{lstlisting}
+
+\subsection{test\_hdi\_calculation}
+
+\begin{lstlisting}[language=Python]
+def test_hdi_calculation(results_dir, n_samples=100):
+    """
+    HDI区間の計算と統計を確認
+    
+    処理内容:
+    1. トレース読み込み
+    2. 事後サンプル取得
+    3. パラメータ統計表示
+    4. 透過スペクトル計算（各サンプル）
+    5. 統計量計算（平均、SD、HDI）
+    6. 診断判定
+    7. テストプロット生成
+    
+    出力:
+    - コンソールへの診断結果
+    - plots/hdi_test_diagnostic.png
+    """
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{enumerate}
+    \item \textbf{目的}：HDI信頼区間の計算・描画が正しいかを診断
+    
+    \item \textbf{診断項目}：
+    \begin{itemize}
+        \item HDI幅の統計（最小、最大、平均）
+        \item 標準偏差の統計
+        \item 特定周波数点でのサンプル分布
+    \end{itemize}
+    
+    \item \textbf{出力}：
+    \begin{itemize}
+        \item 4パネル診断プロット
+        \item コンソール診断レポート
+    \end{itemize}
+    
+    \item \textbf{典型的な問題と対処}：
+    \begin{itemize}
+        \item HDI幅が狭すぎる → 事前分布$\sigma$を拡大
+        \item 境界線が見えない → 線幅を増加
+    \end{itemize}
+\end{enumerate}
+
+\begin{keypoint}
+HDI信頼区間は、ベイズ推定の重要な成果物です。
+可視化に問題がある場合は、このツールで原因を特定し、
+適切な対処を行ってください。
+\end{keypoint}
+
+\end{document}

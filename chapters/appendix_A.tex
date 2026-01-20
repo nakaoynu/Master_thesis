@@ -1,0 +1,116 @@
+\chapter{No-go定理}
+\label{chap:appendix_A}
+
+\section{Dicke模型におけるNo-go定理の詳細導出}
+\label{appendix:no-go-theorem}
+
+本付録では, Rz{\k{a}}{\.z}ewski et al. (1975) \(^{\cite{Rzazewski1975}}\) に基づき, キャビティQED系におけるSRPTに対するNo-go定理の導出を行う. 
+
+\subsection{最小結合ハミルトニアンと\(A^2\)項}
+
+電磁場と相互作用する\(N\)個の原子（荷電粒子系）を考える. 非相対論的な量子力学において, 系全体のハミルトニアンは最小結合原理\(\vb*{p} \to \vb*{p} - e\vb*{A}\) に基づき, 以下のように記述される. 
+
+\begin{equation}
+    \hat{\mathcal{H}} = \sum_{j=1}^{N} \frac{1}{2m} \left( \vb*{p}_j - e\vb*{A}(\vb*{r}_j) \right)^2 + V_{\text{atomic}} + \hat{\mathcal{H}}_{\text{field}}
+\end{equation}
+
+ここで, \(\vb*{p}_j\) は粒子の運動量, \(e\) は電荷, \(m\) は質量, \(\vb*{A}(\vb*{r}_j)\) は位置 \(\vb*{r}_j\) におけるベクトルポテンシャル, \(V_{\text{atomic}}\) は原子核による束縛ポテンシャル, \(\hat{\mathcal{H}}_{\text{field}}\) は自由電磁場のハミルトニアンである. 
+クーロンゲージ \(\nabla \cdot \vb*{A} = 0\) を採用し, 単一モード近似を行うと, ベクトルポテンシャルは以下のように書ける. 
+
+\begin{equation}
+    \vb*{A}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega V}} \boldsymbol{\epsilon} \left( a + a^\dagger \right)
+\end{equation}
+
+ここで, \(V\) は量子化体積, \(\omega\) はキャビティ周波数, \(\boldsymbol{\epsilon}\) は偏光ベクトル, \(a, a^\dagger\) は光子の生成消滅演算子である. 
+ハミルトニアンの運動エネルギー項を展開すると, 以下の3つの項が現れる. 
+
+\begin{equation}
+    \frac{1}{2m} (\vb*{p} - e\vb*{A})^2 = \frac{\vb*{p}^2}{2m} - \frac{e}{m} \vb*{p} \cdot \vb*{A} + \frac{e^2}{2m} \vb*{A}^2
+\end{equation}
+
+通常のDicke模型の導出では, 第2項（相互作用項 \(\vb*{p} \cdot \vb*{A}\)）のみを考慮し, 第3項（\(A^2\)項, 反磁性項）を無視する近似が行われることが多い. しかし, Rz{\k{a}}{\.z}ewskiらは, この\(A^2\)項が相転移の議論において決定的な役割を果たすことを指摘した. 
+
+\subsection{Thomas-Reiche-Kuhn (TRK) 総和則}
+
+No-go定理の核心は, 原子の遷移双極子モーメントとエネルギー準位の間に成立するThomas-Reiche-Kuhn (TRK) 総和則である. 
+\(x\)方向の双極子モーメント演算子を \(\mu = ex\) とし, 基底状態 \(|0\rangle\) から励起状態 \(|n\rangle\) への遷移エネルギーを \(\hbar \omega_{n0} = E_n - E_0\) とすると, TRK総和則は以下で与えられる. 
+
+\begin{equation}
+    \sum_{n} \hbar \omega_{n0} |\langle n | \mu | 0 \rangle|^2 = \frac{\hbar^2 e^2}{2m}
+    \label{eq:TRK_sum_rule}
+\end{equation}
+
+2準位近似を行う場合でも, この総和則の物理的制約（全振動子強度の保存）を破ってはならない. 
+
+\subsection{相転移の条件と矛盾の証明}
+
+Dicke模型においてSRPTが起こる条件は, 有効的な原子-光相互作用の強さが, ある閾値を超えることである. 平均場近似において, その不安定化条件は, 繰り込まれた光子エネルギーがゼロになる点として記述できる. 
+
+\(A^2\)項を含むハミルトニアンをボゾン演算子で整理すると, 以下の形になる. 
+
+\begin{equation}
+    \hat{\mathcal{H}} \approx \hbar \omega a^\dagger a + \sum_{j} \hbar \omega_0 \sigma_j^z + \frac{\lambda}{\sqrt{N}} (a + a^\dagger) \sum_{j} \sigma_j^x + N \kappa (a + a^\dagger)^2
+\end{equation}
+
+ここで, \(\lambda\) は結合定数, \(\kappa\) は \(A^2\)項に由来する係数である. \(A^2\)項は \((a+a^\dagger)^2\) に比例するため, 実質的にキャビティ光子の周波数を上昇させる寄与を持つ. 
+\(A^2\)項の係数 \(N\kappa\) は, 定義より以下のように書ける. 
+
+\begin{equation}
+    N \kappa = N \frac{e^2}{2m} \frac{\hbar}{2\epsilon_0 \omega V} = \frac{N e^2 \hbar}{4 m \epsilon_0 \omega V}
+\end{equation}
+
+一方で, 結合定数 \(\lambda\) は双極子モーメント \(\mu_{10}\) を用いて以下のように表される. 
+
+\begin{equation}
+    \lambda = \omega_{10} \mu_{10} \sqrt{\frac{\hbar}{2\epsilon_0 \omega V}} \sqrt{N}
+\end{equation}
+※ ここでの \(\lambda\) の定義は文献により係数が異なる場合があるが, 物理的本質は変わらない. ここでは \(\vb*{p}\cdot\vb*{A}\) 相互作用からの標準的な導出に従う. 
+
+システムが不安定化し, 相転移を起こすための条件（ヘシアン行列の行列式が負, あるいは励起エネルギーが虚数になる条件）は, 一般に以下の不等式で表される. 
+
+\begin{equation}
+    \Omega_{\text{eff}}^2 < 0 \quad \iff \quad \frac{4\lambda^2}{\hbar \omega_0} > \hbar \omega + 4 N \kappa
+    \label{eq:instability_condition}
+\end{equation}
+
+左辺は原子による引力的な相互作用（不安定化要因）, 右辺は光子エネルギーと\(A^2\)項による斥力的な寄与（安定化要因）を表す. 
+ここで, TRK総和則（式 \ref{eq:TRK_sum_rule}）を2準位系に適用した場合の不等式 \(\omega_{10} |\mu_{10}|^2 \le \frac{\hbar e^2}{2m}\) を考慮する. 
+（多準位系において特定の遷移のみを取り出した場合, 振動子強度は総和則の一部しか占めないため, 一般に不等号となる）. 
+
+この関係式を用いて, 式(\ref{eq:instability_condition})の左辺（相互作用項）の上限を見積もると, 
+
+\begin{equation}
+    \frac{4\lambda^2}{\hbar \omega_0} \approx \frac{4N}{\hbar \omega_{10}} \left( \omega_{10} \mu_{10} \sqrt{\frac{\hbar}{2\epsilon_0 \omega V}} \right)^2 
+    = \frac{2N \omega_{10} \mu_{10}^2}{\epsilon_0 \omega V} 
+    \le \frac{2N}{\epsilon_0 \omega V} \frac{\hbar e^2}{2m} 
+    = 4 \left( \frac{N e^2 \hbar}{4 m \epsilon_0 \omega V} \right) 
+    = 4 N \kappa
+\end{equation}
+
+となる. すなわち, 相互作用項の大きさは, 必ず\(A^2\)項によるエネルギー上昇項 \(4N\kappa\) よりも小さいか, 等しい（等号は全振動子強度がその遷移に集中している場合）. 
+
+\begin{equation}
+    \frac{4\lambda^2}{\hbar \omega_0} \le 4N\kappa < \hbar \omega + 4N\kappa
+\end{equation}
+
+これにより, 不安定化条件（式 \ref{eq:instability_condition}）は決して満たされないことが証明される. 
+つまり, \(A^2\)項を正しく考慮し, かつTRK総和則が成立する系（自由空間や通常のキャビティQED系）においては, 基底状態は常に安定であり, SRPTは禁止される. 
+この物理的な状況を視覚化したものを図\ref{fig:potential_landscape}に示す. \(A^2\)項を無視すると（赤破線）, 相互作用により実効ポテンシャルの曲率が負になり対称性の破れ（相転移）が生じるように見えるが, \(A^2\)項を含めると（青実線）, ポテンシャルは常に原点に極小値を持つ安定な形状となる. 
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/nogo_potential.png}
+    \caption{
+    平均場近似における系の有効ポテンシャルエネルギー \(V(\alpha)\) の概略図. 横軸 \(\alpha\) は秩序変数（キャビティ場の振幅）を表す. 
+    (a) \(A^2\)項を無視した場合（赤破線）：結合定数が閾値を超えると原点が不安定化し, 有限の振幅を持つ超放射相が現れる. 
+    (b) \(A^2\)項を考慮した場合（青実線）：TRK総和則の制約により, \(A^2\)項によるくりこみが相互作用による軟化を上回り, 原点（真空状態）が常に安定となる. 
+    }
+    \label{fig:potential_landscape}
+\end{figure}
+
+\subsection{No-go定理の適用限界と近年の展開}
+
+上述のNo-go定理は, 自然界の原子と電磁場が最小結合原理に従うことを前提としている. しかし, 近年発展が著しい超伝導回路を用いた量子電気力学などの「人工原子」系においては, この限りではないという議論がなされている. 
+
+自然原子におけるTRK総和則は, 電子の質量 \(m\) と電荷 \(e\) によって厳密に規定されるが, 超伝導回路においては, ジョセフソン接合の幾何学的パラメータによって「有効質量」や「振動子強度」を設計可能である. 特に, フラックスキュビットなどをドレスト状態基底で記述した場合, 系のアニールパラメータやトポロジーに依存して, No-go定理の前提となる総和則の制約を回避できるモデルが提案されている\(^{\cite{Nataf2010}}\). 
+したがって, 本論文で議論するNo-go定理は, あくまで標準的な共振器QED系に対する強力な制約であり, 工学的に設計された特殊なハミルトニアン系においては, 平衡状態超放射相転移の観測の可能性が残されている点に留意する必要がある. 

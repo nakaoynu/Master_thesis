@@ -1,0 +1,331 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 解析方法の章
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{解析方法_bayes}
+
+\section{ベイズ階層モデルによるパラメータ推定}
+
+本研究では、Gd$_3$Ga$_5$O$_{12}$（GGG）における磁気ポラリトン透過スペクトルの解析にベイズ統計的手法を適用した。
+従来の最小二乗法によるフィッティングでは、パラメータ間の相関やモデルの不確実性を定量的に評価することが困難であったが、
+ベイズ推定を用いることで事後分布を通じてこれらの情報を得ることが可能となる。
+
+\subsection{モデル形式}
+
+磁気ポラリトン透過スペクトルの理論計算において、結晶場ハミルトニアンの表記形式として2種類のモデルを検討した：
+
+\begin{itemize}
+    \item \textbf{H形式}：標準的なStevens演算子表記
+    \begin{equation}
+        \mathcal{H}_{\mathrm{CF}} = B_4 (O_4^0 + 5O_4^4) + B_6 (O_6^0 - 21O_6^4)
+    \end{equation}
+    
+    \item \textbf{B形式}：係数を分離した表記
+    \begin{equation}
+        \mathcal{H}_{\mathrm{CF}} = B_4^0 O_4^0 + B_4^4 O_4^4 + B_6^0 O_6^0 + B_6^4 O_6^4
+    \end{equation}
+\end{itemize}
+
+両形式において、ゼーマン項は以下のように表される：
+\begin{equation}
+    \mathcal{H}_{\mathrm{Zee}} = g \mu_B B_{\mathrm{ext}} S_z
+\end{equation}
+
+ここで、$g$はg因子、$\mu_B$はボーア磁子、$B_{\mathrm{ext}}$は外部磁場、$S_z$はスピン演算子のz成分である。
+
+\subsection{階層的$\gamma$モデル}
+
+7つのスピン遷移（$S=7/2$系における$2S=7$本の遷移）に対応する減衰定数$\gamma_i$（$i=1,\ldots,7$）について、
+階層ベイズモデルを導入した。これにより、個々の$\gamma_i$が完全に独立ではなく、
+共通のハイパーパラメータ$\gamma_{\mathrm{mean}}$および$\gamma_{\mathrm{std}}$から生成されるという構造を仮定した：
+
+\begin{align}
+    \gamma_{\mathrm{mean}} &\sim \mathrm{TruncNormal}(\mu=0.095\ \mathrm{THz}, \sigma=0.071\ \mathrm{THz}, \mathrm{lower}=0) \\
+    \gamma_{\mathrm{std}} &\sim \mathrm{HalfNormal}(\sigma=0.03\ \mathrm{THz}) \\
+    \gamma_i &\sim \mathrm{TruncNormal}(\mu=\gamma_{\mathrm{mean}}, \sigma=\gamma_{\mathrm{std}}, \mathrm{lower}=0.005, \mathrm{upper}=0.5)
+\end{align}
+
+この部分プーリング（partial pooling）により、$\gamma$パラメータの識別不能性問題を緩和しつつ、
+各遷移の固有の減衰特性を捉えることが可能となった。
+
+\subsection{事前分布の設定}
+
+表\ref{tab:prior_distributions}に各パラメータの事前分布設定を示す。
+事前分布は物理的制約および先行研究の結果に基づいて設定した。
+
+\begin{table}[htbp]
+\centering
+\caption{ベイズ推定における事前分布の設定}
+\label{tab:prior_distributions}
+\begin{tabular}{lll}
+\hline
+パラメータ & 分布型 & 設定根拠 \\
+\hline
+$g$ & TruncNormal($\mu=2.0$, $\sigma=0.05$) & Gd$^{3+}$理論値$g\approx 2.0$ \\
+$a$ & HalfNormal($\sigma=5.0$) & 低値優先、上限10 \\
+$B_4$ & LogNormal & 正値保証、上限50 mK \\
+$B_6$ & Normal($\mu=0$, $\sigma=0.001$) & ゼロ中心対称、範囲$\pm$2 mK \\
+$\varepsilon_{\mathrm{bg}}$ & TruncNormal($\mu=13.8$, $\sigma=0.3$) & v6推定値を参照 \\
+$\gamma_{\mathrm{mean}}$ & TruncNormal($\mu=0.095$, $\sigma=0.071$) & v6 shared-$\gamma$結果 \\
+$\gamma_{\mathrm{std}}$ & HalfNormal($\sigma=0.03$) & $\gamma$間ばらつき \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{尤度関数}
+
+外れ値に対する頑健性を確保するため、正規分布の代わりにStudent-t分布（自由度$\nu=4$）を尤度関数として採用した：
+
+\begin{equation}
+    p(y_{\mathrm{obs}} | \theta) = \prod_{k=1}^{N_{\mathrm{data}}} \prod_{i=1}^{N_{\mathrm{freq}}} 
+    w_{k,i} \cdot \mathrm{StudentT}(y_{\mathrm{obs},k,i} | \nu=4, \mu=T_{\mathrm{model}}(\omega_i; \theta), \sigma)
+\end{equation}
+
+ここで、$w_{k,i}$は周波数依存の重みであり、以下のように設定した：
+\begin{itemize}
+    \item ポラリトン領域：$w=2.0$
+    \item 高次共振器領域：$w=1.0$
+    \item その他の領域：$w=0.01$
+\end{itemize}
+
+\subsection{サンプリング手法}
+
+事後分布からのサンプリングには、Sequential Monte Carlo（SMC）法を採用した。
+SMCはマルチモーダルな事後分布や複雑な相関構造を持つ問題に対して優れた収束性を示す。
+
+サンプリングパラメータは以下の通りである：
+\begin{itemize}
+    \item サンプル数（Draws）：5,000
+    \item チェーン数（Chains）：8
+    \item 総サンプル数：40,000
+\end{itemize}
+
+\subsection{モデル評価指標}
+
+H形式とB形式の比較のため、以下の2つの情報量規準を計算した：
+
+\subsubsection{WAIC（Widely Applicable Information Criterion）}
+
+WAICは対数尤度の事後分布を用いて計算される情報量規準であり、
+有効パラメータ数$p_{\mathrm{WAIC}}$による過学習の補正を含む：
+
+\begin{equation}
+    \mathrm{WAIC} = -2 \times \mathrm{ELPD}_{\mathrm{WAIC}}
+\end{equation}
+
+ここで、ELPD（Expected Log Pointwise Predictive Density）は対数点予測密度の期待値である。
+
+\subsubsection{PSIS-LOO（Pareto Smoothed Importance Sampling Leave-One-Out Cross-Validation）}
+
+PSIS-LOOは重点サンプリングを用いて効率的にLeave-One-Out交差検証を近似する手法である：
+
+\begin{equation}
+    \mathrm{LOO} = -2 \times \mathrm{ELPD}_{\mathrm{LOO}}
+\end{equation}
+
+PSIS-LOOの信頼性はPareto $k$診断により評価され、$k < 0.5$が理想的、$k < 0.7$が許容範囲とされる。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 結果と考察の章
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{結果と考察}
+
+\section{ベイズ推定によるパラメータ推定結果}
+
+\subsection{収束診断}
+
+表\ref{tab:convergence_diagnostics}にH形式およびB形式の収束診断結果を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{収束診断結果のサマリー}
+\label{tab:convergence_diagnostics}
+\begin{tabular}{lcc}
+\hline
+指標 & H形式 & B形式 \\
+\hline
+パラメータ数 & 17 & 17 \\
+平均$\hat{R}$ & 1.135 & 1.001 \\
+平均ESS（有効サンプル数） & 8,397 & 34,292 \\
+総サンプル数 & 40,000 & 40,000 \\
+\hline
+\end{tabular}
+\end{table}
+
+B形式では平均$\hat{R}=1.001$と良好な収束を示したのに対し、
+H形式では一部のパラメータ（特に$\gamma_4$, $\gamma_6$など）で$\hat{R} > 1.1$となり、
+収束が不十分であることが確認された。
+有効サンプル数（ESS）もB形式が約4倍大きく、サンプリング効率においてB形式が優れていた。
+
+\subsection{推定パラメータ値}
+
+表\ref{tab:estimated_parameters}に両形式で推定された物理パラメータの事後分布のサマリーを示す。
+
+\begin{table}[htbp]
+\centering
+\caption{推定パラメータ値（事後分布の平均値および94\% HDI）}
+\label{tab:estimated_parameters}
+\begin{tabular}{lccc}
+\hline
+パラメータ & H形式 & B形式 & 理論値/文献値 \\
+\hline
+$g$因子 & $1.907 \pm 0.005$ & $2.028 \pm 0.002$ & $\approx 2.0$ \\
+$a$（スケール） & $8.60 \pm 0.14$ & $7.37 \pm 0.09$ & -- \\
+$B_4$ [mK] & $8.34 \pm 20.0$ & $2.94 \pm 6.5$ & $\sim 10$ mK \\
+$B_6$ [mK] & $0.002 \pm 1.0$ & $-0.002 \pm 1.0$ & $\sim 0$ mK \\
+$\varepsilon_{\mathrm{bg}}$ & $13.79 \pm 0.01$ & $13.84 \pm 0.01$ & $\approx 14$ \\
+$\gamma_{\mathrm{mean}}$ [THz] & $0.060 \pm 0.029$ & $0.099 \pm 0.032$ & $\sim 0.1$ \\
+$\gamma_{\mathrm{std}}$ [THz] & $0.077 \pm 0.018$ & $0.077 \pm 0.020$ & -- \\
+\hline
+\end{tabular}
+\end{table}
+
+B形式で推定された$g$因子（$g = 2.028$）はGd$^{3+}$イオンの理論値（$g \approx 2.0$）とよく一致した。
+一方、H形式では$g = 1.907$とやや小さい値が得られた。
+これはH形式における収束の問題と関連している可能性がある。
+
+結晶場パラメータ$B_4$については、両形式とも$\sim 10$ mK程度のオーダーで推定されたが、
+不確実性が大きく、より精密な決定には追加のデータが必要である。
+$B_6$パラメータはゼロに近い値が推定され、4次結晶場効果が支配的であることが示唆された。
+
+\subsection{階層的$\gamma$パラメータの推定}
+
+表\ref{tab:gamma_parameters}に7つの$\gamma$パラメータの推定結果を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{個別$\gamma$パラメータの推定値 [THz]}
+\label{tab:gamma_parameters}
+\begin{tabular}{lcc}
+\hline
+パラメータ & H形式 & B形式 \\
+\hline
+$\gamma_1$ & $0.024 \pm 0.001$ & $0.039 \pm 0.001$ \\
+$\gamma_2$ & $0.144 \pm 0.007$ & $0.172 \pm 0.008$ \\
+$\gamma_3$ & $0.142 \pm 0.010$ & $0.010 \pm 0.000$ \\
+$\gamma_4$ & $0.029 \pm 0.042$ & $0.164 \pm 0.013$ \\
+$\gamma_5$ & $0.129 \pm 0.048$ & $0.158 \pm 0.018$ \\
+$\gamma_6$ & $0.026 \pm 0.048$ & $0.151 \pm 0.026$ \\
+$\gamma_7$ & $0.097 \pm 0.070$ & $0.120 \pm 0.058$ \\
+\hline
+\end{tabular}
+\end{table}
+
+H形式では$\gamma_4$, $\gamma_5$, $\gamma_6$, $\gamma_7$の不確実性が非常に大きく（$\hat{R} > 1.2$）、
+これらのパラメータが十分に同定されていないことを示している。
+B形式では全ての$\gamma$パラメータで$\hat{R} \approx 1.0$となり、安定した推定が得られた。
+
+$\gamma_3$については両形式で大きく異なる値が推定され（H形式：0.142 THz、B形式：0.010 THz）、
+この遷移の同定に課題があることが示唆された。
+
+\section{モデル比較}
+
+\subsection{WAIC・PSIS-LOOによる評価}
+
+表\ref{tab:model_comparison}にWAICおよびPSIS-LOOによるモデル比較結果を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{WAICおよびPSIS-LOOによるモデル比較}
+\label{tab:model_comparison}
+\begin{tabular}{lcccc}
+\hline
+モデル & ELPD$_{\mathrm{WAIC}}$ & $p_{\mathrm{WAIC}}$ & ELPD$_{\mathrm{LOO}}$ & $p_{\mathrm{LOO}}$ \\
+\hline
+H形式 & $-3025.8 \pm 164.7$ & 144.9 & $-3022.6 \pm 164.7$ & 141.7 \\
+B形式 & $-3348.6 \pm 162.8$ & 75.9 & $-3347.9 \pm 162.8$ & 75.2 \\
+\hline
+\end{tabular}
+\end{table}
+
+ELPD値はH形式が約323ポイント高く、予測性能の観点からはH形式が優れているように見える。
+しかし、両者の差の標準誤差（$\mathrm{SE}_{\mathrm{diff}} \approx 232$）を考慮すると、
+\begin{equation}
+    |\Delta \mathrm{ELPD}| = 322.7 < 2 \times \mathrm{SE}_{\mathrm{diff}} = 463.1
+\end{equation}
+となり、統計的に有意な差は認められなかった。
+
+\subsection{有効パラメータ数の解釈}
+
+注目すべきは有効パラメータ数$p_{\mathrm{WAIC}}$の違いである：
+\begin{itemize}
+    \item H形式：$p_{\mathrm{WAIC}} = 144.9$
+    \item B形式：$p_{\mathrm{WAIC}} = 75.9$
+\end{itemize}
+
+H形式では有効パラメータ数が約2倍となっており、これは以下の要因が考えられる：
+\begin{enumerate}
+    \item 一部のパラメータ（$\gamma_4$--$\gamma_7$）で収束が不十分なため、事後分布のばらつきが大きい
+    \item パラメータ間の相関が強く、有効な自由度が増加している
+    \item モデルがデータに対して過適合している可能性
+\end{enumerate}
+
+\subsection{Pareto $k$診断}
+
+表\ref{tab:pareto_k}にPSIS-LOOのPareto $k$診断結果を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{Pareto $k$診断結果（$n=1740$データ点）}
+\label{tab:pareto_k}
+\begin{tabular}{lcccc}
+\hline
+モデル & $k < 0.5$（良好） & $0.5 \leq k < 0.7$ & $0.7 \leq k < 1.0$ & $k \geq 1.0$（問題あり） \\
+\hline
+H形式 & 1716 (98.6\%) & 0 & 0 & 24 (1.4\%) \\
+B形式 & 1714 (98.5\%) & 0 & 0 & 26 (1.5\%) \\
+\hline
+\end{tabular}
+\end{table}
+
+両形式とも約98.5\%のデータ点で$k < 0.5$と良好な値を示したが、
+約1.5\%（24--26点）で$k \geq 1.0$となり、これらの点でPSIS-LOOの信頼性が低下している。
+これは特定の周波数領域において、予測分布の裾が厚く、重点サンプリングの効率が低下していることを示唆している。
+
+\section{総合考察}
+
+\subsection{モデル選択の結論}
+
+WAICとPSIS-LOOの両指標において、H形式とB形式の間に統計的に有意な差は認められなかった
+（信頼度：高、WAICとLOOで結論が一致）。
+したがって、予測性能の観点からは両形式は同等であると結論づけられる。
+
+しかし、収束診断の結果を考慮すると、B形式が実用上は推奨される：
+\begin{itemize}
+    \item $\hat{R}$値がほぼ全てのパラメータで1.01以下
+    \item 有効サンプル数が約4倍（34,292 vs 8,397）
+    \item 推定された$g$因子が理論値とよく一致（$g = 2.028$）
+    \item 有効パラメータ数が適切（過適合の兆候なし）
+\end{itemize}
+
+\subsection{物理的解釈}
+
+B形式で得られたパラメータを用いた物理的解釈を以下に述べる。
+
+\paragraph{g因子}
+推定値$g = 2.028 \pm 0.002$は、自由イオンのGd$^{3+}$（$L=0$、純粋スピン状態）における
+理論値$g = 2.0$と極めてよく一致した。
+この結果は、GGG中のGd$^{3+}$イオンが$^8S_{7/2}$基底状態にあり、
+軌道角運動量の寄与がほぼ無視できることを示している。
+
+\paragraph{結晶場パラメータ}
+$B_4 \sim 3$ mK、$B_6 \approx 0$という結果は、
+4次の結晶場効果が支配的であり、6次の寄与は小さいことを示唆している。
+ただし、$B_4$の不確実性は依然として大きく（$\sigma \sim 6$ mK）、
+より精密な決定には温度依存性や磁場依存性のさらなるデータが必要である。
+
+\paragraph{減衰定数$\gamma$}
+階層モデルにより推定された$\gamma_{\mathrm{mean}} = 0.099$ THzは、
+共振器-スピン系の典型的な減衰時定数（$\sim 10$ ps）に対応する。
+個別の$\gamma_i$値には0.01--0.17 THzの範囲でばらつきがあり、
+各スピン遷移が異なる緩和機構を持つことが示唆された。
+
+\subsection{今後の課題}
+
+\begin{enumerate}
+    \item H形式における収束改善のためのサンプリング戦略の検討
+    \item Pareto $k \geq 1.0$となるデータ点の詳細分析と対策
+    \item 温度・磁場依存性を考慮した統合的なベイズモデルの構築
+    \item 結晶場パラメータの不確実性低減のための実験条件最適化
+\end{enumerate}

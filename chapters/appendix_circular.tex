@@ -1,0 +1,91 @@
+\chapter{Faraday配置における磁気感受率テンソルの円偏光基底への変換}
+\label{chap:appendix_circular}
+Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置（磁場 \(\vb*{B} \parallel \vb*{k} \parallel z\)）で透過スペクトルを測定している.\(^{\cite{Kritzell2024}}\) この配置では, 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)が重要となる. そこで, 直線偏光基底での磁気感受率テンソル\(\chi_{ij}\)を, 円偏光基底に変換する方法を以下に示す.
+
+\section{問題設定}
+Faraday配置（磁場 \(\vb*{B} \parallel \vb*{k} \parallel z\)）における, 等方性媒質（または立方晶系）の線形応答を考える. 
+直線偏光基底（デカルト座標系 \(\{x, y, z\}\)）における磁気感受率テンソル \(\vb*{\chi}_{\text{lin}}\) は, 磁気光学効果により以下の反対称成分を持つ. 
+
+\begin{equation}
+    \vb*{\chi}_{\text{lin}} = 
+    \begin{pmatrix}
+    \chi_{xx} & \chi_{xy} & 0 \\
+    -\chi_{xy} & \chi_{xx} & 0 \\
+    0 & 0 & \chi_{zz}
+    \end{pmatrix}
+\end{equation}
+ここで, \(\chi_{xx}\) は対角成分, \(\chi_{xy}\) はジャイロトロピックな非対角成分を表す. 
+
+\section{基底変換行列 (Unitary Transformation)}
+直線偏光基底から円偏光基底への変換を考える. 
+ここでは, 右円偏光 (\(\sigma_+\)) および左円偏光 (\(\sigma_-\)) の基底ベクトルを, 標準的なジョーンズベクトルの定義（時間依存性 \(e^{-i\omega t}\)）に従い以下のように定義する. 
+\begin{align}
+    \hat{\vb*{e}}_+ &= \frac{1}{\sqrt{2}}(\hat{\vb*{x}} - i\hat{\vb*{y}}) \\
+    \hat{\vb*{e}}_- &= \frac{1}{\sqrt{2}}(\hat{\vb*{x}} + i\hat{\vb*{y}})
+\end{align}
+このとき, 基底変換行列（ユニタリ行列）\(U\) は以下のように与えられる. 
+\begin{equation}
+    U = \frac{1}{\sqrt{2}}
+    \begin{pmatrix}
+    1 & i & 0 \\
+    1 & -i & 0 \\
+    0 & 0 & \sqrt{2}
+    \end{pmatrix}
+\end{equation}
+この行列 \(U\) は, 直線偏光基底のベクトル \(\vb*{v}_{\text{lin}}\) を円偏光基底 \(\vb*{v}_{\text{circ}}\) へ変換する（\(\vb*{v}_{\text{circ}} = U \vb*{v}_{\text{lin}}\)）. 
+
+\section{円偏光基底でのテンソル表現}
+テンソルの変換則 \(\vb*{\chi}_{\text{circ}} = U \vb*{\chi}_{\text{lin}} U^{-1}\) （ユニタリ性より \(U^{-1} = U^{\dagger}\)）に従い計算を行う. 
+
+\begin{align}
+    \vb*{\chi}_{\text{circ}} &= U \vb*{\chi}_{\text{lin}} U^{\dagger} \notag \\
+    &= \frac{1}{2}
+    \begin{pmatrix}
+    1 & i & 0 \\
+    1 & -i & 0 \\
+    0 & 0 & \sqrt{2}
+    \end{pmatrix}
+    \begin{pmatrix}
+    \chi_{xx} & \chi_{xy} & 0 \\
+    -\chi_{xy} & \chi_{xx} & 0 \\
+    0 & 0 & \chi_{zz}
+    \end{pmatrix}
+    \begin{pmatrix}
+    1 & 1 & 0 \\
+    -i & i & 0 \\
+    0 & 0 & \sqrt{2}
+    \end{pmatrix} \notag \\
+    &= \frac{1}{2}
+    \begin{pmatrix}
+    \chi_{xx}-i\chi_{xy} & \chi_{xy}+i\chi_{xx} & 0 \\
+    \chi_{xx}+i\chi_{xy} & -\chi_{xy}+i\chi_{xx} & 0 \\
+    0 & 0 & 2\chi_{zz}
+    \end{pmatrix}
+    \begin{pmatrix}
+    1 & 1 & 0 \\
+    -i & i & 0 \\
+    0 & 0 & \sqrt{2}
+    \end{pmatrix} \notag \\
+    &= 
+    \begin{pmatrix}
+    \chi_{xx} - i\chi_{xy} & 0 & 0 \\
+    0 & \chi_{xx} + i\chi_{xy} & 0 \\
+    0 & 0 & \chi_{zz}
+    \end{pmatrix}
+\end{align}
+
+\section{結論と物理的解釈}
+計算の結果, 円偏光基底において磁気感受率テンソルは\textbf{対角化}されることが示された. 
+\begin{equation}
+    \vb*{\chi}_{\text{circ}} = 
+    \begin{pmatrix}
+    \chi_+ & 0 & 0 \\
+    0 & \chi_- & 0 \\
+    0 & 0 & \chi_{zz}
+    \end{pmatrix}
+\end{equation}
+ここで, 対角成分（固有値）は以下のように定義される. 
+\begin{equation}
+    \chi_{\pm} = \chi_{xx} \mp i\chi_{xy}
+\end{equation}
+これは, Faraday配置において円偏光がこの系の\textbf{固有モード (Eigenmodes)} であることを意味する. 

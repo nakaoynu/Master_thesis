@@ -1,0 +1,876 @@
+% filepath: bayesian_v6_informed_priors_HB_documentation.tex
+\documentclass[a4paper,12pt,dvipdfmx]{jlreq}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc}
+\usepackage{algorithm2e}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{multicol}
+
+% カラーボックス設定
+\newtcolorbox{keypoint}{colback=blue!5!white,colframe=blue!75!black,title=Key Point}
+\newtcolorbox{warning}{colback=red!5!white,colframe=red!75!black,title=注意}
+\newtcolorbox{definition}{colback=green!5!white,colframe=green!50!black,title=定義}
+\newtcolorbox{bayesian}{colback=purple!5!white,colframe=purple!75!black,title=ベイズ推定}
+
+\lstset{
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    breaklines=true,
+    frame=single
+}
+
+\title{\vspace{-2cm}
+\textbf{bayesian\_v6\_informed\_priors\_HB.py 理解ドキュメント}\\
+\large 情報的事前分布によるベイズ推定（H形式・B形式同時処理）
+}
+\author{物理工学専攻 修士論文解析用教材}
+\date{2026年1月版}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに：このプログラムの位置づけ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{keypoint}
+このプログラムは、\textbf{pre\_test\_v6\_shared\_gamma.py}で得られた最適化結果を
+\textbf{情報的事前分布（Informative Prior）}として活用し、
+マルコフ連鎖モンテカルロ法（MCMC）によるベイズ推定を行います。
+H形式とB形式の両方を同時に処理し、不確かさを定量化します。
+\end{keypoint}
+
+\subsection{解析パイプラインにおける役割}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    box/.style={rectangle, rounded corners, minimum width=4cm, minimum height=1cm, 
+                text centered, draw=black, fill=white, align=center},
+    arrow/.style={thick,->,>=stealth}
+]
+\node (v6) [box, fill=orange!30] {pre\_test\_v6\_shared\_gamma.py\\（最小二乗法フィット）};
+\node (output1) [box, below=of v6, fill=yellow!30] {v6最適化結果\\（12パラメータ点推定値）};
+\node (bayes) [box, below=of output1, fill=blue!30] {bayesian\_v6\_informed\_priors\_HB.py\\（ベイズ推定）};
+\node (output2) [box, below=of bayes, fill=green!30] {事後分布\\（パラメータ不確かさ付き）};
+
+\draw [arrow] (v6) -- (output1);
+\draw [arrow] (output1) -- node[right] {事前分布の中心値} (bayes);
+\draw [arrow] (bayes) -- (output2);
+
+% 実験データ
+\node (data) [box, left=2cm of bayes, fill=gray!20] {実験データ\\（10条件）};
+\draw [arrow] (data) -- (bayes);
+\end{tikzpicture}
+\caption{解析パイプラインにおける本プログラムの位置づけ}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{なぜベイズ推定が必要か？}
+
+最小二乗法フィット（v6）で得られるのは\textbf{点推定値}のみです。
+ベイズ推定により以下が可能になります：
+
+\begin{enumerate}
+    \item \textbf{パラメータの不確かさ}：各パラメータの信頼区間を定量化
+    \item \textbf{パラメータ間相関}：$g$と$B_4$の相関など、物理的制約を反映
+    \item \textbf{モデル比較}：H形式とB形式の確率的優劣を評価
+    \item \textbf{予測分布}：将来の測定に対する予測と不確かさ
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ベイズ推定の基礎理論}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{ベイズの定理}
+
+\begin{bayesian}
+パラメータ$\bm{\theta}$の事後分布$P(\bm{\theta}|D)$は、ベイズの定理により：
+\begin{equation}
+\boxed{
+P(\bm{\theta}|D) = \frac{P(D|\bm{\theta}) \cdot P(\bm{\theta})}{P(D)}
+}
+\label{eq:bayes}
+\end{equation}
+ここで：
+\begin{itemize}
+    \item $P(\bm{\theta}|D)$: \textbf{事後分布}（データを見た後のパラメータの確率分布）
+    \item $P(D|\bm{\theta})$: \textbf{尤度}（パラメータが与えられたときのデータの確率）
+    \item $P(\bm{\theta})$: \textbf{事前分布}（データを見る前のパラメータの確率分布）
+    \item $P(D)$: \textbf{周辺尤度}（正規化定数）
+\end{itemize}
+\end{bayesian}
+
+\subsection{情報的事前分布}
+
+\begin{definition}
+\textbf{情報的事前分布（Informative Prior）}は、既存の知識（先行研究、物理的制約、
+または予備解析結果）を反映した事前分布です。本プログラムでは、v6最適化結果を
+事前分布の中心値として使用します。
+\end{definition}
+
+対照的に、\textbf{無情報事前分布（Non-informative Prior）}は広い範囲で一様な分布で、
+事前知識を入れない場合に使用されます。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    % 無情報事前分布
+    \begin{scope}
+        \draw[->] (0,0) -- (5,0) node[right] {$\theta$};
+        \draw[->] (0,0) -- (0,2.5) node[above] {$P(\theta)$};
+        \draw[thick, blue] (0.3,1.5) -- (4.7,1.5);
+        \node[below] at (2.5,-0.3) {無情報事前分布};
+        \draw[dashed] (0.3,0) -- (0.3,1.5);
+        \draw[dashed] (4.7,0) -- (4.7,1.5);
+    \end{scope}
+    
+    % 情報的事前分布
+    \begin{scope}[xshift=7cm]
+        \draw[->] (0,0) -- (5,0) node[right] {$\theta$};
+        \draw[->] (0,0) -- (0,2.5) node[above] {$P(\theta)$};
+        \draw[thick, red, domain=0.3:4.7, samples=50] 
+            plot (\x, {2*exp(-(\x-2.5)*(\x-2.5)/0.5)});
+        \node[below] at (2.5,-0.3) {情報的事前分布};
+        \draw[dashed] (2.5,0) -- (2.5,2);
+        \node[above] at (2.5,2) {$\theta_{v6}$};
+    \end{scope}
+\end{tikzpicture}
+\caption{無情報事前分布（左）と情報的事前分布（右）。本プログラムでは右の形式を採用。}
+\label{fig:priors}
+\end{figure}
+
+\subsection{尤度関数}
+
+観測データ$\{T_i^{\text{obs}}\}$とモデル予測$\{T_i^{\text{model}}(\bm{\theta})\}$に対して、
+ガウス尤度を仮定：
+
+\begin{equation}
+P(D|\bm{\theta}) = \prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}\sigma_i^{\text{eff}}} 
+\exp\left[ -\frac{(T_i^{\text{obs}} - T_i^{\text{model}}(\bm{\theta}))^2}{2(\sigma_i^{\text{eff}})^2} \right]
+\label{eq:likelihood}
+\end{equation}
+
+対数尤度は：
+\begin{equation}
+\log P(D|\bm{\theta}) = -\frac{1}{2} \sum_{i=1}^{N} 
+\left[ \frac{(T_i^{\text{obs}} - T_i^{\text{model}})^2}{(\sigma_i^{\text{eff}})^2} + \log(2\pi (\sigma_i^{\text{eff}})^2) \right]
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{事前分布の設計}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{切断正規分布}
+
+本プログラムでは、全パラメータに\textbf{切断正規分布（Truncated Normal）}を使用します：
+
+\begin{equation}
+P(\theta) = \begin{cases}
+\displaystyle \frac{1}{Z} \cdot \frac{1}{\sqrt{2\pi}\sigma} 
+\exp\left[-\frac{(\theta - \mu)^2}{2\sigma^2}\right] & \text{if } L \leq \theta \leq U \\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+ここで$Z$は正規化定数、$\mu$はv6最適化結果、$\sigma$は不確かさ、$[L, U]$は物理的境界。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    \draw[->] (0,0) -- (8,0) node[right] {$\theta$};
+    \draw[->] (0,0) -- (0,3) node[above] {$P(\theta)$};
+    
+    % 通常の正規分布（点線）
+    \draw[dashed, gray, domain=0:8, samples=100] 
+        plot (\x, {2.5*exp(-(\x-4)*(\x-4)/1.5)});
+    
+    % 切断正規分布（実線）
+    \draw[thick, blue, domain=1.5:6.5, samples=100] 
+        plot (\x, {2.5*exp(-(\x-4)*(\x-4)/1.5)});
+    \draw[thick, blue] (1.5,0) -- (1.5,{2.5*exp(-(1.5-4)*(1.5-4)/1.5)});
+    \draw[thick, blue] (6.5,0) -- (6.5,{2.5*exp(-(6.5-4)*(6.5-4)/1.5)});
+    
+    % アノテーション
+    \draw[<->, thick] (1.5,-0.3) -- (6.5,-0.3);
+    \node[below] at (4,-0.5) {物理的許容範囲 $[L, U]$};
+    
+    \draw[dashed] (4,0) -- (4,2.7);
+    \node[above] at (4,2.7) {$\mu = \theta_{v6}$};
+    
+    % 凡例
+    \node[gray] at (7,2) {通常正規分布};
+    \node[blue] at (7,1.5) {切断正規分布};
+\end{tikzpicture}
+\caption{切断正規分布：物理的制約を満たす範囲のみで定義}
+\label{fig:truncnorm}
+\end{figure}
+
+\subsection{各パラメータの事前分布設計}
+
+\begin{table}[h]
+\centering
+\caption{事前分布の設計（H形式の例）}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{パラメータ} & \textbf{中心値 $\mu$} & \textbf{標準偏差 $\sigma$} & \textbf{下限 $L$} & \textbf{上限 $U$} \\
+\midrule
+$g$ (g因子) & $g_{v6}$ & 0.05 & $\max(1.7, g_{v6}-0.15)$ & $\min(2.1, g_{v6}+0.15)$ \\
+$a$ (スケール) & $a_{v6}$ & 1.0 & $\max(8.0, a_{v6}-3.0)$ & $\min(15.0, a_{v6}+3.0)$ \\
+$B_4$ (結晶場) & $B_{4,v6}$ & 0.0005 & $\max(0.005, B_{4,v6}-0.002)$ & $\min(0.012, B_{4,v6}+0.002)$ \\
+$B_6$ (結晶場) & $B_{6,v6}$ & 0.00003 & $\max(-0.0004, B_{6,v6}-0.0001)$ & $\min(-0.0001, B_{6,v6}+0.0001)$ \\
+$\varepsilon_{\text{bg}}$ & $\varepsilon_{v6}$ & 0.3 & $\max(13.0, \varepsilon_{v6}-1.0)$ & $\min(16.0, \varepsilon_{v6}+1.0)$ \\
+$\gamma_k$ (緩和率) & $\gamma_{k,v6}$ & $0.15 \gamma_{k,v6}$ & $\max(0.005, 0.7\gamma_{k,v6})$ & $\min(0.4, 1.5\gamma_{k,v6})$ \\
+\bottomrule
+\end{tabular}
+\label{tab:priors}
+\end{table}
+
+\begin{keypoint}
+事前分布の幅（$\sigma$）の設定は重要です：
+\begin{itemize}
+    \item \textbf{狭すぎる}$\to$ v6結果に過度に拘束され、データの情報を無視
+    \item \textbf{広すぎる}$\to$ 収束が遅く、v6の利点を活かせない
+    \item \textbf{適切な幅}$\to$ v6結果を中心に、データに応じて微調整
+\end{itemize}
+本プログラムでは、$\gamma_k$に対して15\%の相対幅を採用しています。
+\end{keypoint}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MCMCサンプリング}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{マルコフ連鎖モンテカルロ法の原理}
+
+\begin{definition}
+\textbf{MCMC（Markov Chain Monte Carlo）}は、複雑な確率分布からサンプルを生成する
+アルゴリズムです。事後分布$P(\bm{\theta}|D)$から直接サンプリングできない場合に、
+その分布に従うサンプル列を生成します。
+\end{definition}
+
+基本的なアイデア：
+\begin{enumerate}
+    \item 初期パラメータ$\bm{\theta}^{(0)}$から開始
+    \item 提案分布から候補$\bm{\theta}'$を生成
+    \item 受理確率に基づいて候補を受理または棄却
+    \item 十分な回数繰り返すと、サンプルは事後分布に収束
+\end{enumerate}
+
+\subsection{Sliceサンプリング}
+
+本プログラムでは\textbf{Sliceサンプラー}を使用します。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.85]
+    % 確率密度関数
+    \draw[->] (0,0) -- (8,0) node[right] {$\theta$};
+    \draw[->] (0,0) -- (0,4) node[above] {$P(\theta|D)$};
+    
+    \draw[thick, blue, domain=0.5:7.5, samples=100] 
+        plot (\x, {3*exp(-(\x-3)^2/2) + 1.5*exp(-(\x-6)^2/0.8)});
+    
+    % 現在点
+    \fill[red] (3,2.8) circle (3pt);
+    \node[above] at (3,3) {$\theta^{(t)}$};
+    
+    % スライス（水平線）
+    \draw[dashed, orange, thick] (0.8,1.5) -- (6.8,1.5);
+    \node[left] at (0.8,1.5) {$u$};
+    
+    % スライス内の範囲
+    \draw[<->, green!50!black, thick] (1.5,1.3) -- (4.2,1.3);
+    \draw[<->, green!50!black, thick] (5.4,1.3) -- (6.8,1.3);
+    
+    % 新しい点
+    \fill[green!50!black] (5.8,1.5) circle (3pt);
+    \node[below] at (5.8,1.1) {$\theta^{(t+1)}$};
+    
+    % 説明
+    \node[align=left] at (10,2.5) {
+        1. 現在点$\theta^{(t)}$\\
+        2. 高さ$u$をランダムに選択\\
+        3. スライス内で$\theta'$をサンプル\\
+        4. $\theta^{(t+1)} = \theta'$
+    };
+\end{tikzpicture}
+\caption{Sliceサンプリングの概念図。確率密度の「スライス」内で一様にサンプリング。}
+\label{fig:slice}
+\end{figure}
+
+\begin{keypoint}
+Sliceサンプラーの利点：
+\begin{itemize}
+    \item \textbf{勾配不要}：微分できない関数でも適用可能
+    \item \textbf{チューニング不要}：メトロポリス法のようなステップサイズ調整が不要
+    \item \textbf{CPU環境対応}：GPUなしでも効率的に動作
+\end{itemize}
+\end{keypoint}
+
+\subsection{サンプリング設定}
+
+\begin{table}[h]
+\centering
+\caption{MCMCサンプリング設定}
+\begin{tabular}{lcc}
+\toprule
+\textbf{設定項目} & \textbf{値} & \textbf{説明} \\
+\midrule
+Chains（チェーン数） & 8 & 独立した並列マルコフ連鎖 \\
+Draws（サンプル数） & 4,000 & 各チェーンの事後サンプル数 \\
+Tune（調整期間） & 2,000 & ウォームアップ（破棄される） \\
+Cores（並列コア） & 8 & CPU並列処理コア数 \\
+合計サンプル数 & $8 \times 4,000 = 32,000$ & 事後分布の推定に使用 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{重み付け戦略}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{3段階重み付け}
+
+尤度計算における実効的ノイズ$\sigma_i^{\text{eff}}$は、周波数領域に応じて調整：
+
+\begin{equation}
+\sigma_i^{\text{eff}} = \frac{\sigma_0}{\sqrt{w_i}}
+\end{equation}
+
+ここで$\sigma_0 = 0.01$（基準ノイズ）、$w_i$は領域重み：
+
+\begin{table}[h]
+\centering
+\caption{周波数領域別の重み設定}
+\begin{tabular}{lccc}
+\toprule
+\textbf{領域} & \textbf{周波数範囲} & \textbf{重み $w$} & \textbf{実効$\sigma$} \\
+\midrule
+ポラリトン & $f \leq 0.3615$ THz & 1.5 & $0.01/\sqrt{1.5} \approx 0.0082$ \\
+共振器モード & $f \geq 0.45$ THz & 1.0 & $0.01$ \\
+背景（その他） & それ以外 & 0.01 & $0.01/\sqrt{0.01} = 0.1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    \draw[->] (0,0) -- (10,0) node[right] {Frequency [THz]};
+    \draw[->] (0,0) -- (0,4) node[above] {$\sigma^{\text{eff}}$};
+    
+    % 領域の塗りつぶし
+    \fill[red!20] (0,0) rectangle (2.5,0.8);
+    \fill[cyan!20] (4.5,0) rectangle (9,1.0);
+    \fill[gray!10] (2.5,0) rectangle (4.5,3.5);
+    
+    % 実効σの値
+    \draw[thick, red] (0,0.8) -- (2.5,0.8);
+    \draw[thick, blue] (4.5,1.0) -- (9,1.0);
+    \draw[thick, gray] (2.5,3.5) -- (4.5,3.5);
+    
+    % 縦線
+    \draw[dashed] (2.5,0) -- (2.5,4);
+    \draw[dashed] (4.5,0) -- (4.5,4);
+    
+    % ラベル
+    \node at (1.25,0.5) {\small ポラリトン};
+    \node at (1.25,0.2) {\small (1.5$\times$)};
+    \node at (3.5,2) {\small 背景};
+    \node at (3.5,1.7) {\small (0.01$\times$)};
+    \node at (6.75,0.5) {\small 共振器};
+    \node at (6.75,0.2) {\small (1.0$\times$)};
+    
+    % 数値
+    \node[left] at (0,0.8) {\small 0.0082};
+    \node[left] at (0,1.0) {\small 0.01};
+    \node[left] at (0,3.5) {\small 0.1};
+    
+    \node[below] at (2.5,0) {\small 0.36};
+    \node[below] at (4.5,0) {\small 0.45};
+\end{tikzpicture}
+\caption{周波数領域別の実効ノイズ$\sigma^{\text{eff}}$。低い値ほどフィットへの寄与が大きい。}
+\label{fig:weighting}
+\end{figure}
+
+\begin{keypoint}
+この重み付けの意味：
+\begin{itemize}
+    \item \textbf{ポラリトン領域}：物理的に重要、高精度でフィット
+    \item \textbf{共振器モード}：分光学的情報を持つ、適度な精度
+    \item \textbf{背景領域}：情報が少ない、フィットへの影響を抑制
+\end{itemize}
+\end{keypoint}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{PyTensor Opによる物理モデル実装}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{カスタムOpの必要性}
+
+PyMC（ベイズ推定ライブラリ）では、モデル関数を計算グラフとして定義する必要があります。
+しかし、本プログラムの物理モデル（ハミルトニアン対角化、感受率計算など）は
+標準のPyTensor演算で直接表現できません。
+
+そこで、\textbf{カスタムOp}を定義してNumPy計算をラップします。
+
+\subsection{InformedPriorModelOp クラス}
+
+\begin{lstlisting}[language=Python, caption=カスタムOpの構造]
+class InformedPriorModelOp(Op):
+    """情報的事前分布を持つモデルOp（H/B形式選択可能）"""
+    
+    def __init__(self, datasets, model_form='H'):
+        self.datasets = datasets      # 全10データセット
+        self.model_form = model_form  # 'H' or 'B'
+    
+    def make_node(self, a_scale, gamma_vec, g_factor, B4, B6, eps_bg):
+        # 入力テンソルの定義
+        # 出力: 全周波数点の予測透過率（連結）
+        
+    def perform(self, node, inputs, output_storage):
+        # 実際の計算（NumPy）
+        # 各データセットに対して:
+        #   1. ハミルトニアン構築
+        #   2. 感受率計算
+        #   3. 比透磁率計算（H形式 or B形式）
+        #   4. 透過率計算
+\end{lstlisting}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.6cm,
+    box/.style={rectangle, minimum width=2.5cm, minimum height=0.7cm, 
+                text centered, draw=black},
+    arrow/.style={thick,->,>=stealth}
+]
+% 入力パラメータ
+\node (g) [box, fill=orange!30] {$g$};
+\node (a) [box, right=0.5cm of g, fill=orange!30] {$a$};
+\node (B4) [box, right=0.5cm of a, fill=orange!30] {$B_4$};
+\node (B6) [box, right=0.5cm of B4, fill=orange!30] {$B_6$};
+\node (eps) [box, right=0.5cm of B6, fill=orange!30] {$\varepsilon$};
+\node (gamma) [box, right=0.5cm of eps, fill=orange!30] {$\gamma_{1..7}$};
+
+% カスタムOp
+\node (op) [box, below=1cm of B6, minimum width=10cm, fill=blue!30] 
+    {InformedPriorModelOp (NumPy計算)};
+
+% 内部処理
+\node (h1) [box, below=0.8cm of op, fill=yellow!20, minimum width=2cm] {$\hat{H}$};
+\node (chi) [box, right=0.5cm of h1, fill=yellow!20, minimum width=2cm] {$\chi(\omega)$};
+\node (mur) [box, right=0.5cm of chi, fill=yellow!20, minimum width=2cm] {$\mu_r$};
+\node (trans) [box, right=0.5cm of mur, fill=yellow!20, minimum width=2cm] {$T(\omega)$};
+
+% 出力
+\node (output) [box, below=0.8cm of chi, fill=green!30, minimum width=6cm] 
+    {予測透過率 $\{T_i^{\text{model}}\}$};
+
+% 矢印
+\draw [arrow] (g) |- (op);
+\draw [arrow] (a) |- (op);
+\draw [arrow] (B4) -- (op);
+\draw [arrow] (B6) -- (op);
+\draw [arrow] (eps) |- (op);
+\draw [arrow] (gamma) |- (op);
+
+\draw [arrow] (op) -- (h1);
+\draw [arrow] (h1) -- (chi);
+\draw [arrow] (chi) -- (mur);
+\draw [arrow] (mur) -- (trans);
+\draw [arrow] (trans) |- (output);
+
+\end{tikzpicture}
+\caption{InformedPriorModelOpの計算フロー}
+\label{fig:op}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{H形式とB形式の同時処理}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{処理フロー}
+
+本プログラムの最大の特徴は、H形式とB形式を\textbf{独立に}、しかし\textbf{同時に}
+処理することです。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    box/.style={rectangle, rounded corners, minimum width=3.5cm, minimum height=0.8cm, 
+                text centered, draw=black},
+    arrow/.style={thick,->,>=stealth}
+]
+
+% 共通部分
+\node (v6H) [box, fill=orange!30] {v6\_H最適化結果};
+\node (v6B) [box, right=4cm of v6H, fill=orange!30] {v6\_B最適化結果};
+\node (data) [box, below=1cm of $(v6H)!0.5!(v6B)$, fill=gray!20] {実験データ (10条件)};
+
+% H形式パイプライン
+\node (priorH) [box, below left=1.5cm and 0.5cm of data, fill=red!20] {H形式事前分布};
+\node (modelH) [box, below=0.6cm of priorH, fill=red!30] {H形式モデル};
+\node (mcmcH) [box, below=0.6cm of modelH, fill=red!40] {MCMC (H形式)};
+\node (postH) [box, below=0.6cm of mcmcH, fill=red!50] {H形式事後分布};
+
+% B形式パイプライン
+\node (priorB) [box, below right=1.5cm and 0.5cm of data, fill=blue!20] {B形式事前分布};
+\node (modelB) [box, below=0.6cm of priorB, fill=blue!30] {B形式モデル};
+\node (mcmcB) [box, below=0.6cm of modelB, fill=blue!40] {MCMC (B形式)};
+\node (postB) [box, below=0.6cm of mcmcB, fill=blue!50] {B形式事後分布};
+
+% 比較
+\node (compare) [box, below=1.5cm of $(postH)!0.5!(postB)$, fill=green!30, minimum width=5cm] 
+    {H形式 vs B形式 比較};
+
+% 矢印
+\draw [arrow] (v6H) |- (priorH);
+\draw [arrow] (v6B) |- (priorB);
+\draw [arrow] (data) -| (priorH);
+\draw [arrow] (data) -| (priorB);
+
+\draw [arrow] (priorH) -- (modelH);
+\draw [arrow] (modelH) -- (mcmcH);
+\draw [arrow] (mcmcH) -- (postH);
+
+\draw [arrow] (priorB) -- (modelB);
+\draw [arrow] (modelB) -- (mcmcB);
+\draw [arrow] (mcmcB) -- (postB);
+
+\draw [arrow] (postH) |- (compare);
+\draw [arrow] (postB) |- (compare);
+
+\end{tikzpicture}
+\caption{H形式とB形式の並列処理フロー}
+\label{fig:parallel}
+\end{figure}
+
+\subsection{なぜ別々の事前分布を使うか？}
+
+v6最適化の結果、H形式とB形式では異なるパラメータ値が得られます：
+
+\begin{itemize}
+    \item H形式: $\mu_r = 1 + \chi$ $\to$ 弱磁化近似、パラメータ$\bm{\theta}^{(H)}$
+    \item B形式: $\mu_r = 1/(1-\chi)$ $\to$ 強磁化補正、パラメータ$\bm{\theta}^{(B)}$
+\end{itemize}
+
+これらは異なる物理モデルなので、それぞれに適した事前分布を使用します。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{収束診断}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{MCMCが収束したかどうかの判定}
+
+MCMCサンプルが事後分布からの正しいサンプルであるためには、
+マルコフ連鎖が定常分布（事後分布）に\textbf{収束}している必要があります。
+
+\subsection{$\hat{R}$統計量（Gelman-Rubin診断）}
+
+\begin{definition}
+\textbf{$\hat{R}$（R-hat）}は、複数のチェーン間のばらつきとチェーン内のばらつきを比較する指標です：
+\begin{equation}
+\hat{R} = \sqrt{\frac{\text{Var}_{\text{between}} + \text{Var}_{\text{within}}}{\text{Var}_{\text{within}}}}
+\end{equation}
+\end{definition}
+
+\begin{table}[h]
+\centering
+\caption{$\hat{R}$の解釈}
+\begin{tabular}{cl}
+\toprule
+\textbf{$\hat{R}$の値} & \textbf{解釈} \\
+\midrule
+$< 1.01$ & 優れた収束 ✓ \\
+$1.01 - 1.05$ & 許容範囲 \\
+$1.05 - 1.1$ & 要注意 \\
+$> 1.1$ & 未収束、サンプル数増加が必要 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{有効サンプルサイズ（ESS）}
+
+MCMCサンプルは自己相関を持つため、独立なサンプル数は総サンプル数より少なくなります。
+
+\begin{definition}
+\textbf{ESS（Effective Sample Size）}は、自己相関を考慮した実質的な独立サンプル数：
+\begin{equation}
+\text{ESS} = \frac{N}{1 + 2\sum_{k=1}^{\infty} \rho_k}
+\end{equation}
+ここで$\rho_k$はラグ$k$の自己相関係数。
+\end{definition}
+
+目安として、$\text{ESS} > 400$が推奨されます。
+
+\subsection{トレースプロット}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.7]
+% 良好な収束
+\begin{scope}
+    \draw[->] (0,0) -- (6,0) node[right] {\small Iteration};
+    \draw[->] (0,0) -- (0,3) node[above] {\small $\theta$};
+    
+    % 複数チェーン
+    \foreach \seed in {1,2,3,4} {
+        \draw[blue!\seed0!red, opacity=0.7] 
+            plot[domain=0:5.5, samples=50, smooth] 
+            (\x, {1.5 + 0.3*rand});
+    }
+    \node[below] at (3,-0.5) {\textbf{良好な収束}};
+\end{scope}
+
+% 未収束
+\begin{scope}[xshift=9cm]
+    \draw[->] (0,0) -- (6,0) node[right] {\small Iteration};
+    \draw[->] (0,0) -- (0,3) node[above] {\small $\theta$};
+    
+    % 発散するチェーン
+    \draw[blue, opacity=0.7] plot[domain=0:5.5, samples=30, smooth] 
+        (\x, {0.5 + 0.3*\x + 0.2*rand});
+    \draw[red, opacity=0.7] plot[domain=0:5.5, samples=30, smooth] 
+        (\x, {2.5 - 0.2*\x + 0.2*rand});
+    \draw[green!60!black, opacity=0.7] plot[domain=0:5.5, samples=30, smooth] 
+        (\x, {1.5 + 0.15*\x + 0.2*rand});
+    
+    \node[below] at (3,-0.5) {\textbf{未収束}};
+\end{scope}
+\end{tikzpicture}
+\caption{トレースプロットによる収束診断。左：全チェーンが同じ領域を探索（良好）。右：チェーンが異なる領域にいる（問題あり）。}
+\label{fig:trace}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{出力ファイルと結果の解釈}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{生成されるファイル一覧}
+
+\begin{table}[h]
+\centering
+\caption{出力ファイル}
+\begin{tabular}{ll}
+\toprule
+\textbf{ファイル名} & \textbf{内容} \\
+\midrule
+\texttt{trace\_H.nc} & H形式MCMCトレース（NetCDF形式） \\
+\texttt{trace\_B.nc} & B形式MCMCトレース \\
+\texttt{summary\_H.csv} & H形式パラメータ統計サマリー \\
+\texttt{summary\_B.csv} & B形式パラメータ統計サマリー \\
+\texttt{parameters\_H.csv} & H形式事後平均値 \\
+\texttt{parameters\_B.csv} & B形式事後平均値 \\
+\texttt{v6\_comparison.json} & v6最適化 vs ベイズ推定の比較 \\
+\texttt{plots/trace\_H.png} & H形式トレースプロット \\
+\texttt{plots/trace\_B.png} & B形式トレースプロット \\
+\texttt{plots/energy\_levels\_comparison.png} & エネルギー準位比較 \\
+\texttt{plots/populations\_comparison.png} & 占有確率比較 \\
+\texttt{plots/susceptibility\_comparison.png} & 感受率比較 \\
+\texttt{plots/transmission\_spectra\_comparison.png} & 透過スペクトル比較 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{サマリーCSVの読み方}
+
+\texttt{summary\_H.csv}には以下の列が含まれます：
+
+\begin{table}[h]
+\centering
+\caption{サマリー統計量の意味}
+\begin{tabular}{ll}
+\toprule
+\textbf{列名} & \textbf{意味} \\
+\midrule
+\texttt{mean} & 事後平均（点推定値として使用可能） \\
+\texttt{sd} & 事後標準偏差（不確かさの指標） \\
+\texttt{hdi\_3\%} & 94\%信頼区間の下限 \\
+\texttt{hdi\_97\%} & 94\%信頼区間の上限 \\
+\texttt{mcse\_mean} & モンテカルロ標準誤差（推定精度） \\
+\texttt{ess\_bulk} & バルクESS \\
+\texttt{ess\_tail} & テールESS \\
+\texttt{r\_hat} & $\hat{R}$統計量 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{結果の解釈例}
+
+\begin{lstlisting}[caption=サマリー出力例]
+           mean      sd  hdi_3%  hdi_97%  r_hat  ess_bulk
+g_factor  1.952   0.012   1.930    1.974   1.00     3200
+a_scale  11.45    0.82   10.02    12.91   1.01     2800
+B4        0.0037  0.0003  0.0032   0.0043  1.00     3100
+...
+\end{lstlisting}
+
+解釈：
+\begin{itemize}
+    \item $g = 1.952 \pm 0.012$（94\%信頼区間：[1.930, 1.974]）
+    \item 全パラメータで$\hat{R} \approx 1.0$、$\text{ESS} > 2000$ $\to$ 良好な収束
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プログラム全体フロー}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=1cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.7cm, 
+                      text centered, draw=black, fill=red!30},
+    process/.style={rectangle, minimum width=3.5cm, minimum height=0.7cm, 
+                    text centered, draw=black, fill=orange!30},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, 
+               minimum width=3cm, minimum height=0.7cm, text centered, draw=black, fill=blue!30},
+    decision/.style={diamond, minimum width=2cm, minimum height=0.8cm, 
+                     text centered, draw=black, fill=green!30},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (start) [startstop] {開始};
+\node (loadv6) [io, below=of start] {v6最適化結果読み込み (H/B)};
+\node (loaddata) [io, below=of loadv6] {実験データ読み込み (10セット)};
+\node (weight) [process, below=of loaddata] {重み配列生成};
+
+\node (modelH) [process, below left=1cm and 0.5cm of weight] {H形式モデル構築};
+\node (modelB) [process, below right=1cm and 0.5cm of weight] {B形式モデル構築};
+
+\node (mcmcH) [process, below=of modelH] {MCMCサンプリング (H)};
+\node (mcmcB) [process, below=of modelB] {MCMCサンプリング (B)};
+
+\node (save) [io, below=1.5cm of $(mcmcH)!0.5!(mcmcB)$] {結果保存 (trace, summary)};
+\node (plot) [process, below=of save] {比較プロット生成};
+\node (end) [startstop, below=of plot] {終了};
+
+\draw [arrow] (start) -- (loadv6);
+\draw [arrow] (loadv6) -- (loaddata);
+\draw [arrow] (loaddata) -- (weight);
+\draw [arrow] (weight) -| (modelH);
+\draw [arrow] (weight) -| (modelB);
+\draw [arrow] (modelH) -- (mcmcH);
+\draw [arrow] (modelB) -- (mcmcB);
+\draw [arrow] (mcmcH) |- (save);
+\draw [arrow] (mcmcB) |- (save);
+\draw [arrow] (save) -- (plot);
+\draw [arrow] (plot) -- (end);
+
+\end{tikzpicture}
+\caption{プログラム全体のフローチャート}
+\label{fig:flowchart}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{物理量の可視化}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{生成されるプロット}
+
+\begin{enumerate}
+    \item \textbf{トレースプロット}（trace\_H.png, trace\_B.png）
+    \begin{itemize}
+        \item 各パラメータのMCMC軌跡
+        \item 収束診断に使用
+    \end{itemize}
+    
+    \item \textbf{エネルギー準位比較}（energy\_levels\_comparison.png）
+    \begin{itemize}
+        \item 各条件でのエネルギー固有値
+        \item H形式 vs B形式（赤 vs 青の棒グラフ）
+    \end{itemize}
+    
+    \item \textbf{占有確率比較}（populations\_comparison.png）
+    \begin{itemize}
+        \item ボルツマン分布による各準位の占有確率
+        \item 温度・磁場依存性の可視化
+    \end{itemize}
+    
+    \item \textbf{感受率比較}（susceptibility\_comparison.png）
+    \begin{itemize}
+        \item $|\chi(\omega)|$の周波数依存性
+        \item 共鳴ピーク位置の比較
+    \end{itemize}
+    
+    \item \textbf{透過スペクトル比較}（transmission\_spectra\_comparison.png）
+    \begin{itemize}
+        \item 実験データとフィット曲線
+        \item RMSE表示
+        \item 重み領域の色分け
+    \end{itemize}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{enumerate}
+    \item \textbf{目的}：v6最適化の点推定値に確率的不確かさを付与
+    
+    \item \textbf{方法}：
+    \begin{itemize}
+        \item 情報的事前分布（v6結果を中心とした切断正規分布）
+        \item Sliceサンプラーによる勾配不要MCMC
+        \item 8チェーン×4,000サンプルの大規模サンプリング
+    \end{itemize}
+    
+    \item \textbf{特徴}：
+    \begin{itemize}
+        \item H形式とB形式を同時処理
+        \item 3段階重み付け（ポラリトン=1.5, 共振器=1.0, 背景=0.01）
+        \item 豊富な診断・可視化機能
+    \end{itemize}
+    
+    \item \textbf{出力}：
+    \begin{itemize}
+        \item 事後分布（トレースファイル）
+        \item 統計サマリー（平均、標準偏差、信頼区間、$\hat{R}$、ESS）
+        \item 比較プロット（エネルギー、占有確率、感受率、透過率）
+    \end{itemize}
+\end{enumerate}
+
+\begin{keypoint}
+ベイズ推定の利点：
+\begin{itemize}
+    \item パラメータ不確かさの定量化 $\to$ 誤差伝播の正確な評価
+    \item 事前知識（v6結果）と実験データの統合
+    \item モデル選択（H vs B）への拡張可能性
+\end{itemize}
+\end{keypoint}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{付録：用語集}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{description}
+    \item[事後分布（Posterior）] データを観測した後のパラメータの確率分布
+    \item[事前分布（Prior）] データを観測する前のパラメータの確率分布
+    \item[尤度（Likelihood）] パラメータが与えられたときのデータの確率
+    \item[MCMC] マルコフ連鎖モンテカルロ法。複雑な分布からサンプルを生成
+    \item[トレース] MCMCで生成されたパラメータサンプルの時系列
+    \item[$\hat{R}$] 収束診断指標。1に近いほど良好
+    \item[ESS] 有効サンプルサイズ。自己相関を考慮した独立サンプル数
+    \item[切断正規分布] 範囲制限付きの正規分布
+    \item[PyMC] Pythonベイズ推定ライブラリ
+    \item[ArviZ] ベイズ推定結果の診断・可視化ライブラリ
+    \item[PyTensor] PyMCの計算バックエンド（旧Theano）
+\end{description}
+
+\end{document}

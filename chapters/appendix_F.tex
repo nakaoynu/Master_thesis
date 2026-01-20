@@ -1,0 +1,132 @@
+\chapter{相互作用描像・線形応答理論に基づく磁気感受率の導出}
+\label{chap:Kubo_formula_derivation}
+
+GGGの磁気光学的応答（透過率や反射率）を計算するためには, 物質の動的磁気感受率\(\chi(\omega)\)を知る必要がある. これは, 外部からの微弱な振動磁場に対する磁化の応答として定義され, 量子統計力学における線形応答理論（Linear Response Theory）を用いて厳密に導出される. 本節では, 久保公式\(^{\cite{Kubo1957}}\)の導出過程を相互作用描像を用いて詳細に示す. 
+
+\section{Liouville方程式と相互作用描像}
+\subsection{Liouville-von Neumann方程式の導出}
+
+密度演算子（密度行列）\(\hat{\rho}(t)\)の時間発展方程式であるLiouville-von Neumann方程式を, Schrödinger方程式より導出する. 
+ある量子系が, 確率\(p_n\)で純粋状態\(|\psi_n(t)\rangle\)にある混合状態を考える. このとき, 密度演算子は以下のように定義される. 
+
+\begin{equation}
+\hat{\rho}(t) = \sum_n p_n |\psi_n(t)\rangle \langle \psi_n(t)|
+\end{equation}
+
+ここで, 確率\(p_n\)は時間的に変化しない（\(\dot{p}_n = 0\)）と仮定する. これは, 外部環境とのエネルギーや粒子のやり取りによる緩和過程を含まない, 閉じた系におけるユニタリ発展を記述するためである. 
+\(\hat{\rho}(t)\)を時間\(t\)で微分すると, Leibniz則より以下のようになる. 
+
+\begin{equation}
+\frac{\partial \hat{\rho}(t)}{\partial t} = \sum_n p_n \left[ \left( \frac{\partial}{\partial t} |\psi_n(t)\rangle \right) \langle \psi_n(t)| + |\psi_n(t)\rangle \left( \frac{\partial}{\partial t} \langle \psi_n(t)| \right) \right]
+\label{eq:rho_dot}
+\end{equation}
+
+一方, 状態ベクトル\(|\psi_n(t)\rangle\)は時間依存Schrödinger方程式に従う. 
+
+\begin{equation}
+i\hbar \frac{\partial}{\partial t} |\psi_n(t)\rangle = \hat{\mathcal{H}}(t) |\psi_n(t)\rangle
+\end{equation}
+
+この式の両辺を\(i\hbar\)で割り, ケットベクトルの時間微分を得る. 
+
+\begin{equation}
+\frac{\partial}{\partial t} |\psi_n(t)\rangle = \frac{1}{i\hbar} \hat{\mathcal{H}}(t) |\psi_n(t)\rangle = -\frac{i}{\hbar} \hat{\mathcal{H}}(t) |\psi_n(t)\rangle
+\end{equation}
+
+また, エルミート共役をとることで, ブラベクトルの時間微分が得られる（ハミルトニアンのエルミート性 \(\hat{\mathcal{H}}^\dagger = \hat{\mathcal{H}}\) を用いる）. 
+
+\begin{equation}
+-i\hbar \frac{\partial}{\partial t} \langle \psi_n(t)| = \langle \psi_n(t)| \hat{\mathcal{H}}(t) \quad \longrightarrow \quad \frac{\partial}{\partial t} \langle \psi_n(t)| = \frac{i}{\hbar} \langle \psi_n(t)| \hat{\mathcal{H}}(t)
+\end{equation}
+
+これらを式(\ref{eq:rho_dot})に代入すると, 
+
+\begin{align}
+\frac{\partial \hat{\rho}(t)}{\partial t} &= \sum_n p_n \left[ \left( -\frac{i}{\hbar} \hat{\mathcal{H}}(t) |\psi_n(t)\rangle \right) \langle \psi_n(t)| + |\psi_n(t)\rangle \left( \frac{i}{\hbar} \langle \psi_n(t)| \hat{\mathcal{H}}(t) \right) \right] \nonumber \\
+&= -\frac{i}{\hbar} \hat{\mathcal{H}}(t) \left( \sum_n p_n |\psi_n(t)\rangle \langle \psi_n(t)| \right) + \frac{i}{\hbar} \left( \sum_n p_n |\psi_n(t)\rangle \langle \psi_n(t)| \right) \hat{\mathcal{H}}(t) \nonumber \\
+&= -\frac{i}{\hbar} \left( \hat{\mathcal{H}}(t)\hat{\rho}(t) - \hat{\rho}(t)\hat{\mathcal{H}}(t) \right) \nonumber \\
+&= -\frac{i}{\hbar} [\hat{\mathcal{H}}(t), \hat{\rho}(t)]
+\end{align}
+
+整理して, 以下のLiouville-von Neumann方程式を得る. 
+
+\begin{equation}
+i\hbar \frac{\partial \hat{\rho}(t)}{\partial t} = [\hat{\mathcal{H}}(t), \hat{\rho}(t)]
+\end{equation}
+
+この方程式は, 古典力学におけるLiouville方程式の量子力学的対応物であり, 量子状態の確率分布の時間発展を記述する基礎方程式である. \\
+\(\hat{\mathcal{H}}(t)\)は, 時間的に変化しない非摂動系のハミルトニアン\(\hat{\mathcal{H}}_0\)と, 時刻\(t_0\)以降に印加される外部摂動\(\hat{\mathcal{H}}'(t)\)の和で表される. 
+\begin{equation}
+\hat{\mathcal{H}}(t) = \hat{\mathcal{H}}_0 + \hat{\mathcal{H}}'(t)
+\end{equation}
+外部振動場\(\vb*{h}(t)\)に対するZeemanエネルギーを摂動とすると, \(\hat{\mathcal{H}}'(t) = - \hat{\vb*{M}} \cdot \vb*{h}(t)\)である（\(\hat{\vb*{M}}\)は全磁化演算子）. 
+
+ここで, 計算の見通しを良くするために, Schrödinger描像から相互作用描像への変換を行う. 相互作用描像における密度演算子\(\rho_I(t)\)および任意の演算子\(\hat{A}_I(t)\)は以下のように定義される：
+
+\begin{align}
+\rho_I(t) &= e^{i\hat{\mathcal{H}}_0 t / \hbar} \rho(t) e^{-i\hat{\mathcal{H}}_0 t / \hbar} \\
+\hat{A}_I(t) &= e^{i\hat{\mathcal{H}}_0 t / \hbar} \hat{A} e^{-i\hat{\mathcal{H}}_0 t / \hbar}
+\end{align}
+
+Liouville方程式に\(\rho(t) = e^{-i\hat{\mathcal{H}}_0 t / \hbar} \rho_I(t) e^{i\hat{\mathcal{H}}_0 t / \hbar}\)を代入して整理すると, 相互作用描像における時間発展方程式は, 摂動項\(\hat{\mathcal{H}}'_I(t)\)のみを含む形となる：
+
+\begin{equation}
+i\hbar \frac{\partial \rho_I(t)}{\partial t} = [\hat{\mathcal{H}}'_I(t), \rho_I(t)]
+\end{equation}
+
+\section{摂動展開と線形応答}
+
+系は\(t=-\infty\)において熱平衡状態\(\rho_{\text{eq}} = e^{-\beta \hat{\mathcal{H}}_0} / Z\)にあったと仮定する（\(\beta = 1/k_B T\)）. 摂動が微弱であるとして, \(\rho_I(t)\)を\(\hat{\mathcal{H}}'\)について級数展開し, 一次の項までをとる（線形近似）. 
+
+\begin{gather}
+\rho_I(t) = \rho_0 + \Delta \rho_I(t) \\
+i\hbar \frac{\partial \Delta \rho_I(t)}{\partial t} \approx [\hat{\mathcal{H}}'_I(t), \rho_0]
+\end{gather}
+
+これを積分形に直すと, 
+
+\begin{equation}
+\Delta \rho_I(t) = -\frac{i}{\hbar} \int_{-\infty}^t dt' [\hat{\mathcal{H}}'_I(t'), \rho_0]
+\end{equation}
+
+シュレーディンガー描像における密度行列の変化\(\Delta \rho(t)\)は, 逆変換により以下のように得られる：
+
+\begin{equation}
+\Delta \rho(t) = e^{-i\hat{\mathcal{H}}_0 t / \hbar} \Delta \rho_I(t) e^{i\hat{\mathcal{H}}_0 t / \hbar} = -\frac{i}{\hbar} \int_{-\infty}^t dt' e^{-i\hat{\mathcal{H}}_0 t / \hbar} [\hat{\mathcal{H}}'_I(t'), \rho_0] e^{i\hat{\mathcal{H}}_0 t / \hbar}
+\end{equation}
+
+\section{久保公式（Kubo Formula）の導出}
+
+観測量である磁化\(\hat{M}_\alpha\)（\(\alpha = x, y, z\)）の期待値の変化\(\Delta \langle M_\alpha(t) \rangle\)は, トレースを用いて計算される. 
+
+\begin{equation}
+\Delta \langle M_\alpha(t) \rangle = \text{Tr}(\Delta \rho(t) \hat{M}_\alpha)
+\end{equation}
+
+トレースの巡回不変性（\(\text{Tr}(ABC) = \text{Tr}(BCA)\)）を利用して式を変形する. 
+
+\begin{align}
+\Delta \langle M_\alpha(t) \rangle &= -\frac{i}{\hbar} \int_{-\infty}^t dt' \text{Tr}\left( [\hat{\mathcal{H}}'_I(t'), \rho_0] e^{i\hat{\mathcal{H}}_0 t / \hbar} \hat{M}_\alpha e^{-i\hat{\mathcal{H}}_0 t / \hbar} \right) \nonumber \\
+&= -\frac{i}{\hbar} \int_{-\infty}^t dt' \text{Tr}\left( [\hat{\mathcal{H}}'_I(t'), \rho_0] \hat{M}_{\alpha, I}(t) \right) \nonumber \\
+&= -\frac{i}{\hbar} \int_{-\infty}^t dt' \text{Tr}\left( \rho_0 [\hat{M}_{\alpha, I}(t), \hat{\mathcal{H}}'_I(t')] \right) \quad (\because \text{Tr}([A, \rho]B) = \text{Tr}(\rho [B, A]))
+\end{align}
+
+外部磁場が\(\vb*{h}(t')\)として\(\hat{M}_\beta\)成分に結合している場合, \(\hat{\mathcal{H}}'_I(t') = - \hat{M}_{\beta, I}(t') h_\beta(t')\)であるから, 
+
+\begin{equation}
+\Delta \langle M_\alpha(t) \rangle = \int_{-\infty}^t dt' \frac{i}{\hbar} \langle [\hat{M}_{\alpha, I}(t), \hat{M}_{\beta, I}(t')] \rangle_0 h_\beta(t')
+\end{equation}
+
+ここで, \(\langle \dots \rangle_0 = \text{Tr}(\rho_0 \dots)\)は平衡状態でのアンサンブル平均を表す. 応答関数\(\phi_{\alpha\beta}(t-t')\)を以下のように定義すると, これが久保公式である. 
+
+\begin{equation}
+\phi_{\alpha\beta}(t-t') = \frac{i}{\hbar} \theta(t-t') \langle [\hat{M}_\alpha(t), \hat{M}_\beta(t')] \rangle_0
+\end{equation}
+
+\(\theta(t)\)は因果律を表す階段関数である. 周波数領域での感受率\(\chi_{\alpha\beta}(\omega)\)は, この応答関数のフーリエ変換として与えられる. 
+
+\begin{equation}
+\chi_{\alpha\beta}(\omega) = \int_0^\infty dt e^{i\omega t} \phi_{\alpha\beta}(t)
+\end{equation}
+
+この式は, \textbf{「外部磁場に対する巨視的な磁化の応答（非平衡過程）は, 熱平衡状態における磁化の量子力学的な揺らぎ（交換関係の相関関数）によって完全に記述される」}という揺動散逸定理の物理的基礎を与えている. 

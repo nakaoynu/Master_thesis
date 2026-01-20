@@ -1,0 +1,612 @@
+% filepath: diagnose_bayesian_convergence_documentation.tex
+\documentclass[a4paper,12pt,dvipdfmx]{jlreq}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc}
+\usepackage{algorithm2e}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{multicol}
+
+% カラーボックス設定
+\newtcolorbox{keypoint}{colback=blue!5!white,colframe=blue!75!black,title=Key Point}
+\newtcolorbox{warning}{colback=red!5!white,colframe=red!75!black,title=注意}
+\newtcolorbox{definition}{colback=green!5!white,colframe=green!50!black,title=定義}
+\newtcolorbox{diagnostic}{colback=orange!5!white,colframe=orange!75!black,title=診断指標}
+
+\lstset{
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    breaklines=true,
+    frame=single
+}
+
+\title{\vspace{-2cm}
+\textbf{diagnose\_bayesian\_convergence.py 理解ドキュメント}\\
+\large MCMCサンプリングの収束診断ツール
+}
+\author{物理工学専攻 修士論文解析用教材}
+\date{2026年1月版}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに：このプログラムの目的}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{keypoint}
+このプログラムは、ベイズ推定（MCMC）の結果が\textbf{統計的に信頼できるか}を
+診断するためのツールです。MCMCが正しく収束していなければ、
+推定されたパラメータや不確かさは意味を持ちません。
+\end{keypoint}
+
+\subsection{なぜ収束診断が必要か？}
+
+MCMCは「十分に長く実行すれば」事後分布に収束しますが、
+実際には以下の問題が起こりえます：
+
+\begin{enumerate}
+    \item \textbf{未収束}：サンプル数が不足し、真の事後分布を探索できていない
+    \item \textbf{局所解への固着}：パラメータ空間の一部にのみ滞在
+    \item \textbf{高い自己相関}：連続サンプルが独立でなく、実質的なサンプル数が少ない
+    \item \textbf{チェーン間の不一致}：異なるチェーンが異なる領域を探索
+\end{enumerate}
+
+\subsection{使用方法}
+
+\begin{lstlisting}[language=bash]
+python diagnose_bayesian_convergence.py <結果ディレクトリ>
+
+# 例:
+python diagnose_bayesian_convergence.py bayesian_results_v6_informed_HB_20260108_013540
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{収束診断の指標}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{$\hat{R}$統計量（Gelman-Rubin診断）}
+
+\begin{definition}
+\textbf{$\hat{R}$（R-hat）}は、複数の独立したマルコフ連鎖（チェーン）を比較することで
+収束を判定する指標です。
+\end{definition}
+
+\subsubsection{計算方法}
+
+$M$個のチェーンがあり、各チェーンに$N$個のサンプルがあるとします。
+
+\begin{enumerate}
+    \item \textbf{チェーン内分散} $W$（Within-chain variance）:
+    \begin{equation}
+    W = \frac{1}{M} \sum_{m=1}^{M} s_m^2, \quad s_m^2 = \frac{1}{N-1} \sum_{n=1}^{N} (\theta_{mn} - \bar{\theta}_m)^2
+    \end{equation}
+    
+    \item \textbf{チェーン間分散} $B$（Between-chain variance）:
+    \begin{equation}
+    B = \frac{N}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2
+    \end{equation}
+    
+    \item \textbf{推定分散}:
+    \begin{equation}
+    \hat{\text{Var}}(\theta) = \frac{N-1}{N} W + \frac{1}{N} B
+    \end{equation}
+    
+    \item \textbf{$\hat{R}$統計量}:
+    \begin{equation}
+    \boxed{\hat{R} = \sqrt{\frac{\hat{\text{Var}}(\theta)}{W}}}
+    \end{equation}
+\end{enumerate}
+
+\subsubsection{解釈}
+
+\begin{table}[h]
+\centering
+\caption{$\hat{R}$の解釈基準}
+\begin{tabular}{cll}
+\toprule
+\textbf{$\hat{R}$の値} & \textbf{判定} & \textbf{アクション} \\
+\midrule
+$< 1.01$ & ✅ 優秀 & そのまま使用可能 \\
+$1.01 - 1.05$ & ⚠️ 許容範囲 & 注意しながら使用 \\
+$1.05 - 1.10$ & ⚠️ 要注意 & サンプル数増加を検討 \\
+$> 1.10$ & ❌ 未収束 & 必ずサンプル数増加 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% 良好な収束
+\begin{scope}
+    \draw[->] (0,0) -- (6,0) node[right] {\small Iteration};
+    \draw[->] (0,0) -- (0,3.5) node[above] {\small $\theta$};
+    
+    \foreach \c/\col in {1/red, 2/blue, 3/green!60!black, 4/orange} {
+        \draw[\col, opacity=0.7] 
+            plot[domain=0:5.5, samples=40, smooth] 
+            (\x, {1.8 + 0.3*rand});
+    }
+    
+    \node[below] at (3,-0.5) {\textbf{$\hat{R} \approx 1.0$}};
+    \node[below] at (3,-1) {\small 全チェーンが同じ領域};
+\end{scope}
+
+% 未収束
+\begin{scope}[xshift=9cm]
+    \draw[->] (0,0) -- (6,0) node[right] {\small Iteration};
+    \draw[->] (0,0) -- (0,3.5) node[above] {\small $\theta$};
+    
+    \draw[red, opacity=0.7] plot[domain=0:5.5, samples=30] 
+        (\x, {0.8 + 0.15*\x + 0.15*rand});
+    \draw[blue, opacity=0.7] plot[domain=0:5.5, samples=30] 
+        (\x, {2.8 - 0.1*\x + 0.15*rand});
+    \draw[green!60!black, opacity=0.7] plot[domain=0:5.5, samples=30] 
+        (\x, {1.5 + 0.2*rand});
+    \draw[orange, opacity=0.7] plot[domain=0:5.5, samples=30] 
+        (\x, {2.0 + 0.08*\x + 0.2*rand});
+    
+    \node[below] at (3,-0.5) {\textbf{$\hat{R} > 1.1$}};
+    \node[below] at (3,-1) {\small チェーンが分離};
+\end{scope}
+\end{tikzpicture}
+\caption{$\hat{R}$による収束判定の可視化}
+\label{fig:rhat}
+\end{figure}
+
+\subsection{有効サンプルサイズ（ESS）}
+
+\begin{definition}
+\textbf{ESS（Effective Sample Size）}は、自己相関を考慮した
+「実質的に独立な」サンプル数です。
+\end{definition}
+
+MCMCサンプルは時系列データであり、連続したサンプルは相関を持ちます。
+$N$個のサンプルがあっても、独立なサンプル数は$N$より少なくなります。
+
+\subsubsection{計算方法}
+
+自己相関関数$\rho_k$（ラグ$k$の相関）を用いて：
+
+\begin{equation}
+\boxed{\text{ESS} = \frac{N}{1 + 2\sum_{k=1}^{K} \rho_k}}
+\end{equation}
+
+ここで$K$は自己相関が無視できるようになるラグ。
+
+\subsubsection{ESSの種類}
+
+\begin{itemize}
+    \item \textbf{ESS\_bulk}：分布の中心（平均、中央値）の推定精度
+    \item \textbf{ESS\_tail}：分布の裾（信頼区間の端）の推定精度
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{ESSの解釈基準}
+\begin{tabular}{cll}
+\toprule
+\textbf{ESS} & \textbf{判定} & \textbf{意味} \\
+\midrule
+$\geq 400$ & ✅ 十分 & 信頼できる推定 \\
+$100 - 400$ & ⚠️ 不足気味 & 精度向上の余地あり \\
+$< 100$ & ❌ 危険 & 推定が不安定 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{keypoint}
+ESS $\geq 400$ の目安は、事後平均の標準誤差（MCSE）を事後標準偏差の5\%以下に
+抑えるために必要なサンプル数に基づいています：
+\[
+\text{MCSE} = \frac{\text{SD}}{\sqrt{\text{ESS}}} \leq 0.05 \times \text{SD} \quad \Rightarrow \quad \text{ESS} \geq 400
+\]
+\end{keypoint}
+
+\subsection{自己相関}
+
+\begin{definition}
+\textbf{自己相関}$\rho_k$は、$k$ステップ離れたサンプル間の相関係数：
+\begin{equation}
+\rho_k = \frac{\text{Cov}(\theta_t, \theta_{t+k})}{\text{Var}(\theta_t)}
+\end{equation}
+\end{definition}
+
+理想的には、自己相関は小さいラグ$k$で急速に0に減衰すべきです。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% 良好な自己相関
+\begin{scope}
+    \draw[->] (0,0) -- (5,0) node[right] {\small Lag $k$};
+    \draw[->] (0,0) -- (0,3) node[above] {\small $\rho_k$};
+    
+    \draw[thick, blue] plot[domain=0:4.5, samples=20] 
+        (\x, {2.5*exp(-\x)});
+    
+    \draw[dashed, gray] (0,0.2) -- (5,0.2);
+    
+    \node[below] at (2.5,-0.5) {\textbf{良好}};
+    \node[below] at (2.5,-1) {\small 急速に減衰 → 高ESS};
+\end{scope}
+
+% 問題のある自己相関
+\begin{scope}[xshift=8cm]
+    \draw[->] (0,0) -- (5,0) node[right] {\small Lag $k$};
+    \draw[->] (0,0) -- (0,3) node[above] {\small $\rho_k$};
+    
+    \draw[thick, red] plot[domain=0:4.5, samples=20] 
+        (\x, {2.5*exp(-0.2*\x)});
+    
+    \draw[dashed, gray] (0,0.2) -- (5,0.2);
+    
+    \node[below] at (2.5,-0.5) {\textbf{問題あり}};
+    \node[below] at (2.5,-1) {\small 緩やかな減衰 → 低ESS};
+\end{scope}
+\end{tikzpicture}
+\caption{自己相関プロットの解釈}
+\label{fig:autocorr}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プログラムの機能}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{生成される診断プロット}
+
+\begin{table}[h]
+\centering
+\caption{出力ファイル一覧}
+\begin{tabular}{ll}
+\toprule
+\textbf{ファイル名} & \textbf{内容} \\
+\midrule
+\texttt{detailed\_trace\_H.png} & H形式：事後分布ヒストグラム + トレースプロット \\
+\texttt{detailed\_trace\_B.png} & B形式：事後分布ヒストグラム + トレースプロット \\
+\texttt{ess\_comparison.png} & H/B形式のESS比較バープロット \\
+\texttt{rhat\_comparison.png} & H/B形式の$\hat{R}$比較バープロット \\
+\texttt{correlation\_H.png} & H形式：パラメータ間相関ペアプロット \\
+\texttt{correlation\_B.png} & B形式：パラメータ間相関ペアプロット \\
+\texttt{rank\_plot\_H.png} & H形式：ランクプロット \\
+\texttt{rank\_plot\_B.png} & B形式：ランクプロット \\
+\texttt{autocorr\_H.png} & H形式：自己相関プロット \\
+\texttt{autocorr\_B.png} & B形式：自己相関プロット \\
+\texttt{convergence\_report.md} & 収束診断レポート（Markdown） \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{詳細トレースプロット}
+
+各パラメータについて2つのパネルを生成：
+
+\begin{enumerate}
+    \item \textbf{左パネル}：事後分布ヒストグラム
+    \begin{itemize}
+        \item 青ヒストグラム：サンプル分布
+        \item 赤破線：事後平均
+        \item オレンジ点線：2.5\%, 97.5\%パーセンタイル（95\%信頼区間）
+    \end{itemize}
+    
+    \item \textbf{右パネル}：トレースプロット
+    \begin{itemize}
+        \item 8本のチェーンを色分け表示
+        \item ESS と $\hat{R}$ をテキスト表示
+        \item ✅/⚠️ マークで収束状態を示す
+    \end{itemize}
+\end{enumerate}
+
+\subsection{パラメータ間相関プロット}
+
+\begin{definition}
+\textbf{ペアプロット}は、パラメータの全ペアについて2次元事後分布を可視化します。
+強い相関があると、MCMCの探索効率が低下します。
+\end{definition}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.7]
+% 低相関
+\begin{scope}
+    \draw[->] (0,0) -- (4,0) node[right] {$\theta_1$};
+    \draw[->] (0,0) -- (0,4) node[above] {$\theta_2$};
+    
+    \filldraw[blue!30, draw=blue] (2,2) circle (1cm and 0.9cm);
+    
+    \node[below] at (2,-0.5) {\textbf{低相関}};
+    \node[below] at (2,-1) {\small 円形 → 探索容易};
+\end{scope}
+
+% 高相関
+\begin{scope}[xshift=7cm]
+    \draw[->] (0,0) -- (4,0) node[right] {$\theta_1$};
+    \draw[->] (0,0) -- (0,4) node[above] {$\theta_2$};
+    
+    \filldraw[red!30, draw=red, rotate around={45:(2,2)}] (2,2) ellipse (1.5cm and 0.3cm);
+    
+    \node[below] at (2,-0.5) {\textbf{高相関}};
+    \node[below] at (2,-1) {\small 細長い楕円 → 探索困難};
+\end{scope}
+\end{tikzpicture}
+\caption{パラメータ間相関と事後分布の形状}
+\label{fig:correlation}
+\end{figure}
+
+\subsection{ランクプロット}
+
+\begin{definition}
+\textbf{ランクプロット}は、各チェーンのサンプルをプールし、
+全体でのランク（順位）を計算して、チェーンごとにヒストグラム化します。
+\end{definition}
+
+収束している場合、全チェーンのランクヒストグラムは一様分布に近くなります。
+特定のチェーンだけが高い/低いランクに偏っていれば、未収束の兆候です。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{プログラムフロー}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.7cm, 
+                      text centered, draw=black, fill=red!30},
+    process/.style={rectangle, minimum width=3.5cm, minimum height=0.7cm, 
+                    text centered, draw=black, fill=orange!30},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, 
+               minimum width=2.5cm, minimum height=0.7cm, text centered, draw=black, fill=blue!30},
+    decision/.style={diamond, minimum width=2cm, minimum height=1cm, 
+                     text centered, draw=black, fill=green!30},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (start) [startstop] {開始};
+\node (load) [io, below=of start] {トレース読み込み (H/B)};
+\node (summary) [process, below=of load] {統計サマリー計算};
+\node (check) [decision, below=of summary, aspect=2] {$\hat{R} > 1.01$?};
+\node (warn) [process, right=2cm of check, fill=red!20] {警告出力};
+\node (ess) [decision, below=of check, aspect=2] {ESS $< 400$?};
+\node (warn2) [process, right=2cm of ess, fill=red!20] {警告出力};
+\node (plot1) [process, below=of ess] {詳細トレースプロット};
+\node (plot2) [process, below=of plot1] {相関プロット};
+\node (plot3) [process, below=of plot2] {ESS/$\hat{R}$比較プロット};
+\node (report) [io, below=of plot3] {レポート生成};
+\node (end) [startstop, below=of report] {終了};
+
+\draw [arrow] (start) -- (load);
+\draw [arrow] (load) -- (summary);
+\draw [arrow] (summary) -- (check);
+\draw [arrow] (check) -- node[above] {Yes} (warn);
+\draw [arrow] (check) -- node[right] {No} (ess);
+\draw [arrow] (warn) |- (ess);
+\draw [arrow] (ess) -- node[above] {Yes} (warn2);
+\draw [arrow] (ess) -- node[right] {No} (plot1);
+\draw [arrow] (warn2) |- (plot1);
+\draw [arrow] (plot1) -- (plot2);
+\draw [arrow] (plot2) -- (plot3);
+\draw [arrow] (plot3) -- (report);
+\draw [arrow] (report) -- (end);
+
+\end{tikzpicture}
+\caption{プログラムフローチャート}
+\label{fig:flow}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{収束診断レポートの読み方}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{レポートの構成}
+
+\texttt{convergence\_report.md}には以下が含まれます：
+
+\begin{enumerate}
+    \item \textbf{H形式/B形式ごとの診断結果}
+    \begin{itemize}
+        \item $\hat{R} > 1.01$ のパラメータ一覧
+        \item ESS $< 400$ のパラメータ一覧
+        \item 全パラメータの統計サマリー
+    \end{itemize}
+    
+    \item \textbf{推奨事項}
+    \begin{itemize}
+        \item 問題がある場合の対処法
+        \item サンプリング設定の調整案
+    \end{itemize}
+\end{enumerate}
+
+\subsection{問題がある場合の対処法}
+
+\begin{table}[h]
+\centering
+\caption{収束問題と対処法}
+\begin{tabular}{lp{8cm}}
+\toprule
+\textbf{問題} & \textbf{対処法} \\
+\midrule
+$\hat{R} > 1.1$ & 
+\begin{itemize}
+    \item サンプル数（draws）を2〜3倍に増加
+    \item ウォームアップ（tune）を増加
+    \item チェーン数を増やして確認
+\end{itemize} \\
+\midrule
+ESS $< 100$ & 
+\begin{itemize}
+    \item サンプル数を大幅に増加
+    \item 事前分布の$\sigma$を拡大
+    \item 再パラメータ化を検討
+\end{itemize} \\
+\midrule
+高い相関 & 
+\begin{itemize}
+    \item 相関するパラメータ間で再パラメータ化
+    \item 事前分布を緩和
+    \item より効率的なサンプラーを検討
+\end{itemize} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{主要関数の説明}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{diagnose\_convergence}
+
+\begin{lstlisting}[language=Python]
+def diagnose_convergence(trace, model_name, output_dir):
+    """
+    収束診断の詳細分析
+    
+    Parameters
+    ----------
+    trace : az.InferenceData
+        ArviZトレースオブジェクト
+    model_name : str
+        'H' または 'B'
+    output_dir : pathlib.Path
+        出力ディレクトリ
+    
+    Returns
+    -------
+    summary : pd.DataFrame
+        パラメータ統計サマリー
+    
+    出力
+    ----
+    - R-hat > 1.01 のパラメータを警告
+    - ESS < 400 のパラメータを警告
+    - ESS < 100 のパラメータを危険として報告
+    """
+\end{lstlisting}
+
+\subsection{plot\_detailed\_trace}
+
+\begin{lstlisting}[language=Python]
+def plot_detailed_trace(trace, model_name, output_dir):
+    """
+    詳細なトレースプロット生成
+    
+    各パラメータについて:
+    - 左: 事後分布ヒストグラム（平均、95%CI付き）
+    - 右: 8チェーンのトレースプロット（ESS/R-hat表示）
+    
+    出力: detailed_trace_{model_name}.png
+    """
+\end{lstlisting}
+
+\subsection{generate\_convergence\_report}
+
+\begin{lstlisting}[language=Python]
+def generate_convergence_report(traces, output_dir):
+    """
+    収束診断レポート生成（Markdown形式）
+    
+    内容:
+    - H/B形式ごとの問題パラメータ
+    - 全パラメータのサマリー統計
+    - 問題がある場合の推奨事項
+    
+    出力: convergence_report.md
+    """
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{実践的な使用例}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{典型的なワークフロー}
+
+\begin{enumerate}
+    \item ベイズ推定を実行
+    \begin{lstlisting}[language=bash]
+python bayesian_v6_informed_priors_HB.py
+    \end{lstlisting}
+    
+    \item 収束診断を実行
+    \begin{lstlisting}[language=bash]
+python diagnose_bayesian_convergence.py bayesian_results_v6_...
+    \end{lstlisting}
+    
+    \item レポートを確認
+    \begin{lstlisting}[language=bash]
+cat bayesian_results_v6_.../diagnostics/convergence_report.md
+    \end{lstlisting}
+    
+    \item 問題があれば設定を調整して再実行
+\end{enumerate}
+
+\subsection{出力例の解釈}
+
+\begin{lstlisting}
+======================================================================
+📊 H形式 収束診断
+======================================================================
+
+【R-hat診断】
+✅ 全パラメータでR-hat < 1.01
+
+【ESS診断】
+⚠️ ESS_bulk < 400 のパラメータ:
+   - B4: ESS_bulk = 287, ESS_tail = 312
+   - B6: ESS_bulk = 203, ESS_tail = 245
+\end{lstlisting}
+
+解釈：
+\begin{itemize}
+    \item $\hat{R}$は問題なし（全チェーン収束済み）
+    \item $B_4$, $B_6$のESSが低い $\to$ サンプル数増加推奨
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{まとめ}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{enumerate}
+    \item \textbf{目的}：MCMCサンプリングの信頼性を定量的に評価
+    
+    \item \textbf{主要指標}：
+    \begin{itemize}
+        \item $\hat{R}$：チェーン間の一致度（$< 1.01$が理想）
+        \item ESS：実質的な独立サンプル数（$\geq 400$が推奨）
+        \item 自己相関：連続サンプル間の依存性
+    \end{itemize}
+    
+    \item \textbf{出力}：
+    \begin{itemize}
+        \item 詳細トレースプロット
+        \item パラメータ間相関プロット
+        \item ESS/$\hat{R}$比較バープロット
+        \item Markdownレポート
+    \end{itemize}
+    
+    \item \textbf{活用}：
+    \begin{itemize}
+        \item 問題パラメータの特定
+        \item サンプリング設定の改善方針決定
+        \item 推定結果の信頼性評価
+    \end{itemize}
+\end{enumerate}
+
+\begin{keypoint}
+MCMCの結果を報告する際は、必ず収束診断の結果（$\hat{R}$、ESS）を添えましょう。
+収束していないMCMCの結果は、統計的に無意味です。
+\end{keypoint}
+
+\end{document}

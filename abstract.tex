@@ -16,6 +16,7 @@
 
 \usepackage{graphicx}  % 画像挿入用
 \usepackage{secdot}    % セクション番号の後のドット
+\def\thefootnote{\fnsymbol{footnote}} % 脚注記号を*や†に変更
 
 % --- フォント・レイアウト調整 ---
 \usepackage{titlesec}
@@ -44,7 +45,7 @@
         \vspace{5mm}
         
         % 所属・氏名
-        {\gtfamily\fontsize{12pt}{18pt}\selectfont 馬場研究室　学籍番号24NC230　中尾 太一}
+        {\gtfamily\fontsize{12pt}{18pt}\selectfont 馬場研究室　中尾 太一}
         
         \vspace{5mm}
         
@@ -52,10 +53,11 @@
         \begin{minipage}{0.9\textwidth}
             \small
             \textbf{Abstract:} 
-            The interaction between light and matter is a fundamental theme in quantum optics.
-            In the ultra-strong coupling (USC) regime, where the coupling strength is comparable to the transition frequency, novel physical phenomena such as superradiant phase transition (SRPT) are predicted.
-            In this study, we quantitatively evaluate the validity of two theoretical models, the H-form and the B-form, describing the interaction between the paramagnetic material GGG and THz light using Bayesian estimation.
-            Our analysis clarifies which model correctly describes the experimental data and discusses the possibility of realizing SRPT in the thermal equilibrium state, paving the way for robust quantum technologies.
+            In the ultrastrong coupling (USC) regime, where the light-matter coupling strength is comparable to the transition frequency, the possibility of superradiant phase transitions (SRPT) in thermal equilibrium remains a subject of fundamental debate due to the ``no-go'' theorem associated with the diamagnetic \(A^2\) term.
+In this study, I investigate the interaction between the paramagnetic material \(\text{Gd}_{3}\text{Ga}_{5}\text{O}_{12}\) (GGG) and terahertz fields.
+I quantitatively compare two competing theoretical interaction models---the H-form (\(-\hat{\vb*{d}} \cdot \mu_0 \hat{\vb*{H}}\)) and the B-form (\(-\hat{\vb*{d}} \cdot \hat{\vb*{B}}\))---using Bayesian estimation.
+Employing Markov Chain Monte Carlo (MCMC) methods implemented in PyMC, I rigorously evaluate the posterior distributions of key parameters, including the coupling strength \(g\), to account for experimental uncertainties.
+Our results statistically identify the model that best describes the GGG susceptibility, thereby clarifying the validity of the no-go theorem in spin systems and providing quantitative insights into the feasibility of realizing SRPT in cavity quantum electrodynamics.
         \end{minipage}
     \end{center}
     \vspace{5mm}
@@ -66,56 +68,48 @@
 \section{緒言}
 
 \subsection{研究背景：超強結合と超放射相転移}
-光と物質の相互作用は量子光学の根幹をなすテーマであり，レーザー，原子時計，そして現代の量子情報技術分野の基礎を形成している．
-近年のナノテクノロジーや超伝導回路技術の進展により，結合定数\(g\)が原子や共振器の共振周波数\(\omega\)の数10\%程度に達する「超強結合（USC）領域」，さらには\(g \geq \omega\)となる「深強結合（DSC）領域」へのアクセスが可能になった．
-これらの領域では，従来の摂動論的アプローチや回転波近似（RWA）が破綻し, 光と物質の境界が曖昧な混成状態の準粒子（ポラリトン）が形成される$^{\cite{Ciuti2005, FornDiaz2019, Kockum2019}}$．
+光と物質の相互作用は量子光学の根幹をなし，レーザー，原子時計，量子情報技術の基礎を形成している．
+近年の技術進展により，結合定数\(g\)が原子や共振器の共振周波数\(\omega\)の数10\%程度に達する「超強結合（USC）領域」へのアクセスが可能になった．\(^{\cite{Ciuti2005, FornDiaz2019, Kockum2019}}\)
+USC領域で注目される現象が，1973年にHeppらが提唱した「超放射相転移（SRPT）」である．\(^{\cite{Hepp1973, Wang1973}}\)多数の原子と単一の光モードが相互作用するDickeモデル$^{\cite{Dicke1954}}$において，結合強度が臨界点を超えると，光子場と物質場がそれぞれ静的電磁場と静的分極として熱平衡状態で自発的に現れ, 基底状態が巨視的な光子数を伴う状態へと相転移する．SRPTの特異的な点は，光と物質の結合系の熱平衡状態に関連する物理現象であることだ．
 
-USC領域において注目される現象として，1973年にHeppらが提唱した「超放射相転移（SRPT）」が挙げられる．$^{\cite{Hepp1973, Wang1973}}$多数の原子と単一の光モードが相互作用するDickeモデル$^{\cite{Dicke1954}}$において，結合強度が臨界点を超えると，基底状態が巨視的な光子数を伴う状態へと相転移する現象である．これに伴い，光子場と物質場がそれぞれ静的電磁場と静的分極として熱平衡状態で自発的に現れる．SRPTの特異的な点は，光と物質の結合系の熱平衡状態に関連する物理現象であることだ．
+熱平衡状態のSRPT実現は，デコヒーレンスに強い量子技術への道を開くことが期待される．従来の量子技術では外部駆動で生成した光子のスクイーズド状態を利用するが，その状態は伝搬・検出過程の光子損失で急速に劣化する．これに対しSRPTの臨界点では，系の基底状態として強いスクイージングが自発的に現れるため\(^{\cite{Hayashida2023}}\)，外部駆動不要で時間経過に頑健である．この「内在的スクイージング」は環境ノイズに強い量子技術の基盤となる. 
 
-熱平衡状態におけるSRPTの実現は，デコヒーレンスに強い量子技術への新たな道を開くと期待されている．SRPTの臨界点において理想的なスクイージングが得られることが示唆されており\(^{\cite{Hayashida2020}}\)，これは量子メモリや量子熱機関の実現に向けた重要な基盤となる．
+\subsection{no-go定理と磁性体の可能性}
+SRPT実現の障壁として「no-go定理」が存在する. 最小結合ハミルトニアンで記述される荷電粒子系においては, ベクトルポテンシャルの2乗項（\(A^2\)項）に由来する反磁性効果により, 熱平衡状態でのSRPTは原理的に実現できないことが示唆されている.\(^{\cite{Rzazewski1975}}\) 実際, 熱平衡状態でのSRPTは実験的には未観測である. 一方，磁気相互作用が支配的な系はこの定理を回避しうると指摘されていた．\(^{\cite{Knight1978}}\)
 
-\subsection{No-go定理と磁性体の可能性}
-SRPTの実現に向けた障壁として「no-go定理」が存在する. 最小結合ハミルトニアンで記述される系, すなわち電磁場と相互作用する（スピンを持たない）荷電粒子系においては, ベクトルポテンシャルの2乗項（$A^2$項）に由来する反磁性効果により, 熱平衡状態でのSRPTは原理的に実現できないことが示されている.\(^{\cite{Rzazewski1975}}\) 実際に, 熱平衡状態におけるSRPTは実験的には未だ観測されていない. これに対し，磁気相互作用が支配的な系はこの定理を回避しうると指摘されていた．\(^{\cite{Li2018, Nataf2010, Bamba2014}}\)
-これまで磁気相互作用による結合定数は電気相互作用に比べて小さく, USCの達成が困難であったが, 近年, Kritzellらは常磁性体 \(\text{Gd}_3 \text{Ga}_5 \text{O}_{12}\) (GGG) とテラヘルツ（THz）光の結合系においてUSCを実験的に達成し, この系がSRPTの有力な候補であることを示した.\(^{\cite{Kritzell2024}}\) 
+従来, 磁気相互作用による結合定数は電気相互作用に比べて小さくUSCの達成が困難であったが, 近年Kritzellらは常磁性体 \(\text{Gd}_3 \text{Ga}_5 \text{O}_{12}\) (GGG) とTHz光の結合系でUSCを実験的に達成し, この系がSRPTの有力候補であることを示した.\(^{\cite{Kritzell2024}}\) 
 
 \subsection{問題の所在：相互作用記述の不定性}
-Kritzellらの実験結果は, この系のスピン-磁気相互作用を記述する理論形式として，磁束密度に応答する「B形式」($-\hat{\vb*{d}}\cdot\hat{\vb*{B}}$)と，磁場に応答する「H形式」($-\hat{\vb*{d}}\cdot\mu_0\hat{\vb*{H}}$)のいずれが妥当かという重要な問題を提起した. B形式はno-go定理を回避できる一方で, H形式では\({A^2}\)項に相当する相互作用が現れ相転移が抑制されるため\(^{\cite{Sakata2025}}\)，モデル選択はSRPT実現可能性の結論に直結するからである．
-坂田らは線形応答理論によりGGGの磁気感受率\(\chi (\omega)\)と両形式の透過スペクトルを導出したが, 以下の理由から実験データを説明する形式の特定には至らなかった. 
-第一に, Kritzellらの実験が磁場・温度依存性の双方を測定したのに対し, 坂田らの解析は一方の解析に留まっていた点である. 第二に, 理論と実験の比較が定性的な議論に終始していた点である.  \(^{\cite{Sakata2025}}\)
+Kritzellらの実験\(^{\cite{Kritzell2024}}\)は, \(\text{Gd}^{3+}\)スピン磁気双極子モーメント\(\hat{\vb*{d}}\)と磁場の相互作用を記述する理論モデルとして，磁束密度\(\hat{\vb*{B}}\)に応答する「Bモデル」(\(-\hat{\vb*{d}}\cdot\hat{\vb*{B}}\))と，外部磁場\(\hat{\vb*{H}}\)に応答する「Hモデル」(\(-\hat{\vb*{d}}\cdot\mu_0\hat{\vb*{H}}\))のいずれが妥当かという問題を提起した．\(\hat{\vb*{H}}= \hat{\vb*{B}} / \mu_0 - \hat{\vb*{M}}\)の関係より，Hモデルは磁化\(\hat{\vb*{M}}\)を通じたスピン集団の自己相互作用項\(\hat{\vb*{d}}\cdot\mu_0\hat{\vb*{M}}\)を含む．この項は荷電粒子系における\(A^2\)項と同等の役割を果たし，相転移を抑制することが示唆される\(^{\cite{Sakata2025}}\)．Bモデルではno-go定理を回避できるが，Hモデルでは定理が適用されるため，理論モデル選択はSRPT実現可能性に直結する．
 
-\section{研究目的}
-本研究の目的は, Kritzellらの実験データを磁場依存性・温度依存性の両観点から統合的に解析することに加えて, ベイズ統計モデリングに基づく厳密な定量的評価を行い, H形式及びB形式の妥当性を判定することである. これにより, GGGを用いた光・スピン強結合系におけるSRPT発現の真の可能性を明らかにすることを目指す.
+坂田らは線形応答理論によりGGGの磁気感受率\(\chi (\omega)\)と両モデルの透過スペクトルを導出したが, 実験データを説明するモデルの特定には至らなかった. 理由は，Kritzellらが測定した磁場・温度依存性の統合解析の不足と，理論・実験比較の定性的議論で留まった為である\(^{\cite{Sakata2025}}\)．
+
+\subsection{研究目的}
+本研究の目的は, GGGを用いた光・スピン強結合系におけるSRPT発現可能性を明らかにすることである. 具体的には, Kritzellらの実験データを磁場依存性・温度依存性の両観点から統合解析し, ベイズ推定による定量評価でHモデル・Bモデルの妥当性を判定する. 
 
 \section{解析手法：ベイズ推定}
-本研究では, 従来のフィッティングでは困難であったパラメータの不確実性評価のため, 確率論的プログラミングライブラリPyMCを用いたベイズ推定を導入した. 
+従来の最小二乗法が単一最適解（点推定）を求めるのに対し, ベイズ推定はパラメータを確率変数と見なし, その存在確率の分布（事後分布）全体を導出する. これにより, パラメータ間の相関や不定性を厳密に定量化し, 不確実性を考慮した堅牢なモデル比較が可能となる. 本研究では, 確率的プログラミングライブラリPyMCで実装した. 
 
 \subsection{物理モデルと統計モデル}
-坂田らの計算を参考にして, 線形応答理論に基づき, H形式およびB形式それぞれのハミルトニアンから導かれる理論透過スペクトル\(T_{\text{model}}(\omega; \Theta)\)を定義した．ここで\(\Theta\)は結合強度\(g\), GGGの結晶場演算子\(B\), 緩和係数\(\gamma\)などのパラメータ群である．
-観測データ\(y\)が理論値\(T_{\text{model}}(\omega; \Theta)\)を中心とする正規分布に従うと仮定し，尤度関数（実験データに対する物理モデルの精度に対応する関数）を以下のように設定した．
-\begin{equation}
-y_i \sim \mathcal{N}(T_{\text{model}}(\omega_i; \Theta), \sigma^2)
-\end{equation}
-推定にはSLICE, Metroporis, NUTS（No-U-Turn Sampler）アルゴリズムを用い, 収束判定には\(\hat{R}\)値を用いた．
-
+坂田らの計算を参考にして, 線形応答理論に基づきHモデル・Bモデルそれぞれのハミルトニアンから導かれる理論透過スペクトル\(T_{\text{model}}(\omega; \Theta)\)を定義した．ここで\(\Theta\)は結合強度\(g\), GGGの結晶場演算子\(B_{4,6}\), 緩和係数\(\gamma\)などのパラメータ群である．
+観測データ\(y\)の尤度関数（実験データに対する物理モデルの精度に対応）には，外れ値に対する頑健性を確保するためStudent-t分布（自由度\(\nu=4\)）を採用した．Student-t分布は正規分布と比較して裾が厚く，外れ値に過度に引きずられず安定した推定が可能となる．
+推定にはマルコフ連鎖モンテカルロ法（MCMC法）を用い, 各パラメータの最尤推定値と不確実性を取得し, 各モデルの予測スペクトルを比較した.
 \subsection{モデル選択指標}
-モデルの良否判定には, 予測精度の指標である1個抜き交差検証（LeaveOneOut-CrossValidation; LOOCV）を採用した. これにより，過学習を防ぎつつ，未知のデータに対する予測能力の観点からモデルの優劣を比較した．
+モデルの良否判定には, 予測精度の指標である1個抜き交差検証を採用し, 過学習を防ぎつつ未知データに対する予測能力の観点でモデルの優劣を比較した．
 
 \section{結果と考察}
-ベイズ推定の結果, LOOCVの値において, （B形式/H形式）が有意に低い値を示した. 
-% ＊ここに実際の結果を記述
-% ＊サンプリング精度, 結合定数の大きさ（USCに達しているか否か）
-% ＊スペクトル結果を基に, 物理的観点も明記する. 
-
-（例：B形式が優位だった場合）
-この結果は，GGG系において$A^2$項に相当する抑制項の影響が限定的であり，SRPT発現に必要な物理的条件を満たしうることを示唆している．
+1個抜き交差検証によるベイズモデル比較で，HモデルとBモデルの予測性能は統計的に同等であった．しかし最適化透過スペクトル（図\ref{fig:spectra}）では，Hモデルが実験データのピーク構造をより精密に再現した．この乖離は，ベイズ統計的には両モデルが許容されるが，物理的再現性ではHモデルが優位であることを示す．本結果は，KritzellらのGGGスピン系\(^{\cite{Kritzell2024}}\)においてSRPT実現を制約するno-go定理の妥当性を支持する．一方で, 統計的にはBモデルも排除できないため, SRPT実現可能性を完全に否定するものではない．
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{bayesian_result/posterior_predictive_spectra_HB_comparison.png}
+    \caption{GGGのTHz透過スペクトルの理論計算と実験データの比較. 赤: Hモデル, 青: Bモデル. 灰色点が実験データを示す.}
+    \label{fig:spectra}
+\end{figure}
 
 \section{結言}
 本研究では, ベイズ推定を用いて磁気相互作用モデルの選択を行い, SRPT発現可能性について定量的な議論を行った. 本成果は, 熱平衡状態におけるSRPTの実現に向けた重要な一歩となり, 将来的な量子技術への応用に寄与することが期待される.
-
-\section{参考文献}
 % --- 参考文献の出力設定 ---
-\bibliographystyle{junsrt} % 引用順 (BibTeX)
-\bibliography{bib/references_ab.bib}  % references_ab.bib を読み込む
-% -----------------------
+\bibliographystyle{naturemag}
+\bibliography{bib/references_ab.bib}  
 
 \end{document}

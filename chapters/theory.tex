@@ -3,133 +3,335 @@
 \chapter{理論}
 \label{chap:theory} % 後で参照するためにラベルを付ける
 本章では, 本研究で用いる理論的背景について述べる. 
-まず, GGG中のGd$^{3+}$イオンのスピン状態を記述するハミルトニアンを定義し, 線形応答理論を用いて磁気感受率を導出する. 次に, H形式およびB形式における比透磁率の定式化を行い, GGGの透過スペクトル計算モデルを説明する. 最後に, これらの理論モデルを実験データと照らし合わせて評価するための, ベイズ推定の統計的枠組みについて述べる. 
+まず, GGG中の\(\text{Gd}^{3+}\)イオンのスピン状態を記述するハミルトニアンを定義し, 線形応答理論を用いて磁気感受率を導出する. 次に, H形式およびB形式における比透磁率の定式化を行い, 転送行列法によるGGGの透過スペクトル計算方法を説明する. 最後に, これらの理論モデルを実験データと照らし合わせて評価するための, ベイズ推定の統計的枠組みについて述べる. 
 
-\section{ハミルトニアン}
+\section{Hamiltonian}
 \label{sec:theory_hamiltonian}
-GGG結晶中の磁性イオンGd$^{3+}$ ($4f^7, L=0, S=7/2$) のスピン状態は, 主に結晶場相互作用と外部磁場によるゼーマン相互作用によって記述される. 全ハミルトニアン $\hat{H}$ は以下のように表される [引用]. 
+GGG結晶中の常磁性体\(\text{Gd}^{3+}\)イオン (\(4f^7 5s^2 p^6, L=0, S=7/2\)) のスピン状態は, 主に結晶場相互作用と外部磁場によるゼーマン相互作用によって記述される. 全ハミルトニアン \(\hat{\mathcal{H}}\) は以下のように表される\(^{\cite{Yamada2024}}\). 
     
 \begin{equation}
-\hat{H} =\hat{H}_{0} + \hat{H}_{\text{\text{CF}}} + \hat{H}_{\text{\text{Zeeman}}}
+\hat{\mathcal{H}} =\hat{\mathcal{H}}_{\text{\text{CF}}} + \hat{\mathcal{H}}_{\text{\text{Zeeman}}} \label{H_total}
 \end{equation}
 
-ここで, 第2項$\hat{H}_{\text{CF}}$は結晶場ハミルトニアンであり, スティーブンス演算子$\hat{O}_{n,m}$と結晶場パラメータ $B_{n,m}$を用いて展開される. 
+ここで, 式\ref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{CF}}\)は結晶場ハミルトニアンである. 結晶場ハミルトニアン \(\hat{\mathcal{H}}_{CF}\) は Stevens演算子 \(O_k^q\) を基底として展開され, その展開係数である結晶場パラメータ \(B_k^q\) が相互作用の強度と対称性を決定する. 
+詳細は付録\ref{chap:CF_theory}にて記載する. 
 
 \begin{equation}
-\hat{H}_{\text{CF}} = \sum_{n,m} B_{n,m} \hat{O}_{n,m}
+\hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
 \end{equation}
 
-第3項$\hat{H}_{\text{Zeeman}}$は, 外部磁場$\hat{B}_{ext}$とスピン演算子$\hat{S}$の相互作用を表すゼーマン項である. 
+また, 式\ref{H_total}の第3項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部磁場\(\hat{\vb*{B}}_{ext}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
 \begin{equation}
-\hat{H}_{\text{Zeeman}} = g \mu_{B} \hat{S} \cdot \hat{B}_{ext}
+\hat{\mathcal{H}}_{\text{Zeeman}} = g \mu_{B} \hat{S} \cdot \hat{B}_{ext}
 \end{equation}
 
-ここで, $g$はg因子, $\mu_{B}$はボーア磁子である. この全ハミルトニアン$\hat{H}$を対角化することで, 磁場中のエネルギー固有値（ゼーマン準位）$E_{n}$と固有状態$\ket{\psi_{n}}$が得られる. 
+ここで, \(g\)はg因子, \(\mu_{B}\)はボーア磁子である. この全ハミルトニアン\(\hat{\mathcal{H}}\)を対角化することで, 磁場中のエネルギー固有値\(E_{n}\)と固有状態\(\ket{\psi_{n}}\)が得られる. 
 
-\section{線形応答理論}
+\section{線形応答理論に基づく磁気感受率の導出}
 \label{sec:linear_response}
-周波数 $\omega$ の交流磁場に対するスピン系の応答は, 線形応答理論の久保公式 [引用: Kubo] を用いて, 磁気感受率テンソル $\chi_{ij}(\omega)$ として記述される. 
+周波数 \(\omega\) の交流磁場に対するスピン系の線形応答は, H形式とB形式それぞれ以下のように記述できる. 線形応答理論における重要な点として，H形式とB形式の両方で磁気感受率テンソル\(\chi_{ij}(\omega)\)が同一であることに注意する.
+\begin{align}
+    \text{H形式}: \vb*{M}(\omega) &= \chi_{ij}(\omega) \vb*{H}(\omega) \label{eq:M_H_form}\\
+    \text{B形式}: \vb*{M}(\omega) &= \chi_{ij}(\omega) \frac{\vb*{B}(\omega)}{\mu_{0}} \label{eq:M_B_form}
+\end{align}
+磁気感受率テンソル \(\chi_{ij}(\omega)\)は線形応答理論の久保公式 \(^{\cite{Kubo1957}}\) を用いて次式のように記述される. 導出は付録\ref{chap:Kubo_formula_derivation}に詳細を示すが, ここでは結果のみを述べる.
 
 \begin{equation}
 \chi_{ij}(\omega) = - \frac{N \mu_{0}}{i \hbar} \int_{0}^{\infty} dt e^{i \omega t} \langle [\hat{d}_{i}(t), \hat{d}_{j}] \rangle
 \end{equation}
 
-ハミルトニアンの固有状態$\ket{\psi_n}$を用いて磁気感受率を計算すると, 以下の形式で与えられる [引用]. 
+ハミルトニアンの固有状態\(\ket{\psi_n}\)を用いて磁気感受率を計算すると, 以下の形式で与えられる. 
 \begin{equation}
-\chi_{ij}(\omega) = - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{\langle \psi_{n}| \hat{d}_{i} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{j} | \psi_n \rangle}{\omega + i \gamma - \Delta \omega} - \frac{\langle \psi_{n}| \hat{d}_{j} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{i} | \psi_n \rangle}{\omega + i \gamma + \Delta \omega} \}
+\chi_{ij}(\omega) = - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} (P_{n} - P_{n'}) \{ \frac{\langle \psi_{n}| \hat{d}_{i} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{j} | \psi_n \rangle}{\omega + i \gamma - \Delta \omega} - \frac{\langle \psi_{n}| \hat{d}_{j} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{i} | \psi_n \rangle}{\omega + i \gamma + \Delta \omega} \}
+\label{eq:chi_linear}
 \end{equation}
 
-ただし, $$\Delta \omega = (E_{n'} - E_{n})/\hbar$$
-$$P_{n} = \frac{e^{-\frac{E_{n}}{k_{B}T}}}{Z}$$, $$Z = \sum_{n} e^{-\frac{E_{n}}{k_{B}T}}$$
-ここで, $N$はスピン密度, $P_{n}$はボルツマン分布に従う準位$n$の占有確率, $\Delta \omega$は準位$n, n'$間のエネルギー差,  $\gamma$は緩和レート（スペクトルの線幅に対応）, $\hat{d}_i$は磁気モーメント演算子の$i$成分である. \\
-
-固有状態$\ket{\psi_n}$は, スピン$s$の磁気量子数$m$を用いて, 各準位$\ket{m}$の重ね合わせとして表される. すなわち, 
+ただし, 
+\begin{align*}
+    \Delta \omega &= (E_{n'} - E_{n})/\hbar \\
+    P_{n} &= \frac{e^{-\frac{E_{n}}{k_{B}T}}}{Z}\\
+    Z &= \sum_{n} e^{-\frac{E_{n}}{k_{B}T}}
+\end{align*}
+ここで, \(N\)はスピン密度, \(P_{n}\)はBoltzmann分布に従う準位\(n\)の占有確率, \(\Delta \omega\)は準位\(n, n'\)間のエネルギー差,  \(\gamma\)は緩和レート（スペクトルの線幅に対応）, \(\hat{d}_i\)は磁気モーメント演算子の\(i\)成分である. \\
+固有状態\(\ket{\psi_n}\)は, スピン\(s\)の磁気量子数\(m\)を用いて, 各準位\(\ket{m}\)の重ね合わせとして表される. この固有状態を用いて磁気感受率テンソルの各成分を詳細に計算した結果については, 付録\ref{chap:appendix_F}に示す.
+\subsubsection*{円偏光基底での磁気感受率テンソル}
+\label{subsubsec:theory_circular_basis}
+Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置（磁場 \(\vb*{B} \parallel \vb*{k} \parallel z\)）で透過スペクトルを測定している.\(^{\cite{Kritzell2024}}\) この配置では, 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)が重要となる. そこで, この直線偏光基底での磁気感受率テンソル(式\ref{eq:chi_linear})を, 円偏光基底に変換する. 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)は, 直線偏光基底の成分\(\chi_{xx}, \chi_{yy}, \chi_{xy}, \chi_{yx}\)を用いて以下のように表される. (詳細は付録\ref{chap:appendix_circular}参照)
 \begin{equation}
-  \ket{\psi_n} = \sum_{m} c_{n,m} \ket{m} (m = -s, -s+1, \ldots, s-1, s)
-\end{equation} 
-である.
+\chi_{\pm} = \chi_{xx} \pm i \chi_{xy}
+\end{equation}
+本研究では, 坂田の解析\(^{\cite{Sakata2025}}\)と同様に, 共鳴的な振る舞いを示す場合の磁気感受率として右回り偏光成分\(\chi_{+}\)を考慮する. 
 
-磁気モーメント演算子$\hat{d}_{i}$はスピン演算子$\hat{S}_{i}$を用いて以下のように表される.
+\section{比透磁率の定式化}
+\label{sec:theory_permeability}
+本節では，前節で導出した線形応答理論に基づく磁気感受率\(\chi^{+}\)と電磁気学で用いられる磁気感受率\(\chi\)との対応関係を導出し，H形式およびB形式における比透磁率\(\mu_{r}\)の定式化について説明する.\\
+電磁気学では，一般に磁化\(\vb*{M}\)は磁場\(\vb*{H}\)に比例すると仮定される．本研究でも慣例に従い，式\ref{eq:M_H_form}の形で磁化\(\vb*{M}\)を記述する．
 \begin{equation}
-\langle m | \hat{d}_{i,j} | m' \rangle = \mu_{B} g \langle m | \hat{S}_{i,j} | m' \rangle
+\label{def:susceptibility_LRT_EM}
+\vb*{M} = \chi \vb*{H} = \chi^{+} \vb*{H} 
+\end{equation}
+この関係を用いると, H形式における比透磁率\(\mu_{rH}\)は次式で与えられる.
+\begin{equation}    
+\mu_{rH} = 1 + \chi = 1 + \chi^{+}
+\end{equation}
+一般に, 磁場\(\vb*{H}\)と磁束密度\(\vb*{B}\), 磁化\(\vb*{M}\)の関係は, 真空の透磁率\(\mu_{0}\)を用いて次式のように表される.
+\begin{equation}
+\label{def:relation_H_B_M}
+\vb*{H} =\frac{\vb*{B}}{\mu_{0}} - \vb*{M}
+\end{equation}
+この関係式\ref{def:relation_H_B_M}を用いると，式\ref{def:susceptibility_LRT_EM}は以下のように書き換えられる.
+\begin{align*}
+\vb*{M} &= \chi \left( \frac{\vb*{B}}{\mu_{0}} - \vb*{M} \right)\\ 
+(1 + \chi) \vb*{M} &= \chi \frac{\vb*{B}}{\mu_{0}} \\
+\vb*{M} &= \frac{\chi}{1 + \chi} \frac{\vb*{B}}{\mu_{0}}
+\end{align*}
+従って，線形応答理論の磁気感受率\(\chi^{+}\)と電磁気学における磁気感受率\(\chi\)のB形式での関係は次式のようになる.
+\begin{equation}
+\chi^{+} = \frac{\chi}{1 + \chi}
+\end{equation}
+よって, B形式の比透磁率\(\mu_{rB}\)は次式で与えられる．
+\begin{equation}
+\mu_{rB} = 1 + \chi = \frac{1}{1 - \chi^{+}}
 \end{equation}
 
-また, スピン演算子は昇降演算子$\hat{S}_{\pm}$を用いて以下のように表される.
-\begin{equation*}
-\hat{S}_{x} = \frac{1}{2} (\hat{S}_{+} + \hat{S}_{-}), \quad \hat{S}_{y} = \frac{1}{2i} (\hat{S}_{+} - \hat{S}_{-}), \quad \hat{S}_{z} = m
-\end{equation*}
-以上より, 
+\section{転送行列法による透過スペクトルの計算方法}
+\label{sec:theory_transfer_matrix}
+転送行列法は, 多層構造を通過する電磁波の伝搬を解析するための強力な手法である. 本節では, GGG試料の透過スペクトルを計算するための転送行列法の基本的な考え方を説明する.
+まず, 各層における電磁波の伝搬を記述するために, 各層の特性インピーダンス\(Z\)と伝搬定数\(\beta\)を定義する. 次に, 各層の境界での電磁波の連続条件を適用し, 層間の転送行列を構築する. 最終的に, 全体の転送行列を用いて, 入射波と透過波の関係を導出し, 透過スペクトルを計算する.
+本節では, 図\ref{fig:ggg_tmm_model}に示すようなGGGの多層構造を考える.
 
+\begin{figure}[h]
+    \centering
+    \large 
+    % 図の開始
+    \begin{tikzpicture}[>=Stealth, scale=1.0]
+        % --- 定義: サイズと配置の調整 ---
+        \def\slabW{6.0}   
+        \def\h{3.0}       
+        \def\labelOffsetOne{1.6} 
+        \def\labelOffsetTwo{1.0} 
+        \def\textOffsetSide{2.2} 
+
+        % --- 領域ラベル (最上段) ---
+        \node at (-\textOffsetSide, \h+\labelOffsetOne) {\textbf{Region 1} (Vacuum)};
+        \node at (\slabW/2, \h+\labelOffsetOne) {\textbf{Region 2} (GGG Slab)};
+        \node at (\slabW+\textOffsetSide, \h+\labelOffsetOne) {\textbf{Region 3} (Vacuum)};
+
+        % --- 屈折率 (中段) ---
+        \node at (-\textOffsetSide, \h+\labelOffsetTwo) {$n_1$};
+        \node at (\slabW/2, \h+\labelOffsetTwo) {$n_2$};
+        \node at (\slabW+\textOffsetSide, \h+\labelOffsetTwo) {$n_3 = n_1$};
+
+        % --- スラブと界面の描画 ---
+        \fill[cyan!10] (0, -\h) rectangle (\slabW, \h);
+        
+        \draw[thick] (0, -\h) -- (0, \h);
+        \node[above] at (0, \h) {Interface 1 ($z=0$)}; 
+        
+        \draw[thick] (\slabW, -\h) -- (\slabW, \h);
+        \node[above] at (\slabW, \h) {Interface 2 ($z=d$)};
+        
+        % --- 電場ベクトル ---
+        % 入射・反射 (Region 1)
+        \draw[->, very thick, red] (-\textOffsetSide, 2.0) -- (0, 0.8) node[midway, above, sloped, yshift=2pt] {$E_{in}^+$ (Incident)};
+        \draw[<-, very thick, blue] (-\textOffsetSide, -2.0) -- (0, -0.8) node[midway, below, sloped, yshift=-2pt] {$E_{in}^-$ (Reflected)};
+        
+        % 内部多重反射 (Region 2)
+        \draw[->, very thick, red!80] (0, 0.8) -- (\slabW, 0.8) node[midway, above, yshift=2pt] {$E_{slab}^+ e^{i\delta}$};
+        \draw[<-, very thick, blue!80] (0, -0.8) -- (\slabW, -0.8) node[midway, below, yshift=-2pt] {$E_{slab}^- e^{-i\delta}$};
+        
+        % 位相シフト表示
+        \draw[<->, dashed, darkgray] (0, 0) -- (\slabW, 0) node[midway, fill=cyan!10, align=center, inner sep=3pt] {Thickness $d$ \\ Phase $\delta=kn_2d$};
+
+        % 透過 (Region 3)
+        \draw[->, very thick, red] (\slabW, 0.8) -- (\slabW+\textOffsetSide, 2.0) node[midway, above, sloped, yshift=2pt] {$E_{out}^+$ (Transmitted)};
+        \draw[dashed, blue] (\slabW, -0.8) -- (\slabW+\textOffsetSide, -2.0) node[midway, below, sloped, yshift=-2pt] {$E_{out}^- = 0$};
+
+        % --- 行列演算の概念図 (下部) ---
+        \draw[<-, double, line width=1.5pt, black!70] (-0.5, -4.0) -- (\slabW+0.5, -4.0) node[midway, below=8pt, font=\bfseries] {Transfer Matrix Calculation (Backward)};
+        
+        \node[anchor=north] at (\slabW/2, -4.8) {
+            $\displaystyle \begin{pmatrix} E_{in}^+ \\ E_{in}^- \end{pmatrix} = \mathbf{M}_{total} \begin{pmatrix} E_{out}^+ \\ 0 \end{pmatrix}$
+        };
+
+        % --- 結合点の黒丸 ---
+        \foreach \x/\y in {0/0.8, 0/-0.8, \slabW/0.8, \slabW/-0.8}
+            \fill[black] (\x, \y) circle (2pt);
+
+    \end{tikzpicture}
+    
+    % --- キャプションとラベル ---
+    \caption{転送行列法によるGGGの多層構造の計算モデル\\屈折率\(n_1, n_2, n_3\)および厚さ\(d\)を持つGGGスラブを通過する電磁波の伝搬を解析するためのモデル図. 各界面での入射波、反射波、透過波、およびスラブ内部での多重反射波を示している. また, 下部には転送行列計算の概念図を示し, 入射波と透過波の関係を行列形式で表現していることを強調している.}
+    \label{fig:ggg_tmm_model}
+\end{figure}
+
+\subsection{問題設定}
+\begin{itemize}
+    \item \textbf{領域 1 (左側)}: 真空 (\(n_1 = 1\))
+    \item \textbf{領域 2 (薄膜)}: GGG (\(n_2\), 厚さ \(d\))
+    \item \textbf{領域 3 (右側)}: 真空 (\(n_3 = n_1 = 1\))
+\end{itemize}
+
+\subsection{転送行列の定式化 (Backward Definition)}
+数学的な整合性を保つため, 標準的な光学テキスト（Born \& Wolf等）で採用されている\textbf{Backward転送行列}を使用する. これは, 出力側（右側）の場から入力側（左側）の場を逆算する形式である. 
 \begin{equation}
-\langle m | \hat{d}_{x} | m' \rangle = \frac{\mu_{B} g \hbar}{2} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} + \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+    \begin{pmatrix} E_{in}^+ \\ E_{in}^- \end{pmatrix} = \mathbf{M}_{total} \begin{pmatrix} E_{out}^+ \\ E_{out}^- \end{pmatrix}
+\end{equation}
+ここで, \(E^+\) は進行波, \(E^-\) は後退波を表す. 透過問題を考えるため, スラブのさらに右側からの入射はないものとし, 境界条件 \(E_{out}^- = 0\) を課す. 
+
+透過係数 \(t_{slab}\) および反射係数 \(r_{slab}\) は以下のように定義される. 
+\begin{equation}
+    t_{slab} = \frac{E_{out}^+}{E_{in}^+} = \frac{1}{(\mathbf{M}_{total})_{11}}, \quad r_{slab} = \frac{E_{in}^-}{E_{in}^+} = \frac{(\mathbf{M}_{total})_{21}}{(\mathbf{M}_{total})_{11}}
 \end{equation}
 
+\subsubsection*{構成行列}
+
+\textbf{1. 界面行列（媒質 \(i \to j\)）:}
+フレネル係数を用いると, 界面における場の接続行列は以下のようになる. 
 \begin{equation}
-\langle m | \hat{d}_{y} | m' \rangle = \frac{\mu_{B} g \hbar}{2i} (\delta_{m', m-1} \sqrt{(s + m)(s - m + 1)} - \delta_{m', m+1} \sqrt{(s - m)(s + m + 1)} )
+    \mathbf{M}_{ij} = \frac{1}{t_{ij}} \begin{pmatrix} 1 & r_{ij} \\ r_{ij} & 1 \end{pmatrix}
+\end{equation}
+ここで, 垂直入射におけるフレネル係数は次式で与えられる. 
+\begin{equation}
+    r_{ij} = \frac{n_i - n_j}{n_i + n_j}, \quad t_{ij} = \frac{2n_i}{n_i + n_j}
+\end{equation}
+対称性 \(r_{ji} = -r_{ij}\) およびストークスの関係式 \(t_{ij}t_{ji} = 1 - r_{ij}^2\) が成立することに注意する. 
+
+\textbf{2. 伝搬行列（媒質 \(j\) 内部）:}
+厚さ \(d\) の媒質内部での位相シフトを \(\delta = k_0 n_j d\) とする. 位置 \(z+d\) から \(z\) へ逆算する伝搬行列は以下の通りである. 
+\begin{equation}
+    \mathbf{M}_{prop} = \begin{pmatrix} e^{-i\delta} & 0 \\ 0 & e^{i\delta} \end{pmatrix}
+\end{equation}
+（注：物理的な進行波 \(E^+\) は前方へ進むにつれ \(e^{i\delta}\) の位相を獲得する. したがって, 出力側から入力側へ「戻る」計算を行うBackward行列では, 逆位相 \(e^{-i\delta}\) を乗じる必要がある. ）
+\subsection{全行列の計算}
+「真空 \(\to\) GGG \(\to\) 真空」系の全転送行列は, 物理的な配置の逆順に行列を掛け合わせることで得られる. 
+\begin{equation}
+    \mathbf{M}_{GGG} = \mathbf{M}_{12} \cdot \mathbf{M}_{prop} \cdot \mathbf{M}_{21}
+\end{equation}
+成分を代入して計算する. 
+\begin{align}
+    \mathbf{M}_{GGG} &= \frac{1}{t_{12}} \begin{pmatrix} 1 & r_{12} \\ r_{12} & 1 \end{pmatrix}
+    \begin{pmatrix} e^{-i\delta} & 0 \\ 0 & e^{i\delta} \end{pmatrix}
+    \frac{1}{t_{21}} \begin{pmatrix} 1 & r_{21} \\ r_{21} & 1 \end{pmatrix} \\
+    &= \frac{1}{t_{12}t_{21}} \begin{pmatrix} 1 & r_{12} \\ r_{12} & 1 \end{pmatrix}
+    \begin{pmatrix} e^{-i\delta} & r_{21} e^{-i\delta} \\ r_{21} e^{i\delta} & e^{i\delta} \end{pmatrix}
+\end{align}
+ここで, \(r_{21} = -r_{12} \equiv -r\) と置き, 透過係数の導出に必要な \((1,1)\) 成分のみを計算する. 
+\begin{align}
+    (\mathbf{M}_{GGG})_{11} &= \frac{1}{t_{12}t_{21}} \left[ 1 \cdot (e^{-i\delta}) + r_{12} \cdot (r_{21} e^{i\delta}) \right] \\
+    &= \frac{1}{1 - r^2} \left( e^{-i\delta} - r^2 e^{i\delta} \right)
+\end{align}
+ここでは恒等式 \(t_{12}t_{21} = 1 - r^2\) を用いた. 
+
+\subsection{透過係数の導出と結論}
+スラブ全体の透過係数は次式で求まる. 
+\begin{equation}
+    t_{slab} = \frac{1}{(\mathbf{M}_{GGG})_{11}} = \frac{1 - r^2}{e^{-i\delta} - r^2 e^{i\delta}}
 \end{equation}
 
-計算の見通しを良くするために, 次のように$F_{\pm}, K$を定義する.
+標準的なファブリ・ペローの公式と比較するため, 分母・分子に \(e^{i\delta}\) を乗じて整理する. 
+\begin{equation}
+    t_{slab} = \frac{(1 - r^2) e^{i\delta}}{1 - r^2 e^{2i\delta}}
+\end{equation}
+ここで, \(\delta = n_2 k_0 d = \frac{2\pi n_2 d}{\lambda}\) である. 
 
-\begin{align}
-F_{+} &= \sum_{m} C_{n,m} C_{n',m-1} \sqrt{(s + m)(s - m + 1)}, \\ 
-F_{-} &= \sum_{m} C_{n,m} C_{n',m+1}\sqrt{(s - m)(s + m + 1)}, \\
-F_z &= \sum_{m} C_{n,m} C_{n',m} m, \\
-K &= \left(\frac{\mu_{B} g \hbar}{2}\right)^2 
-\end{align}
-
-これらを用いると, 磁気モーメント演算子の各成分は以下のように表される.
-\begin{align}
-\langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle &= K (F_{+} + F_{-}), \\
-\langle \psi_{n} | \hat{d}_{y} | \psi _{n'} \rangle &= K (F_{+} - F_{-}), \\
-\langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle &= K F_z 
-\end{align}
-
-エルミート演算子の性質より, $\langle \psi_{n'} | \hat{d}_{i} | \psi_{n} \rangle = \langle \psi_{n} | \hat{d}_{i} | \psi_{n'} \rangle^{*}$であることに注意すると, 
-\begin{align}
-\langle \psi_{n'} | \hat{d}_{x} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{x} | \psi_{n'} \rangle = K (F_{+} + F_{-}), \\
-\langle \psi_{n'} | \hat{d}_{y} | \psi _{n} \rangle &= \langle \psi_{n} | \hat{d}_{y} | \psi_{n'} \rangle = K (F_{+} - F_{-}), \\
-\langle \psi_{n'} | \hat{d}_{z} | \psi_{n} \rangle &= \langle \psi_{n} | \hat{d}_{z} | \psi_{n'} \rangle = K F_z
-\end{align}
-
-以上より, 磁気感受率テンソルの各成分は以下のように表される.
-\begin{align}
-\chi_{xx}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
-\chi_{yy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})^2}{\omega + i \gamma + \Delta \omega} \}, \\
-\chi_{zz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 F_z^2}{\omega + i \gamma - \Delta \omega} - \frac{K^2 F_z^2}{\omega + i \gamma + \Delta \omega} \}, \\
-\chi_{xy}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})(F_{+} - F_{-})}{\omega + i \gamma + \Delta \omega} \}, \\
-\chi_{yx}(\omega) &= \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})(F_{+} + F_{-})}{\omega + i \gamma + \Delta \omega} \}\notag \\ &= -\chi_{xy}(\omega), \\
-\chi_{xz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} + F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}, \\
-\chi_{yz}(\omega) &= - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} P_{n} \{ \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma - \Delta \omega} - \frac{K^2 (F_{+} - F_{-})F_z}{\omega + i \gamma + \Delta \omega} \}
-\end{align}
-
+\subsubsection*{インピーダンス\(Z\)による表現}
+この式を, インピーダンスパラメータ \(Z\)（ただし \(r = \frac{1-Z}{1+Z}\), \(Z=\sqrt{\frac{\mu_{r}}{\epsilon_{r}}}\)）を用いて書き直すと以下のようになる. 
+\begin{equation}
+    t_{slab} = \frac{ \frac{4Z}{(1+Z)^2} e^{i\delta} }{ 1 - \left(\frac{1-Z}{1+Z}\right)^2 e^{2i\delta} } 
+    = \frac{4Z e^{i\delta}}{(1+Z)^2 - (1-Z)^2 e^{2i\delta}}
+\end{equation}
 \section{ベイズ推定}
 \label{sec:method_bayesian}
-ベイズ推定は, 事前分布と尤度に基づいてパラメータの事後分布を推定する手法である. 特に, 観測データが少ない場合やノイズが多い場合に有効である. 
+物理実験, 特にGGGの分光測定のような複雑な系においては, 観測データにノイズが含まれるだけでなく, 理論モデル自体にも不確実性が存在する. 従来の最小二乗法（最尤推定）による点推定では, パラメータ間の相関や多峰性を捉えきれず, 過学習のリスクも高い. 本章では, これらの問題を解決し, 厳密な不確実性評価を可能にするベイズ推論の枠組みを詳述する. 
+\subsubsection{ベイズの定理}
+ベイズ推定は, 観測データ \(D\) に基づいてモデルパラメータ \(\theta\) の確率分布を更新する枠組みである. ベイズの定理により, 事後分布 \(p(\theta|D)\) は以下のように表される.
+\begin{equation}
+p(\theta|D) = \frac{\mathcal{L}(\theta | D) p(\theta)}{p(D)} \label{equation_bayesian}
+\end{equation}
+ここで, \(\mathcal{L}(\theta | D)\) (=\(p(D|\theta)\))は尤度関数, \(p(\theta)\) は事前分布, \(p(D)\) は周辺尤度（正規化定数）である. ベイズ推定の目的は, 観測データに基づいてパラメータの不確実性を反映した事後分布を得ることである.
+\subsubsection*{事前分布}
+事前分布 \(p(\theta)\) は, 観測データを得る前のパラメータに関する知識や仮定を反映する. 例えば, 物理的制約や過去の研究結果に基づいて, パラメータが特定の範囲にあることを示す一様分布や, より具体的な情報を反映した正規分布などが用いられる.
+本研究の解析においては, g因子に対して, ランデのg因子を平均とした正規分布を設定したり, あるいは物理的に取りうる範囲（正値性など）を正規分布として与えたりする. 事前分布は, 推定の「正則化」として機能し, データが少ない場合でも非物理的な解への発散を防ぐ役割を果たす. 
+\subsubsection*{尤度関数}
+尤度関数 \(\mathcal{L}(\theta | D)\) は, パラメータ \(\theta\) のもとで観測データ \(D\) が得られる確率を表す. 通常, 観測データのノイズモデルに基づいて定義される. 例えば, 観測誤差が正規分布に従う場合, 尤度関数は以下のように表される.
+\begin{equation}
+\mathcal{L}(\theta | D) = \prod_{i} \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{(D_i - f(x_i; \theta))^2}{2\sigma^2} \right)
+\end{equation}
+ここで, \(f(x_i; \theta)\) はモデル関数, \(\sigma\) は観測ノイズの標準偏差である. 尤度関数は, 観測データとモデル予測の一致度を定量化し, パラメータ推定において重要な役割を果たす.
+
+\subsubsection*{周辺尤度}
+周辺尤度 \(p(D)\) は, 観測データ \(D\) が得られる全確率を表し, 事後分布の正規化定数として機能する. これは, 全てのパラメータ空間にわたる尤度関数と事前分布の積分によって計算される.
+\begin{equation}
+    p(D) = \int \mathcal{L}(\theta | D) p(\theta) d\theta
+\end{equation}
+これは, パラメータ空間全体にわたって「モデルがデータを生成する平均的な能力」を積分した値である. モデル選択において極めて重要な指標であり, 例えば「H形式」と「B形式」のどちらがデータをより良く説明するかを比較する際の「ベイズ因子（Bayes Factor）」の算出に用いられる.
+\subsubsection*{事後分布}
+事後分布 \(p(\theta|D)\) は, 式\ref{equation_bayesian}にあるように, 観測データに基づいて更新されたパラメータの確率分布を表す. 事後分布は, 事前分布と尤度関数の積に比例し, 正規化定数 \(p(D)\) によって正規化される. 
+事後分布からは, パラメータの最頻値（MAP推定値）, 平均値, 分散などの統計量を計算できる.
+ベイズ推論のゴールは, この事後分布の形状（平均, 分散, 相関構造など）を明らかにすることである. しかし, GGGのモデルのようにパラメータが多数存在し, モデルが非線形である場合, 事後分布を解析的に求めることは事実上不可能であり, 後述する数値計算手法（マルコフ連鎖モンテカルロ法など）が必要となる. 
 
 \section{マルコフ連鎖モンテカルロ法}
 \label{sec:method_mcmc}
-マルコフ連鎖モンテカルロ法（MCMC）は, 複雑な確率分布からサンプリングするための手法である. 特に, ベイズ推定において事後分布が解析的に求められない場合に用いられる. 
+ベイズ推定において, 事後分布 \(P(\theta|D)\) を直接計算することは困難であるため, マルコフ連鎖モンテカルロ法（MCMC）が広く用いられる. MCMCは, 事後分布から, その分布に従う乱数（サンプル）を効率的に生成するためのアルゴリズム群が, マルコフ連鎖モンテカルロ法（Markov Chain Monte Carlo: MCMC）である.
+本節では, MCMCの基本的な考え方とアルゴリズムについて説明する.
 
-\section{LOO-CV}
+\subsection{メトロポリス法}
+最も古典的かつ基本的なMCMCアルゴリズムの一つに, メトロポリス法がある. メトロポリス法は, 事後分布 \(P(\theta|D)\) に比例する確率分布からサンプルを生成するための手法である. アルゴリズムの概要は以下の通りである.
+\begin{enumerate}
+    \item 初期状態 \(\theta_0\) を設定する.
+    \item 現在の状態 \(\theta_t\) から新しい候補状態 \(\theta^*\) を提案する. 通常, 対称な提案分布 \(q(\theta^*|\theta_t)\)（例: 正規分布）を用いる.
+    \item 受容確率 \(\alpha\) を計算する:
+    \begin{equation}
+        \alpha = \min\left(1, \frac{P(D|\theta^*) P(\theta^*)}{P(D|\theta_t) P(\theta_t)}\right)
+    \end{equation}
+    \item 一様乱数 \(u \sim U(0,1)\) を生成し, \(u < \alpha\) ならば新しい状態を受容し, \(\theta_{t+1} = \theta^*\) とする. そうでなければ, 現在の状態を維持し, \(\theta_{t+1} = \theta_t\) とする.
+    \item ステップ2から4を繰り返し, 十分な数のサンプルを収集する.
+\end{enumerate}
+この手法は実装が容易であるが, パラメータ間の相関が強い場合や高次元空間では, 提案された候補の多くが棄却されるか, あるいはランダムウォーク的な挙動に陥り, 効率的にサンプリングできないことがある.
+
+\subsection{スライスサンプリング}
+スライスサンプリングは, メトロポリス法の欠点を克服するために開発されたMCMCアルゴリズムである. メトロポリス法における「ステップ幅（提案分布の分散）」の調整問題を解決するために, Nealによって考案された手法である\(^{\cite{Neal2003}}\).アルゴリズムの概要は以下の通りである.
+\begin{enumerate}
+    \item 初期状態 \(\theta_0\) を設定する.
+    \item 現在の状態 \(\theta_t\) における事後分布の値 \(P(\theta_t|D)\) を計算し, 水平線の高さ \(y\) を一様乱数 \(u \sim U(0, P(\theta_t|D))\) によって決定する.
+    \item 水平線 \(y\) と交わる事後分布の区間（スライス）を見つける.
+    \item スライス内から新しい候補状態 \(\theta^*\) を一様にサンプリングする.
+    \item 新しい状態を受容し, \(\theta_{t+1} = \theta^*\) とする.
+    \item ステップ2から5を繰り返し, 十分な数のサンプルを収集する.
+\end{enumerate}
+このアルゴリズムは, 事後分布の形状に適応的にサンプリングを行うことで, 高次元空間や相関の強いパラメータ空間でも効率的にサンプルを生成できる. 
+
+\subsection{NUTS(No-U-Return Sampler)}
+NUTS (No-U-Turn Sampler) は, ハミルトニアンモンテカルロ法 (HMC) を基盤とした現代のベイズ統計ソフトウェア（Stan, PyMCなど）で標準エンジンとなっている最先端アルゴリズムである. \(^{\cite{Hoffman2014}}\)HMCは, 物理学のハミルトニアン力学系の概念を利用して, パラメータ空間を効率的に探索する手法であり, 以下に概要を示す. 
+\subsubsection*{HMCの基礎}
+HMCは, パラメータ \(\theta\) に対して仮想的な運動量 \(p\) を導入し, ハミルトニアン \(H(\theta, p) = U(\theta) + K(p)\) を定義する. ここで, \(U(\theta) = -\log P(\theta|D)\) はポテンシャルエネルギー, \(K(p) = \frac{1}{2} p^T M^{-1} p\) は運動エネルギーであり, \(M\) は質量行列である. HMCは, レヴィ・カンター方程式に基づいて \((\theta, p)\) の時間発展をシミュレートし, 新しい候補状態を生成する. この方法により, 高次元空間でも効率的にサンプリングが可能となる.
+\subsubsection*{NUTSの革新性}
+HMCの最大の課題は, 積分ステップ数\(L\)の調整である. \(L\)が短すぎるとランダムウォークになり, 長すぎると軌道が一周して元の位置に戻ってしまい（Uターン）, 計算資源を浪費する. 
+NUTSは, 以下の手順でこれを自動化する：
+\begin{enumerate}
+    \item \textbf{再帰的な二分木の構築}: ハミルトニアン力学系のシミュレーションを前進と後退の両方向に行い, ツリー構造を再帰的に構築する.
+    \item \textbf{No-U-Turn停止条件の判定}: 構築された軌道の始点\(\theta^-\)と終点\(\theta^+\)を結ぶベクトルと, 終点の運動量ベクトル\(r^+\)の内積を確認する. これが負になった（\(( \theta^+ - \theta^- ) \cdot r^+ < 0\)）, すなわち粒子が来た道を戻り始めた時点で, 木の拡張を停止する.
+    \item \textbf{詳細釣り合いの維持}: 新しい候補状態を選択する際に, 停止位置までの軌道上の点から, スライスサンプリングの考え方を応用して次の点を抽出する.これにより, 詳細釣り合い条件を満たすように確率的に選択を行う.
+\end{enumerate}
+これにより, 高次元かつ相関の強いGGGの結晶場パラメータ空間においても, 極めて高い効率（有効サンプルサイズの最大化）で事後分布を探索することが可能となる. 
+
+\section{LOO-CV(Leave-One-Out Cross-Validation)}
 \label{sec:method_loo_cv}
-Leave-One-Out Cross-Validation（LOO-CV）は, モデルの汎化性能を評価するための手法である. 特に, データセットが小さい場合に有効である. 
-
-\section{WAIC}
-\label{sec:method_waic}
-Widely Applicable Information Criterion（WAIC）は, ベイズモデルの適合度を評価するための情報量規準である. 特に, モデルの複雑さを考慮した評価が可能である. 
-...
-
-- H形式とB形式をモデル記述に使った理由
-    - Dickeモデルではなく, これら（比透磁率を通して磁気感受率）を使う理由はなぜ？
-    - 磁性体の影響も十分に考慮しているから
-        - スピン-スピン相互作用の有無
-    - 磁気感受率→Maxwell eq
-        - SRPT**有無**にのみ関心がある（相転移後には関心がない）
-            - LP=0が確認できれば十分
-        - 物質のパラメータ（屈折率, 透磁率, 膜厚…）に基づいた解析
-            - CavityQEDよりも設定すべきパラメータが少ない→信頼性の高い解析
-    - cavityQED
-        - SRPT**後**にも関心がある（スクイージング）
-        - モデル化しているので単純化されている
-            - 物質に基づくパラメータの設定が難しい
-                - 共振器モード毎に緩和レート, 膜厚…が設定できる
+ベイズモデルの予測性能を評価し, 過学習を防ぐための主要な手法として, 1個抜き交差検証（Leave-One-Out Cross-Validation: LOOCV）がある\(^{\cite{Stone1974LOO}}\). 
+LOOCVは, 観測データセット \(D = \{(x_i, y_i)\}_{i=1}^{N}\) に対して, 各データ点を一つずつ検証用データとして取り除き, 残りのデータでモデルを学習し, 取り除いたデータ点に対する予測性能を評価する手法である. 具体的な手順は以下の通りである.
+\begin{enumerate}
+    \item データセット \(D\) から, 各データ点 \((x_i, y_i)\) を一つずつ取り除き, 検証用データセット \(D_{-i} = D \setminus \{(x_i, y_i)\}\) を作成する.
+    \item 検証用データセット \(D_{-i}\) を用いてモデルを学習し, 事後分布 \(P(\theta|D_{-i})\) を得る.
+    \item 学習したモデルを用いて, 取り除いたデータ点 \((x_i, y_i)\) に対する予測分布 \(P(y_i|x_i, D_{-i})\) を計算する.
+    \item 予測性能を評価するために, 例えば対数尤度を用いて次式のように計算する.
+    \begin{equation}
+        \text{LOO-CV} = \frac{1}{N} \sum_{i=1}^{N} \log P(y_i|x_i, D_{-i})
+    \end{equation}
+\end{enumerate}
+LOOCVは, データセット全体を用いたモデルの汎化性能を評価するための厳密な方法であり, 特にデータ数が少ない場合に有効である. しかし, 各データ点ごとにモデルを再学習する必要があるため, 計算コストが高くなる欠点もある. そのため, 実際の応用では, 近似的な手法（例えば, WAICやPSIS-LOOなど）を用いることも検討される. 本研究でも, モデル比較の際は, 計算効率を考慮してArvizライブラリで実装されているPSIS-LOOを採用した.
+\subsubsection*{PSIS-LOOによる高速化}
+PSIS-LOO (Pareto Smoothed Importance Sampling Leave-One-Out) は, LOOCVの計算コストを大幅に削減するための近似手法である\(^{\cite{Vehtari2017}}\). 単純なLOOCVは, データ点数\(N\)回分のMCMC実行を要し, 計算コストが膨大である. そこで, 全データを用いた事後分布\(p(\theta | y)\)からのサンプル\(\theta^s\)を利用して, \(p(\theta | y_{-i})\)を近似する重点サンプリング（Importance Sampling: IS）が用いられる. 
+ISの重みは \(w_i^s \propto 1 / p(y_i | \theta^s)\) となるが, この重みの分散はしばしば発散し, 推定が不安定になる. 
+PSIS (Pareto Smoothed Importance Sampling)は, この重み分布の裾を一般化パレート分布で近似・平滑化することで, 分散を劇的に低減させる. 推定されたパレート分布の形状パラメータ\(k\)は, 近似の信頼性を診断する指標としても機能する（\(k < 0.7\)なら信頼できる）. 
+この手法により, 1回のMCMCシミュレーションの結果のみを用いて, 厳密なLOOCVとほぼ同等の精度でモデル評価・比較を行うことが可能となり, GGGのハミルトニアンモデル選択において強力なツールとなる. 

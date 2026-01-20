@@ -1,0 +1,102 @@
+\chapter{超強結合領域におけるZeemanポラリトンの定量的記述}
+\label{chap:zeeman_polariton}
+
+\section{電磁場の量子化}
+\section{ベクトルポテンシャルの導入}
+クーロンゲージ（\(\nabla \cdot \vb*{A} = 0\)）を採用し, 体積 \(V\) のキャビティ内における単一モードの電磁場を考える. 
+ベクトルポテンシャル \(\hat{\vb*{A}}(\vb*{r}, t)\) を, キャビティの固有モード関数 \(\vb*{u}(\vb*{r})\) を用いて以下のように量子化する. 
+\begin{equation}
+    \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} \vb*{u}(\vb*{r}) + \hat{a}^\dagger \vb*{u}^*(\vb*{r}) \right)
+\end{equation}
+ここで, \(\hat{a}, \hat{a}^\dagger\) はそれぞれ光子の消滅・生成演算子であり, 交換関係 \([\hat{a}, \hat{a}^\dagger] = 1\) を満たす. \(\omega_c\) はキャビティの共鳴角周波数である. 
+
+\section*{磁場演算子の導出}
+磁束密度演算子 \(\hat{\vb*{B}}(\vb*{r})\) は, ベクトルポテンシャルの回転として定義される. 
+\begin{equation}
+    \hat{\vb*{B}}(\vb*{r}) = \nabla \times \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} (\nabla \times \vb*{u}(\vb*{r})) + \hat{a}^\dagger (\nabla \times \vb*{u}^*(\vb*{r})) \right)
+\end{equation}
+
+\section*{ファラデー配置におけるモード設定}
+本実験系（ファラデー配置）に合わせ, 以下の幾何学的条件を設定する. 
+\begin{itemize}
+    \item 光の伝搬方向（波数ベクトル）: \(\vb*{k} \parallel z\)
+    \item 静磁場方向: \(\vb*{B}_{\text{DC}} \parallel z\)
+    \item キャビティモード: \(z\) 軸方向に定在波を形成する直線偏光モード
+\end{itemize}
+ここで, 磁場が \(x\) 軸方向に偏光している（\(\vb*{B} \parallel x\)）ようなモードを考える. 電磁波の横波性により電場は \(y\) 方向成分を持つため, ベクトルポテンシャルのモード関数を以下のように仮定できる. 
+\begin{equation}
+    \vb*{u}(\vb*{r}) = u(z) \vb*{e}_y
+\end{equation}
+これの回転をとると, 
+\begin{equation}
+    \nabla \times \vb*{u}(\vb*{r}) = \mqty|\vb*{e}_x & \vb*{e}_y & \vb*{e}_z \\ \partial_x & \partial_y & \partial_z \\ 0 & u(z) & 0| = -\frac{d u(z)}{dz} \vb*{e}_x
+\end{equation}
+となる. スピン集団が配置されている位置（例えば \(z=0\)）において磁場が腹（最大振幅）になると仮定し, その局所的な空間微分値を定数 \(C\) （無次元量のオーダー）として扱うと, 
+\begin{equation}
+    \hat{\vb*{B}} = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \frac{k c}{\omega_c} C (\hat{a} + \hat{a}^\dagger) \vb*{e}_x
+\end{equation}
+のように整理できる. ここで \(\omega_c = c k, c=\frac{1}{\sqrt{\epsilon_0 \mu_0}}\) の関係を用い, すべての定数を真空磁場揺らぎ振幅 \(B_{\text{vac}}\) に押し込めると, 最終的に以下の簡潔な形を得る. 
+\begin{equation}
+    \hat{\vb*{B}} = B_{\text{vac}} (\hat{a} + \hat{a}^\dagger) \vb*{e}_x, \quad B_{\text{vac}} \equiv C \sqrt{\frac{\hbar \omega_c \mu_0}{2V}}
+    \label{eq:B_field}
+\end{equation}
+これにより, 直線偏光モードの量子化磁場が定義された. 
+
+\section{磁気双極子相互作用}
+\section*{ハミルトニアンの定義}
+\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) は, ゼーマン・エネルギーの形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = - \sum_{i=1}^N \hat{\boldsymbol{\mu}}_i \cdot \hat{\vb*{B}}
+\end{equation}
+磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_L \mu_B \hat{\vb*{S}}_i\) である（\(g_L\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = g_L \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
+\end{equation}
+
+\section*{昇降演算子による展開と反回転項}
+スピン演算子の \(x\) 成分を昇降演算子 \(\hat{S}_\pm^i = \hat{S}_x^i \pm i \hat{S}_y^i\) を用いて \(\hat{S}_x^i = \frac{1}{2}(\hat{S}_+^i + \hat{S}_-^i)\) と書き換える. 
+さらに, 集団スピン演算子 \(\hat{J}_\pm = \sum_i \hat{S}_\pm^i\) を導入する. 
+\begin{align}
+    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_L \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
+    &= \frac{g_L \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{回転項}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{反回転項}} \right]
+\end{align}
+この式変形により, エネルギー保存則を一見破るように見える項（光子生成かつスピン励起 \(\hat{a}^\dagger \hat{J}_+\), およびその逆過程）が自然に出現することがわかる. これらがUSC領域で重要となる反回転項である. 
+
+\section*{Dickeモデルハミルトニアン}
+単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_L \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g_{\text{eff}} = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g_{\text{eff}}}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-) \label{Dicke_Hamiltonian}
+\end{equation}
+ここで \(\omega_s\) は静磁場によるLarmor周波数である. 
+以上より, 直線偏光モードを持つキャビティ場とスピン系の磁気双極子相互作用から, 反回転項を含むDickeハミルトニアンが第一原理的に導出された. 
+
+\section{Holstein-Primakoff変換によるボゾン化}
+熱力学的極限（\(N \gg 1\)）かつ低励起極限（\(\langle \hat{J}_z \rangle \approx -N/2\)）において, 集団スピン演算子に対してHolstein-Primakoff変換を適用し, スピン自由度をボゾン演算子\(\hat{b}, \hat{b}^\dagger\)（マグノン）に写像する. 
+\begin{align}
+    \hat{J}_+ &\simeq \sqrt{N} \hat{b}^\dagger, \quad \hat{J}_- \simeq \sqrt{N} \hat{b} \\
+    \hat{J}_z &= -N/2 + \hat{b}^\dagger \hat{b}
+\end{align}
+これらをDickeハミルトニアン(式\ref{Dicke_Hamiltonian})に代入し, 定数項を除くと, 以下の2次形式ボゾンハミルトニアン（Hopfieldハミルトニアン）が得られる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{Hop}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{b}^\dagger \hat{b} + \hbar g_{\text{eff}} (\hat{a}^\dagger + \hat{a})(\hat{b}^\dagger + \hat{b}) 
+    \label{eq:Hopfield}
+\end{equation}
+式(\ref{eq:Hopfield})は, \(\hat{a}^\dagger \hat{b}^\dagger\)（光子・マグノンの同時生成）および\(\hat{a}\hat{b}\)（同時消滅）を含んでおり, RWAでは記述できない物理現象を示唆している. 
+
+\section{Bogoliubov変換と固有エネルギー}
+このハミルトニアン(式\ref{eq:Hopfield})を対角化するために, 一般化されたBogoliubov変換（Hopfield変換）を導入し, 新たな固有演算子（ポラリトン演算子）\(\hat{p}_k\) (\(k=\text{LP, UP}\)) を定義する. 
+\begin{equation}
+    \hat{p}_k = w_k \hat{a} + x_k \hat{b} + y_k \hat{a}^\dagger + z_k \hat{b}^\dagger
+\end{equation}
+Heisenbergの運動方程式に基づく行列形式の固有値問題を解くことで, Zeemanポラリトンの分散関係（固有エネルギー \(E_{\pm} = \hbar \Omega_{\pm}\)）は以下のように導出される. 
+\begin{equation}
+    \Omega_{\pm}^2 = \frac{1}{2} \left[ \omega_c^2 + \omega_s^2 \pm \sqrt{(\omega_c^2 - \omega_s^2)^2 + 16 g_{\text{eff}}^2 \omega_c \omega_s} \right]
+\end{equation}
+この結果は, USC領域において固有振動数が結合強度\(g_{\text{eff}}\)に対して非線形に依存することを示している. 特に\(\Omega_-\)（Lower Polariton）は, Bloch-Siegertシフトを含んだエネルギー準位となる. 
+\section{基底状態の量子性}
+Dickeモデルにおける真の基底状態（USC真空）\(|G_{\text{USC}}\rangle\) は, ポラリトン消滅演算子に対し \(\hat{p}_k |G_{\text{USC}}\rangle = 0\) を満たす状態として定義される. しかし, 元の粒子演算子（\(\hat{a}, \hat{b}\)）に対しては真空ではない. 
+すなわち, 
+\begin{equation}
+    \langle G_{\text{USC}} | \hat{a}^\dagger \hat{a} | G_{\text{USC}} \rangle \neq 0, \quad \langle G_{\text{USC}} | \hat{b}^\dagger \hat{b} | G_{\text{USC}} \rangle \neq 0
+\end{equation}
+となり, 基底状態においても有限の光子数とマグノン数が存在する（仮想光子の衣をまとう）. これは, 系がスクイーズド真空状態にあることを意味し, キャビティ量子電磁力学（Cavity QED）における顕著な量子効果の一つである. 

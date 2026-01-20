@@ -1,0 +1,504 @@
+% filepath: master_thesis_results_chapter.tex
+\documentclass[a4paper,12pt,dvipdfmx]{jlreq}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds, calc}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{siunitx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{longtable}
+
+% 画像パスの設定
+\graphicspath{{figures/}}
+
+% カラーボックス設定
+\newtcolorbox{keypoint}{colback=blue!5!white,colframe=blue!75!black,title=要点}
+\newtcolorbox{result}{colback=green!5!white,colframe=green!60!black,title=結果}
+
+\title{\vspace{-2cm}
+\textbf{第4章　ベイズ推定による解析結果}\\
+\large Gd$_3$Ga$_5$O$_{12}$のテラヘルツ透過スペクトル解析
+}
+\author{修士論文}
+\date{2026年1月}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{概要}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+本章では、共有$\gamma$モデル（v6）を用いた最小二乗法フィッティングの結果を情報的事前分布として活用し、
+マルコフ連鎖モンテカルロ法（MCMC）によるベイズ推定を実施した結果を報告する。
+H形式（$\mu_r = 1 + \chi$）とB形式（$\mu_r = 1/(1-\chi)$）の両方について解析を行い、
+パラメータの事後分布、収束診断、および透過スペクトルの再現性を評価した。
+
+解析条件は以下の通りである：
+\begin{itemize}
+    \item \textbf{サンプリング手法}: Sliceサンプラー
+    \item \textbf{チェーン数}: 8
+    \item \textbf{サンプル数}: 4,000（各チェーン）
+    \item \textbf{ウォームアップ}: 2,000（破棄）
+    \item \textbf{合計事後サンプル}: 32,000
+    \item \textbf{データセット数}: 10条件（温度4条件 + 磁場6条件）
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{推定パラメータの結果}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{H形式の推定結果}
+
+表\ref{tab:params_H}にH形式におけるベイズ推定の結果を示す。
+全パラメータにおいて$\hat{R} = 1.00$、ESS $> 24,000$が達成され、
+MCMCが十分に収束していることが確認された。
+
+\begin{table}[H]
+\centering
+\caption{H形式パラメータの事後分布統計}
+\label{tab:params_H}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{パラメータ} & \textbf{事後平均} & \textbf{SD} & \textbf{94\% HDI} & \textbf{ESS} & \textbf{$\hat{R}$} \\
+\midrule
+$g$ (g因子) & 1.859 & 0.000 & [1.859, 1.860] & 29,286 & 1.00 \\
+$a$ (スケール) & 8.001 & 0.001 & [8.000, 8.002] & 25,078 & 1.00 \\
+$B_4$ [K] & 0.009 & 0.000 & [0.008, 0.010] & 26,724 & 1.00 \\
+$B_6$ [K] & $-2.9 \times 10^{-4}$ & 0.000 & --- & 31,758 & 1.00 \\
+$\varepsilon_{\text{bg}}$ & 14.095 & 0.002 & [14.092, 14.099] & 30,391 & 1.00 \\
+\midrule
+$\gamma_1$ [THz] & 0.020 & 0.000 & [0.020, 0.020] & 24,646 & 1.00 \\
+$\gamma_2$ [THz] & 0.182 & 0.002 & [0.179, 0.185] & 28,021 & 1.00 \\
+$\gamma_3$ [THz] & 0.009 & 0.000 & [0.009, 0.009] & 25,158 & 1.00 \\
+$\gamma_4$ [THz] & 0.108 & 0.001 & [0.107, 0.111] & 24,375 & 1.00 \\
+$\gamma_5$ [THz] & 0.094 & 0.001 & [0.093, 0.096] & 25,087 & 1.00 \\
+$\gamma_6$ [THz] & 0.084 & 0.001 & [0.083, 0.086] & 26,538 & 1.00 \\
+$\gamma_7$ [THz] & 0.073 & 0.002 & [0.071, 0.077] & 27,525 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{result}
+H形式では全12パラメータが優れた収束を示し、ESS $> 24,000$という極めて高い有効サンプルサイズが得られた。
+これは事前分布の設計と重み付け戦略が適切であったことを示している。
+\end{result}
+
+\subsection{B形式の推定結果}
+
+表\ref{tab:params_B}にB形式におけるベイズ推定の結果を示す。
+大部分のパラメータは良好な収束を示したが、$g$因子と$B_4$において
+$\hat{R} = 1.03$、ESS $\approx 172$と収束が不十分であることが確認された。
+
+\begin{table}[H]
+\centering
+\caption{B形式パラメータの事後分布統計}
+\label{tab:params_B}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{パラメータ} & \textbf{事後平均} & \textbf{SD} & \textbf{94\% HDI} & \textbf{ESS} & \textbf{$\hat{R}$} \\
+\midrule
+$g$ (g因子) & 1.929 & 0.000 & [1.928, 1.929] & \textcolor{red}{172} & \textcolor{red}{1.03} \\
+$a$ (スケール) & 8.001 & 0.001 & [8.000, 8.002] & 25,661 & 1.00 \\
+$B_4$ [K] & 0.009 & 0.000 & [0.009, 0.010] & \textcolor{red}{172} & \textcolor{red}{1.03} \\
+$B_6$ [K] & $-3.0 \times 10^{-4}$ & 0.000 & --- & 30,302 & 1.00 \\
+$\varepsilon_{\text{bg}}$ & 14.116 & 0.002 & [14.112, 14.120] & 30,983 & 1.00 \\
+\midrule
+$\gamma_1$ [THz] & 0.036 & 0.000 & [0.036, 0.036] & 26,744 & 1.00 \\
+$\gamma_2$ [THz] & 0.237 & 0.002 & [0.234, 0.241] & 26,809 & 1.00 \\
+$\gamma_3$ [THz] & 0.010 & 0.000 & [0.010, 0.010] & 25,315 & 1.00 \\
+$\gamma_4$ [THz] & 0.173 & 0.003 & [0.167, 0.179] & 20,288 & 1.00 \\
+$\gamma_5$ [THz] & 0.162 & 0.003 & [0.157, 0.168] & 21,849 & 1.00 \\
+$\gamma_6$ [THz] & 0.158 & 0.004 & [0.152, 0.166] & 21,518 & 1.00 \\
+$\gamma_7$ [THz] & 0.157 & 0.007 & [0.147, 0.170] & 22,611 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{keypoint}
+B形式において$g$因子と$B_4$の収束が不十分である理由は、これら2つのパラメータ間に
+強い負の相関が存在するためである。この問題は事前分布の$\sigma$を拡大することで
+改善できる可能性がある（第\ref{sec:discussion}節で議論）。
+\end{keypoint}
+
+\subsection{v6最適化結果との比較}
+
+表\ref{tab:v6_comparison}に、v6最適化（最小二乗法）とベイズ推定の結果を比較して示す。
+
+\begin{table}[H]
+\centering
+\caption{v6最適化とベイズ推定の比較}
+\label{tab:v6_comparison}
+\begin{tabular}{lccccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{H形式}} & \multicolumn{2}{c}{\textbf{B形式}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\textbf{パラメータ} & \textbf{v6} & \textbf{Bayes} & \textbf{v6} & \textbf{Bayes} \\
+\midrule
+$g$ & 1.800 & 1.859 & 1.927 & 1.929 \\
+$a$ & 10.00 & 8.00 & 10.00 & 8.00 \\
+$B_4$ [K] & 0.0080 & 0.0088 & 0.0080 & 0.0094 \\
+$B_6$ [K] & $-2.9 \times 10^{-4}$ & $-2.9 \times 10^{-4}$ & $-3.0 \times 10^{-4}$ & $-3.0 \times 10^{-4}$ \\
+$\varepsilon_{\text{bg}}$ & 13.90 & 14.10 & 13.94 & 14.12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+注目すべき変化として、スケール係数$a$がv6の10.0からベイズ推定では8.0に減少している。
+これは事前分布の下限（8.0）に張り付いていることを示唆しており、
+真の最適値がさらに小さい可能性がある。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{収束診断}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{トレースプロット}
+
+図\ref{fig:trace_H}および図\ref{fig:trace_B}に、H形式およびB形式のトレースプロットを示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/trace_H.png}
+\caption{H形式のトレースプロット。各パラメータについて、事後分布（左）とMCMC軌跡（右）を示す。
+全パラメータで8本のチェーンが同一領域を探索しており、良好な収束が確認できる。}
+\label{fig:trace_H}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/trace_B.png}
+\caption{B形式のトレースプロット。$g$因子および$B_4$においてチェーン間のばらつきが
+見られ、収束が不十分であることが確認できる。}
+\label{fig:trace_B}
+\end{figure}
+
+\subsection{詳細トレースプロット}
+
+図\ref{fig:detailed_trace_H}および図\ref{fig:detailed_trace_B}に、
+ESS・$\hat{R}$情報付きの詳細トレースプロットを示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/diagnostics/detailed_trace_H.png}
+\caption{H形式の詳細トレースプロット。各パラメータについて事後分布ヒストグラム（左）と
+8チェーンの軌跡（右）を表示。右パネルにはESS・$\hat{R}$の値と収束状態（✅/⚠️）が表示されている。
+全パラメータで✅（収束良好）が確認された。}
+\label{fig:detailed_trace_H}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/diagnostics/detailed_trace_B.png}
+\caption{B形式の詳細トレースプロット。$g$因子と$B_4$において⚠️（要注意）が表示されており、
+ESS = 172と低い値が確認できる。これらのパラメータではチェーン間の不一致が見られる。}
+\label{fig:detailed_trace_B}
+\end{figure}
+
+\subsection{有効サンプルサイズ（ESS）比較}
+
+図\ref{fig:ess}にH形式とB形式のESS比較を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/diagnostics/ess_comparison.png}
+\caption{有効サンプルサイズ（ESS）の比較。緑色バーはESS $\geq$ 400（推奨基準）、
+赤色バーはESS $<$ 100（危険）を示す。B形式の$g$因子と$B_4$のみが低ESS（172）を示している。}
+\label{fig:ess}
+\end{figure}
+
+\subsection{$\hat{R}$統計量比較}
+
+図\ref{fig:rhat}にH形式とB形式の$\hat{R}$比較を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/diagnostics/rhat_comparison.png}
+\caption{$\hat{R}$統計量の比較。緑色の縦線（$\hat{R} = 1.01$）が目標値、
+オレンジの縦線（$\hat{R} = 1.05$）が警告閾値を示す。
+B形式の$g$因子と$B_4$のみが$\hat{R} = 1.03$と目標を超えている。}
+\label{fig:rhat}
+\end{figure}
+
+\subsection{パラメータ間相関}
+
+図\ref{fig:correlation_H}および図\ref{fig:correlation_B}に、
+主要パラメータ間の相関プロットを示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/diagnostics/correlation_H.png}
+\caption{H形式のパラメータ間相関。$g$因子、$a$スケール、$B_4$、$B_6$の4パラメータについて
+ペアプロットを表示。対角成分は周辺分布、非対角成分は2次元事後分布のカーネル密度推定を示す。
+H形式ではパラメータ間の相関は比較的弱い。}
+\label{fig:correlation_H}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/diagnostics/correlation_B.png}
+\caption{B形式のパラメータ間相関。$g$因子と$B_4$の間に強い負の相関（細長い楕円形状）が
+見られる。この強い相関がMCMCの探索効率を低下させ、低ESS・高$\hat{R}$の原因となっている。}
+\label{fig:correlation_B}
+\end{figure}
+
+\subsection{自己相関プロット}
+
+図\ref{fig:autocorr}に自己相関プロットを示す。
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{figures/diagnostics/autocorr_H.png}
+\caption{H形式}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{figures/diagnostics/autocorr_B.png}
+\caption{B形式}
+\end{subfigure}
+\caption{自己相関プロット。H形式（左）では全パラメータで自己相関が急速に減衰しているが、
+B形式（右）の一部パラメータでは減衰が緩やかであり、高い自己相関が残存している。}
+\label{fig:autocorr}
+\end{figure}
+
+\subsection{ランクプロット}
+
+図\ref{fig:rank}にランクプロットを示す。
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{figures/diagnostics/rank_plot_H.png}
+\caption{H形式}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{figures/diagnostics/rank_plot_B.png}
+\caption{B形式}
+\end{subfigure}
+\caption{ランクプロット。収束している場合、各チェーンのランク分布は一様分布に近くなる。
+H形式（左）では全パラメータで一様に近いヒストグラムが得られているが、
+B形式（右）の一部パラメータでは偏りが見られる。}
+\label{fig:rank}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{物理量の比較}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{エネルギー準位}
+
+図\ref{fig:energy_levels}に、H形式とB形式で推定されたパラメータから計算した
+エネルギー固有値の比較を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/energy_levels_comparison.png}
+\caption{エネルギー準位の比較。各測定条件（4K, 10K, 20K, 30K, 4.2T〜9T）について、
+H形式（赤）とB形式（青）から計算したGd$^{3+}$イオンの8準位エネルギーを棒グラフで表示。
+ゼーマン分裂により磁場依存性が明確に現れている。}
+\label{fig:energy_levels}
+\end{figure}
+
+\subsection{占有確率（ボルツマン分布）}
+
+図\ref{fig:populations}に、各準位の占有確率の比較を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/populations_comparison.png}
+\caption{占有確率の比較。ボルツマン分布に従う各準位の占有確率を表示。
+低温（4K, 1.5K）では基底状態の占有率が高く、高温（30K）では複数準位に分布が広がる。
+H形式とB形式で僅かな差異が見られるが、定性的な振る舞いは一致している。}
+\label{fig:populations}
+\end{figure}
+
+\subsection{磁気感受率}
+
+図\ref{fig:susceptibility}に、磁気感受率$|\chi(\omega)|$の周波数依存性を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/susceptibility_comparison.png}
+\caption{磁気感受率$|\chi(\omega)|$の比較。各測定条件について、H形式（赤）とB形式（青）の
+感受率振幅を周波数の関数として表示。共鳴ピーク位置と強度がモデル形式によって異なることが確認できる。
+特に低周波のポラリトン領域で顕著な差異が見られる。}
+\label{fig:susceptibility}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{透過スペクトルの再現性}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{H形式とB形式の比較}
+
+図\ref{fig:transmission}に、全10データセットについて実験データとフィット曲線の比較を示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/plots/transmission_spectra_comparison.png}
+\caption{透過スペクトルの比較。灰色点が実験データ、赤線がH形式、青線がB形式による
+フィット曲線を示す。オレンジの塗りつぶし領域はポラリトンモード（重み1.5×）、
+緑の塗りつぶし領域は共振器モード（重み1.0×）を示す。各パネルにRMSE値が表示されている。}
+\label{fig:transmission}
+\end{figure}
+
+\subsection{HDI信頼区間付き透過スペクトル}
+
+図\ref{fig:transmission_hdi}に、95\% HDI信頼区間を付した透過スペクトルを示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/plots/transmission_spectra_with_hdi.png}
+\caption{95\% HDI信頼区間付き透過スペクトル。事後サンプルから計算した透過スペクトルの
+2.5\%〜97.5\%パーセンタイルを薄赤色（H形式）・薄青色（B形式）の帯として表示。
+事後平均は濃い実線で示す。HDI帯の幅が狭いことから、パラメータの不確かさが
+透過スペクトルに与える影響は小さいことがわかる。}
+\label{fig:transmission_hdi}
+\end{figure}
+
+\subsection{HDI診断プロット}
+
+図\ref{fig:hdi_diagnostic}に、HDI区間の詳細診断プロットを示す。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/plots/hdi_test_diagnostic.png}
+\caption{HDI区間診断プロット。左上：全体図（データ+HDI帯+境界線）、
+右上：HDI幅の周波数依存性、左下：標準偏差の周波数依存性、右下：0.25〜0.35 THz領域の拡大図。
+HDI幅は平均で0.01程度であり、事後分布の分散が適度に小さいことが確認できる。}
+\label{fig:hdi_diagnostic}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{考察}
+\label{sec:discussion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{H形式とB形式の比較}
+
+本解析により、H形式とB形式で以下の違いが明らかになった：
+
+\begin{enumerate}
+    \item \textbf{収束性}: H形式は全パラメータで優れた収束（ESS $>$ 24,000, $\hat{R} = 1.00$）を示したのに対し、
+    B形式では$g$因子と$B_4$で収束が不十分（ESS = 172, $\hat{R} = 1.03$）であった。
+    
+    \item \textbf{パラメータ推定値}: 
+    \begin{itemize}
+        \item $g$因子: H形式（1.859） $<$ B形式（1.929）
+        \item 緩和率$\gamma$: B形式の方が全般的に大きい値を示した
+    \end{itemize}
+    
+    \item \textbf{パラメータ間相関}: B形式では$g$因子と$B_4$に強い負の相関が存在し、
+    これがMCMCの探索効率を低下させている。
+\end{enumerate}
+
+\subsection{B形式の収束問題の原因}
+
+B形式で観測された$g$因子と$B_4$の低ESS・高$\hat{R}$は、以下の要因によると考えられる：
+
+\begin{itemize}
+    \item \textbf{パラメータ間の強い相関}: 相関プロット（図\ref{fig:correlation_B}）に示されるように、
+    $g$と$B_4$の間に強い負の相関が存在する。これにより、事後分布が細長い楕円形状となり、
+    サンプラーがこの狭い領域を効率的に探索できない。
+    
+    \item \textbf{事前分布の制約}: 事前分布の$\sigma$が狭すぎる可能性がある。
+    より広い事前分布を使用することで、探索効率が改善される可能性がある。
+    
+    \item \textbf{B形式特有の数値的困難}: $\mu_r = 1/(1-\chi)$という形式では、
+    $\chi \to 1$で発散が生じるため、パラメータ空間の一部で数値的に不安定になりやすい。
+\end{itemize}
+
+\subsection{下限張り付き問題}
+
+スケール係数$a$がv6最適化の10.0からベイズ推定では8.0（事前分布の下限）に張り付いている。
+これは以下を示唆する：
+
+\begin{itemize}
+    \item 真の最適値は$a < 8.0$である可能性が高い
+    \item 事前分布の下限を1.0程度まで拡大すべき
+\end{itemize}
+
+同様に、一部の$\gamma$パラメータも下限（0.005 THz）に近い値を示しており、
+より広い探索範囲が必要である。
+
+\subsection{改善の方向性}
+
+以上の考察に基づき、以下の改善を推奨する：
+
+\begin{enumerate}
+    \item $a$スケールの下限を8.0 $\to$ 1.0に拡大
+    \item $\gamma$の下限を0.005 $\to$ 0.001 THzに拡大
+    \item B形式の$g$因子、$B_4$の事前分布$\sigma$を3〜5倍に拡大
+    \item サンプリング設定の強化（draws: 4,000 $\to$ 8,000, chains: 8 $\to$ 12）
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{結論}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+本章では、共有$\gamma$モデルを用いたGd$_3$Ga$_5$O$_{12}$テラヘルツ透過スペクトルの
+ベイズ推定結果を報告した。主要な成果は以下の通りである：
+
+\begin{result}
+\begin{enumerate}
+    \item H形式では全12パラメータが優れた収束を達成（ESS $>$ 24,000, $\hat{R} = 1.00$）
+    
+    \item B形式では$g$因子と$B_4$に収束の問題が確認されたが、
+    他のパラメータは良好な収束を示した
+    
+    \item 両形式とも透過スペクトルの良好な再現性を達成
+    
+    \item 95\% HDI信頼区間により、パラメータ不確かさの定量化に成功
+    
+    \item B形式の収束問題は、$g$-$B_4$間の強い相関に起因することが判明
+\end{enumerate}
+\end{result}
+
+今後の課題として、B形式の収束改善のための事前分布再設計、
+および下限張り付き問題の解消のための探索範囲拡大が挙げられる。
+これらの改善により、より信頼性の高いパラメータ推定が可能になると期待される。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{収束診断の数値詳細}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+表\ref{tab:full_summary}に、全パラメータの詳細な統計量を示す。
+
+\begin{table}[H]
+\centering
+\caption{全パラメータの詳細統計（H形式）}
+\label{tab:full_summary}
+\footnotesize
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{パラメータ} & \textbf{Mean} & \textbf{SD} & \textbf{HDI 3\%} & \textbf{HDI 97\%} & \textbf{MCSE} & \textbf{ESS bulk} & \textbf{ESS tail} \\
+\midrule
+g\_factor & 1.859 & 0.000 & 1.859 & 1.860 & 0.000 & 29,286 & 23,050 \\
+a\_scale & 8.001 & 0.001 & 8.000 & 8.002 & 0.000 & 25,078 & 17,771 \\
+B4 & 0.009 & 0.000 & 0.008 & 0.010 & 0.000 & 26,724 & 16,432 \\
+B6 & $-$0.000 & 0.000 & $-$0.000 & $-$0.000 & 0.000 & 31,758 & 21,681 \\
+eps\_bg & 14.095 & 0.002 & 14.092 & 14.099 & 0.000 & 30,391 & 24,098 \\
+gamma\_1 & 0.020 & 0.000 & 0.020 & 0.020 & 0.000 & 24,646 & 17,334 \\
+gamma\_2 & 0.182 & 0.002 & 0.179 & 0.185 & 0.000 & 28,021 & 23,089 \\
+gamma\_3 & 0.009 & 0.000 & 0.009 & 0.009 & 0.000 & 25,158 & 18,660 \\
+gamma\_4 & 0.108 & 0.001 & 0.107 & 0.111 & 0.000 & 24,375 & 18,284 \\
+gamma\_5 & 0.094 & 0.001 & 0.093 & 0.096 & 0.000 & 25,087 & 18,317 \\
+gamma\_6 & 0.084 & 0.001 & 0.083 & 0.086 & 0.000 & 26,538 & 18,433 \\
+gamma\_7 & 0.073 & 0.002 & 0.071 & 0.077 & 0.000 & 27,525 & 18,916 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

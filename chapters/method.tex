@@ -3,20 +3,307 @@
 \chapter{解析方法}
 \label{chap:method} % 後で参照するためにラベルを付ける
 
-本章では, 研究の解析方法について述べる.
+本研究では, 取得されたTHz帯透過スペクトルの解析にあたり, 物理モデルに基づくパラメータ推定を行う. 解析は三段階で構成される. 第一に, 重み付き非線形最小二乗法を用いて大域的な最適解近傍を探索し, 第二に, その結果を事前情報として組み込んだベイズ推定を行うことで, パラメータの不確実性と相関を評価する. 第三に, パレート平滑化重点サンプリング（PSIS）を用いた1つ抜き交差検証（LOOCV）により, モデルの汎化性能を評価する. 以下, 各手法の詳細について述べる.
 
-\section{低周波領域のデータ解析}
-\label{sec:method_low_freq}
-低周波領域のデータ解析には, MCMCサンプリングによるベイズ推定を用いて以下のパラメータセットの推定を行う. 具体的には, 各データポイントを一つずつ除外し, 残りのデータでモデルを学習し, 除外したデータポイントに対する予測精度を評価する. 
+\section{各準位の緩和係数}
+磁気感受率は式\ref{eq:chi_linear}によって計算される. GGGは8準位あるので, 全\(8 \times 7 = 56\)個の遷移ペア( \(n \leftrightarrow n'\) )の寄与を考える必要がある. 計算コストの観点から, 本研究では, 式\ref{eq:gamma_approximation}を仮定し, 表\ref{tab:gamma_transition}で示すように, 56個の遷移の緩和係数を7個の緩和係数で記述する. 以下, この仮定に基づく緩和係数を共有\(\gamma\)モデルと呼称する. 
+\begin{equation}
+    \gamma (n, n') = \gamma_{\text{min}} (n, n')
+    \label{eq:gamma_approximation}
+\end{equation}
+この物理的意味は, 緩和過程が主に初期状態（低エネルギー側）の特性で決まるという仮定である. 
+\begin{table}[h]
+\centering
+\caption{共有\(\gamma\)モデル}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{\(\gamma_{i}\)} & \textbf{遷移パターン} & \textbf{遷移数}\\
+\midrule
+\(\gamma_0\) & \(|0\rangle \leftrightarrow |1,2,\dots,7\rangle\) & \(7 \times 2 = 14\)\\
+\(\gamma_1\) & \(|0\rangle \leftrightarrow |2, \dots,7\rangle\) & \(6 \times 2 = 12\)\\
+\(\gamma_2\) & \(|0\rangle \leftrightarrow |3, \dots,7\rangle\) & \(5 \times 2 = 10\)\\
+\(\gamma_3\) & \(|0\rangle \leftrightarrow |4,\dots,7\rangle\) & \(4 \times 2 =8\)\\
+\(\gamma_4\) & \(|0\rangle \leftrightarrow |5,\dots,7\rangle\) & \(3 \times 2 = 6\)\\
+\(\gamma_5\) & \(|0\rangle \leftrightarrow |6,7\rangle\) & \(2 \times 2 = 4\)\\
+\(\gamma_6\) & \(|0\rangle \leftrightarrow |7 \rangle\) & \(1 \times 2 = 2\)\\
+\bottomrule
+\end{tabular}
+\label{tab:gamma_transition}
+\end{table}
 
-\section{高周波領域のデータ解析}
-\label{sec:method_high_freq}
-高周波領域のデータ解析には, ベイズ推定とMCMCを組み合わせて用いる. 具体的には, 観測データに対して事前分布を設定し, MCMCを用いて事後分布からサンプリングを行う. 
+\section{推定するパラメータ群}
+\label{sec:parameters_to_estimate}
+本解析において推定対象となる主要なパラメータ群とその物理的役割を Table \ref{tab:parameters_1} にまとめる. 
 
-\section{全体としてのデータ解析}
-\label{sec:method_all_freq}
-全体のデータ解析には, 低周波領域と高周波領域のデータを統合して解析を行う. 具体的には, 各領域で得られた知見をもとに, 全体のモデルを構築し, 解析を行う. 
+\begin{table}[h]
+    \centering
+    \caption{本解析における推定パラメータ群とその物理的役割}
+    \label{tab:parameters_1}
+    \renewcommand{\arraystretch}{1.3} % 行の高さを調整
+    \begin{tabular}{@{}llp{8.5cm}@{}}
+        \toprule
+        \textbf{記号} & \textbf{パラメータ名称} & \textbf{物理的役割とモデルへの寄与} \\
+        \midrule
+        \(g\) & g因子 & ゼーマンエネルギー \(\muB g B\) を決定し, スペクトルの共鳴中心周波数を支配する.  \\
+        \(B_{4}, B_{6}\) & 結晶場パラメータ & ゼロ磁場分裂や準位の混合を引き起こし, ピークの微細構造（分裂幅）やポラリトンモードに寄与する. \\
+        \(\gamma_{i}\) & 緩和率 & 遷移の寿命 \(\tau = 1/\gamma\) に対応し, スペクトルの線幅（Lorentzian幅）を決定する. コヒーレンスの減衰や散乱過程を反映する.  \\
+        \(a_{\vb*{scale}}\) & スケーリング係数 & 実効的なスピン密度や試料充填率に依存する吸収強度の絶対値を補正する係数. \(\chi \propto a_{\vb*{scale}} \cdot g^2\) の関係を持つ.  \\
+        \(\varepsilon_{\vb*{bg}}\) & 背景誘電率 & 磁気共鳴以外のバックグラウンド透過率および高次の共振器モードを決定する.  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-\section{モデル選択}
-\label{sec:method_model_selection}
-モデル選択には, WAICを用いて複数のモデルの適合度を比較する. WAICが最も低いモデルを選択し, そのモデルを用いて最終的な解析を行う.   
+\section{重み付き非線形最小二乗法}
+\label{sec:wnlls}
+\subsection{物理的背景に基づく目的関数の設計}
+量子光学実験において, 物理的に最も重要な情報は, 透過スペクトルの「共鳴ピーク位置（固有エネルギーに対応）」および「線幅（緩和率に対応）」に集約されている. 一方, 共鳴から離れたベースライン領域は, 主に測定系のバックグラウンドノイズや誘電率の分散に支配されており, スピン系の物性パラメータ推定における情報密度は低い. 
+
+通常の最小二乗法では, 全データ点の残差を均等に評価するため, データ点数の多いベースライン領域の微小なズレを修正しようとして, 肝心のピーク形状のフィッティングが犠牲になる場合がある. 
+そこで本研究では, 物理的な重要度を反映させた重み付き残差二乗和 \(S(\vb*{\theta})\) を目的関数（損失関数）として定義する. 
+
+\begin{equation}
+    S(\vb*{\theta}) = \sum_{i=1}^{N} w_i \left( y_i^{\vb*{obs}} - y_i^{\vb*{model}}(\vb*{\theta}) \right)^2
+\end{equation}
+
+ここで重みここで重み $w_{i}$ は, ピーク検出アルゴリズム（本研究では\texttt{Scipy}の \texttt{find\_peaks} 関数及び \texttt{peak\_widths} 関数）により特定された共鳴中心周波数および半値全幅（FWHM）内の領域に対して大きな値を与え, それ以外の領域には小さな値を与える. これは統計学的には, 興味のある領域（共鳴構造）の誤差に対するペナルティを重く設定し, それ以外のリスクを相対的に下げる「リスク関数の変更」に相当する.
+
+\subsection{最適化アルゴリズムと収束判定}
+最適化アルゴリズムには, 最急降下法（勾配法）とガウス・ニュートン法の中間的な特性を持つ Levenberg-Marquardt 法（制約条件がある場合は信頼領域反射法）を用いる. 本研究では, \texttt{Scipy}の \texttt{curve\_fit} 関数を利用して実装した.\\
+パラメータの更新ベクトル \(\Delta \bm{\theta}\) は, 以下の正規方程式（減衰最小二乗法）を解くことで決定される. 
+\begin{equation}
+    (\vb*{J}^T \vb*{W} \vb*{J} + \lambda \vb*{D}) \Delta \bm{\theta} = \vb*{J}^T \vb*{W} (\bm{y}^{\mathrm{obs}} - \bm{y}^{\mathrm{model}})
+\end{equation}
+ここで \(\vb*{J}\) はヤコビ行列, \(\vb*{W}\) は観測誤差の逆分散を成分とする重み行列（\(\vb*{W}_{ii} = 1/\sigma_i^2\)）, \(\lambda\) はダンピング係数である. また, \(\vb*{D}\) はスケーリング行列であり, 一般に単位行列 \(\vb*{I}\) または近似ヘッセ行列の対角成分 \(\mathrm{diag}(\vb*{J}^T \vb*{W} \vb*{J})\) が用いられる. 
+\(\lambda\) が大きい場合は最急降下法に近い挙動を示して大域的な探索を行い, 解近傍で \(\lambda\) が小さくなるとガウス・ニュートン法に近づき, 高速に収束する. 
+
+収束判定は, 目的関数の変化量 \(\Delta S\), パラメータの変化量 \(\Delta \bm{\theta}\), または勾配のノルムが所定の許容誤差（例: \(10^{-8}\)）を下回った時点で行う. 
+
+\subsection{最適化アルゴリズム: 信頼領域反射法 (Trust Region Reflective Method)}
+
+本研究におけるスペクトルフィッティングでは、モデルパラメータ \(\bm{\theta}\)（減衰率 \(\gamma\)、g因子、結晶場パラメータ等）に対し、物理的に妥当な正値性や理論的上限・下限といった制約条件を課す必要がある。そのため、最適化アルゴリズムには単純な勾配法やLevenberg-Marquardt法ではなく、境界制約付き非線形最小二乗問題（Bound-Constrained Non-linear Least Squares）に適した\textbf{信頼領域反射法}（Trust Region Reflective algorithm: TRF）\cite{Branch1999}を採用した。
+
+\subsubsection{目的関数と制約条件}
+観測データベクトルを \(\bm{y}^{\mathrm{obs}}\)、モデル関数を \(\bm{f}(\bm{\theta})\) とする。測定誤差の逆分散を対角成分に持つ重み行列 \(\vb*{W}\)（\(\vb*{W}_{ii} = 1/\sigma_i^2\)）を用いて、以下の重み付き残差二乗和 \(S(\bm{\theta})\) を目的関数として定義する。
+\begin{equation}
+    \min_{\bm{\theta}} S(\bm{\theta}) = \frac{1}{2} \left( \bm{y}^{\mathrm{obs}} - \bm{f}(\bm{\theta}) \right)^T \vb*{W} \left( \bm{y}^{\mathrm{obs}} - \bm{f}(\bm{\theta}) \right)
+    \label{eq:objective_function}
+\end{equation}
+ここで、パラメータベクトル \(\bm{\theta}\) は以下の不等式制約を満たすものとする。
+\begin{equation}
+    \bm{l} \le \bm{\theta} \le \bm{u}
+    \label{eq:boundary_constraints}
+\end{equation}
+\(\bm{l}, \bm{u}\) はそれぞれパラメータの下限および上限ベクトルである。
+
+\subsubsection{信頼領域サブ問題とスケーリング}
+TRF法は反復解法であり、第 \(k\) ステップにおけるパラメータ推定値 \(\bm{\theta}_k\) の近傍（信頼領域）において、目的関数 \(S(\bm{\theta})\) を二次近似したモデル \(m_k(\bm{p})\) を最小化する探索ベクトル \(\bm{p}\) を決定する。二次近似モデルは以下で表される。
+\begin{equation}
+    m_k(\bm{p}) = S(\bm{\theta}_k) + \vb*{g}_k^T \bm{p} + \frac{1}{2} \bm{p}^T \vb*{H}_k \bm{p}
+    \label{eq:quadratic_model}
+\end{equation}
+ここで、\(\vb*{g}_k = \nabla S(\bm{\theta}_k) = -\vb*{J}_k^T \vb*{W} (\bm{y}^{\mathrm{obs}} - \bm{f}(\bm{\theta}_k))\) は勾配ベクトル、\(\vb*{H}_k \approx \vb*{J}_k^T \vb*{W} \vb*{J}_k\) はガウス・ニュートン近似を用いたヘッセ行列、\(\vb*{J}_k\) はヤコビ行列である。
+
+TRF法の最大の特徴は、境界条件を厳密に扱うために導入されたスケーリング行列 \(\vb*{D}_k\) にある。探索ステップ \(\bm{p}\) は以下の信頼領域制約の下で計算される。
+\begin{equation}
+    \min_{\bm{p}} m_k(\bm{p}) \quad \text{subject to} \quad \norm{\vb*{D}_k \bm{p}} \le \Delta_k
+    \label{eq:trf_subproblem}
+\end{equation}
+ここで \(\Delta_k\) は信頼領域の半径である。\(\vb*{D}_k\) は対角行列であり、現在のパラメータ \(\bm{\theta}_k\) が境界 \(\bm{l}, \bm{u}\) に近づくにつれて、その方向への移動を制限するようにスケーリング成分が決定される（Coleman-Liスケーリング）。これにより、探索過程において解が常に実行可能領域（Feasible Region）内に留まることが数学的に保証される。
+
+また、探索方向が境界に衝突する場合、アルゴリズムは探索ベクトルを境界で「反射（Reflect）」させ、領域内部へ向かう新たな探索方向を生成する。この機構により、変数が境界値付近にある場合でも探索が停滞せず、大域的な収束性が維持される。
+
+\subsubsection{Levenberg-Marquardt法との比較}
+一般に非線形最小二乗法の標準解法として知られるLevenberg-Marquardt (LM) 法は、ダンピング係数 \(\lambda\) を用いて最急降下法とガウス・ニュートン法を補間する強力な手法であるが、本質的には制約なし問題（Unconstrained Optimization）を対象としている。LM法で境界条件を扱う場合、変数のクリッピングやペナルティ関数などのヒューリスティックな処理が必要となり、数値的な不安定性を招く恐れがある。
+
+\subsection*{フィッティング手法とプログラムの全体フロー}    
+\label{subsec:wnlls_method}
+まず, Kritzellらの実験データを読み込み, 磁場・温度ごとにデータを分割する. 次に, 各モデル(H形式, B形式)について, 手作業でフィッティングした際の知見を活かした初期パラメータを設定し, 重み付き非線形最小二乗法を適用してフィッティングを行う. フィッティングには\texttt{Scipy}ライブラリの\texttt{optimize}モジュールに含まれる\texttt{curve\_fit}関数を使用し, 各パラメータの最適値と共分散行列を取得する. 最後に, フィッティング結果を用いて各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出し, 結果を保存する. 重み付け方法としては, ピーク検出アルゴリズムにより特定された共鳴中心周波数および半値全幅（FWHM）内の領域に対して大きな値を与え, それ以外の領域には小さな値を与える. ただし, ポラリトン形成領域のフィッティングが困難だった為, ポラリトン形成領域の方が高次共振器モードよりも高く設定した.
+図\ref{fig:flowchart_wnlls}に, 重み付き非線形最小二乗法の全体フローチャートを示す. 初期条件は表\ref{tab:parameters_initial_wnlls}, フィッティング条件は表\ref{tab:stepwise_fitting_parameters}の通りである.
+
+\begin{table}[h]
+\centering
+\caption{重み付き非線形最小二乗法の全パラメータの初期条件}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{カテゴリ} & \textbf{パラメータ} & \textbf{初期値} & \textbf{範囲}\\
+\midrule
+\multirow{5}{*}{Global (5個)} 
+ & \(g\) & 1.95 & [1.5, 2.8]\\
+ & \(a\) & 1.0 & [0.1, 5.0]\\
+ & \(B_4\) & 2.02 mK & [0.1, 30] mK\\
+ & \(B_6\) & \(-0.012\) mK & [-1.0, 1.0] mK\\
+ & \(\varepsilon_{\text{bg}}\) & 14.4 & [13.0, 16.0]\\
+\midrule
+\multirow{7}{*}{Shared \(\gamma\) (7個)} 
+ & \(\gamma_0\) & 0.10 THz & [0.01, 0.5] THz\\
+ & \(\gamma_1\) & 0.15 THz & [0.01, 0.5] THz\\
+ & \(\gamma_2\) & 0.12 THz & [0.01, 0.5] THz\\
+ & \(\gamma_3\) & 0.11 THz & [0.01, 0.5] THz\\
+ & \(\gamma_4\) & 0.14 THz & [0.01, 0.5] THz\\
+ & \(\gamma_5\) & 0.13 THz & [0.01, 0.5] THz\\
+ & \(\gamma_6\) & 0.16 THz & [0.01, 0.5] THz\\
+\bottomrule
+\end{tabular}
+\label{tab:parameters_initial_wnlls}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{\textbf{重み付き非線形最小二乗法の段階的フィッティング条件}}
+    \label{tab:stepwise_fitting_parameters}
+    \renewcommand{\arraystretch}{1.2} % 行間調整
+    \begin{tabular}{@{}lccc@{}}
+        \toprule
+        \multicolumn{4}{c}{\textbf{段階的最適化設定}} \\
+        \cmidrule(lr){1-4}
+        \textbf{パラメータ項目} & \textbf{Stage 1} & \textbf{Stage 2} & \textbf{Stage 3} \\
+        & (粗探索) & (中間精緻化) & (微調整) \\
+        \midrule
+        最大反復回数 ($N_{\text{max}}$) & 5,000 & 15,000 & 30,000 \\
+        関数値収束許容誤差 (\texttt{ftol}) & \(1.0 \times 10^{-5}\) & \(1.0 \times 10^{-7}\) & \(1.0 \times 10^{-9}\) \\
+        パラメータ収束許容誤差 (\texttt{xtol}) & \(1.0 \times 10^{-5}\) & \(1.0 \times 10^{-7}\) & \(1.0 \times 10^{-9}\) \\
+        \midrule
+        \multicolumn{4}{c}{\textbf{共通設定}} \\
+        \cmidrule(lr){1-4}
+        \multicolumn{2}{l}{最適化アルゴリズム} & \multicolumn{2}{l}{TRF法} \\
+        \multicolumn{2}{l}{ポラリトンモードの重み ($w_{\text{pol}}$)} & \multicolumn{2}{l}{1.5} \\
+        \multicolumn{2}{l}{共振器モードの重み ($w_{\text{cav}}$)} & \multicolumn{2}{l}{1.0} \\
+        \multicolumn{2}{l}{背景・ノイズ領域の重み ($w_{\text{bg}}$)} & \multicolumn{2}{l}{0.01} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.8cm, text centered, draw=black, fill=red!30},
+    process/.style={rectangle, minimum width=3cm, minimum height=0.8cm, text centered, draw=black, fill=orange!30},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=0.8cm, text centered, draw=black, fill=blue!30},
+    decision/.style={diamond, minimum width=2cm, minimum height=0.8cm, text centered, draw=black, fill=green!30},
+    arrow/.style={thick,->,>=stealth}
+]
+
+% ノード
+\node (start) [startstop] {開始};
+\node (load) [io, below of=start] {データロード (10セット)};
+\node (detect) [process, below of=load] {ポラリトン検出・重み付け};
+\node (init) [process, below of=detect] {初期値・境界値設定};
+\node (opt1) [process, below of=init] {Stage 1: 粗探索};
+\node (opt2) [process, below of=opt1] {Stage 2: 中間精緻化};
+\node (opt3) [process, below of=opt2] {Stage 3: 微調整};
+\node (analyze) [process, below of=opt3] {結果解析・診断};
+\node (plot) [io, below of=analyze] {プロット生成・保存};
+\node (end) [startstop, below of=plot] {終了};
+
+% 矢印
+\draw [arrow] (start) -- (load);
+\draw [arrow] (load) -- (detect);
+\draw [arrow] (detect) -- (init);
+\draw [arrow] (init) -- (opt1);
+\draw [arrow] (opt1) -- (opt2);
+\draw [arrow] (opt2) -- (opt3);
+\draw [arrow] (opt3) -- (analyze);
+\draw [arrow] (analyze) -- (plot);
+\draw [arrow] (plot) -- (end);
+
+% モデル形式のループ
+\node[draw, dashed, fit=(opt1)(opt2)(opt3)(analyze), inner sep=0.3cm, label=right:{\small H形式・B形式で繰り返し}] {};
+
+\end{tikzpicture}
+\caption{プログラムの処理フロー}
+\label{fig:flowchart_wnlls}
+\end{figure}
+\clearpage
+
+\section{重み付き尤度に基づくベイズ推定}
+\label{sec:weighted_bayesian}
+点推定である最小二乗法に対し, パラメータの事後確率分布 \(p(\vb*{\theta} | D)\) を求めることで, 推定値の不確実性とパラメータ間の相関を定量化する. 
+
+\subsection{重み付き尤度関数の設計}
+前節の重み付き非線形最小二乗法と同様の物理的要請に基づき, 本研究では重み付き対数尤度を導入する. 
+観測データ \(D = \{(\omega_i, y_i^{\text{obs}})\}_{i=1}^N\) に対する対数尤度関数 \(\ln \mathcal{L}(\vb*{\theta} | D)\) を次式で定義する. 
+\begin{equation}
+    \ln \mathcal{L}(\vb*{\theta} | D) \propto -\frac{1}{2} \sum_{i=1}^{N} w_i \left( \frac{y_i^{\text{obs}} - y_i^{\text{model}}(\vb*{\theta})}{\sigma} \right)^2
+\end{equation}
+ここで \(\sigma\) は測定誤差の標準偏差である. この定義は, 重要度の高いデータ点（ピーク付近）において実効的な分散を小さく見積もる（\(\sigma_{\text{eff}, i} = \sigma / \sqrt{w_i}\)）ことと等価であり, 物理的に重要な特徴量への適合度を尤度に強く反映させる効果を持つ. 
+\subsection{事前分布と事後分布の解釈}
+ベイズの定理により, 事後分布は尤度と事前分布の積に比例する. 
+\begin{equation}
+    p(\vb*{\theta} | D) \propto \mathcal{L}(\vb*{\theta} | D) p(\vb*{\theta})
+\end{equation}
+事前分布 \(p(\vb*{\theta})\) には, 物理的な制約条件および事前解析（\ref{sec:wnlls}節）の知見を反映させる. 
+\begin{itemize}
+    \item \textbf{物理的制約}: \(g > 0\), \(\gamma > 0\) 等の条件を切断正規分布等で表現する. 
+    \item \textbf{弱情報事前分布}: 重み付き非線形最小二乗法で得られた最適値を平均 \(\mu_0\) とし, 十分な分散 \(\sigma_0^2\) を持たせることで, 探索の効率化を図りつつ, 局所解へのトラップを防ぐ. 
+\end{itemize}
+
+得られた事後分布 \(p(\vb*{\theta} | D)\) から, パラメータの期待値および 95\% 最高密度区間（HDI: Highest Density Interval）を算出する. 事後分布の広がりが鋭いほど推定精度が高く, 分布が多峰性を示す場合は, モデル内のパラメータ間に強い相関が存在するか, あるいは物理モデルが現象を記述するのに不十分である可能性を示唆する. 
+
+\subsection{サンプリング手法}
+事後分布からのサンプリングには, マルコフ連鎖モンテカルロ法（MCMC）の一種である Sliceを用いる. 
+
+\subsection{プログラムの全体フロー}
+図\ref{fig:flowchart_bayesian}にて, ベイズ推定を行うプログラムコードの全体フローチャートを示す. 
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=1cm,
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.7cm, 
+                      text centered, draw=black, fill=red!30},
+    process/.style={rectangle, minimum width=3.5cm, minimum height=0.7cm, 
+                    text centered, draw=black, fill=orange!30},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, 
+               minimum width=3cm, minimum height=0.7cm, text centered, draw=black, fill=blue!30},
+    decision/.style={diamond, minimum width=2cm, minimum height=0.8cm, 
+                     text centered, draw=black, fill=green!30},
+    arrow/.style={thick,->,>=stealth}
+]
+
+\node (start) [startstop] {開始};
+\node (loadv6) [io, below=of start] {v6最適化結果読み込み (H/B)};
+\node (loaddata) [io, below=of loadv6] {実験データ読み込み (10セット)};
+\node (weight) [process, below=of loaddata] {重み配列生成};
+
+\node (modelH) [process, below left=1cm and 0.5cm of weight] {H形式モデル構築};
+\node (modelB) [process, below right=1cm and 0.5cm of weight] {B形式モデル構築};
+
+\node (mcmcH) [process, below=of modelH] {MCMCサンプリング (H)};
+\node (mcmcB) [process, below=of modelB] {MCMCサンプリング (B)};
+
+\node (save) [io, below=1.5cm of $(mcmcH)!0.5!(mcmcB)$] {結果保存 (trace, summary)};
+\node (plot) [process, below=of save] {比較プロット生成};
+\node (end) [startstop, below=of plot] {終了};
+
+\draw [arrow] (start) -- (loadv6);
+\draw [arrow] (loadv6) -- (loaddata);
+\draw [arrow] (loaddata) -- (weight);
+\draw [arrow] (weight) -| (modelH);
+\draw [arrow] (weight) -| (modelB);
+\draw [arrow] (modelH) -- (mcmcH);
+\draw [arrow] (modelB) -- (mcmcB);
+\draw [arrow] (mcmcH) |- (save);
+\draw [arrow] (mcmcB) |- (save);
+\draw [arrow] (save) -- (plot);
+\draw [arrow] (plot) -- (end);
+
+\end{tikzpicture}
+\caption{プログラム全体のフローチャート}
+\label{fig:flowchart_bayesian}
+\end{figure}
+\clearpage
+
+\section{モデル比較と評価 (PSIS-LOOCV)}
+構築した物理モデルの汎化性能を評価するため, パレート平滑化重点サンプリングを用いた1つ抜き交差検証（PSIS-LOOCV）を行う. 
+
+\subsection{ELPDによる評価}
+モデルの予測能力は, 期待対数各点予測密度（ELPD: Expected Log Pointwise Predictive Density）によって定量化される. 
+\begin{equation}
+    \text{elpd}_{\text{loo}} = \sum_{i=1}^{N} \ln p(y_i | y_{-i})
+\end{equation}
+ここで \(p(y_i | y_{-i})\) は, データ点 \(i\) を除いた残りのデータ \(y_{-i}\) で学習したモデルが, 未知の点 \(y_i\) を予測する確率密度である. 
+PSISを用いることで, 実際にモデルを \(N\) 回再学習させることなく, MCMCサンプルから重点サンプリングの重みを補正（パレート分布による平滑化）して近似的に \(\text{elpd}_{\text{loo}}\) を算出できる. 
+\subsection{結果の解釈}
+\begin{itemize}
+    \item \textbf{ELPD値}: 値が大きい（0に近い）ほど, そのモデルは未知のデータに対する予測精度が高い（過学習も未学習もしていない）ことを示す. モデル間の比較では, ELPDの差 \(\Delta \text{elpd}\) とその標準誤差（SE）を比較し, 差がSEに対して有意に大きい場合, より良いモデルを選定する根拠となる. 
+    \item \textbf{パレート形状パラメータ \(\hat{k}\)}: 各データ点に対する近似の信頼性を示す指標である. \(\hat{k} > 0.7\) となるデータ点が多い場合, その点は外れ値であるか, あるいはモデルがその点を記述するのに苦労している（事後分布の裾が重い）ことを示唆し, モデル改善のヒントを与える. 
+\end{itemize}

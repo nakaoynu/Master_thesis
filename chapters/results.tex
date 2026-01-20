@@ -1,0 +1,130 @@
+\chapter{結果と考察}
+\label{chap:results}
+
+本章では, 本研究で得られた主要な結果について述べる. まず, 重み付き非線形最小二乗法によるパラメータ推定結果を示し（\ref{sec:wnls_results}節）, 次にベイズ推定に基づくパラメータの不確実性評価とモデル比較結果を提示する（\ref{sec:bayes_results}節）. 最後に, これらの結果に基づく物理的考察を行う（\ref{sec:discussion}節）.
+\section{実験データセット}
+\begin{table}[h]
+\centering
+\caption{使用データセット（10条件）}
+\begin{tabular}{lccc}
+\toprule
+\textbf{データセット} & \textbf{磁場 $B$ [T]} & \textbf{温度 $T$ [K]} & \textbf{パターン} \\
+\midrule
+4K & 9.0 & 4.0 & 温度変化 \\
+10K & 9.0 & 10.0 & 温度変化 \\
+20K & 9.0 & 20.0 & 温度変化 \\
+30K & 9.0 & 30.0 & 温度変化 \\
+4.2T & 4.2 & 1.5 & 磁場変化 \\
+5T & 5.0 & 1.5 & 磁場変化 \\
+6T & 6.0 & 1.5 & 磁場変化 \\
+7T & 7.0 & 1.5 & 磁場変化 \\
+8T & 8.0 & 1.5 & 磁場変化 \\
+9T & 9.0 & 1.5 & 磁場変化 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{重み付き非線形最小二乗法によるパラメータ推定}
+\label{sec:wnls_results}
+まず, Kritzellらの実験データ\(^{\cite{Kritzell2024}}\)に対して重み付き非線形最小二乗法を適用し, H形式とB形式, それぞれのモデルのパラメータをフィッティングした. このフィッティングパラメータに基づき, 各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出した結果を以下に示す.
+
+\subsection*{フィッティングパラメータの結果}
+\label{subsec:wnlls_parameters}
+\begin{table}[htbp]
+    \centering
+    \caption{共有$\gamma$モデルにおける最適化パラメータおよび評価指標の比較}
+    \label{tab:parameters_results_wnlls}
+    \renewcommand{\arraystretch}{1.2} % 行間の調整
+    \begin{tabular}{@{}lcc@{}}
+        \toprule
+        \textbf{Parameter} & \textbf{Model H (H-form)} & \textbf{Model B (B-form)} \\
+        \midrule
+        \multicolumn{3}{@{}l@{}}{\textit{Global Parameters}} \\
+        \quad $g$-factor ($g$) & 1.925 & 2.086 \\
+        \quad Scaling factor ($a$) & 5.000 & 5.000 \\
+        \quad Crystal field $B_4$ & $3.000 \times 10^{-2}$ & $1.592 \times 10^{-4}$ \\
+        \quad Crystal field $B_6$ & $-1.000 \times 10^{-3}$ & $-9.989 \times 10^{-4}$ \\
+        \quad Permittivity ($\epsilon$) & 14.001 & 14.131 \\
+        \midrule
+        \multicolumn{3}{@{}l@{}}{\textit{Shared Relaxation Rates ($\gamma_k$)}} \\
+        \quad $\gamma_1$ & 0.0245 & 0.0237 \\
+        \quad $\gamma_2$ & 0.0130 & 0.1445 \\
+        \quad $\gamma_3$ & 0.1159 & 0.1148 \\
+        \quad $\gamma_4$ & 0.0950 & 0.0100 \\
+        \quad $\gamma_5$ & 0.0100 & 0.0100 \\
+        \quad $\gamma_6$ & 0.0100 & 0.0283 \\
+        \quad $\gamma_7$ & 0.0100 & 0.0100 \\
+        \midrule
+        \multicolumn{3}{@{}l@{}}{\textit{Evaluation Metrics}} \\
+        \quad Final Cost ($S_{\text{min}}$) & $1.475 \times 10^{5}$ & $1.395 \times 10^{5}$ \\
+        \quad Condition Number ($\kappa$) & $3.85 \times 10^{5}$ & $1.15 \times 10^{6}$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection*{エネルギー固有値と占有確率}
+\label{subsec:E_P_wnlls}
+分裂幅が等間隔 → 結晶場の影響が小さいことを示唆. 実際に, フィッティング結果から得られた結晶場パラメータ\(B_4, B_6\)は非常に小さい値となっている. 本解析では, 本来ゼロ磁場分裂（ZFS）で主要となる効果の2次効果(\(B_2\))を考慮していないため, この近似が原因であると考えられる. ただし, 以下のフィッティング結果を見ると概ね良好な結果は得られるため, Kritzellらが行ったGGGのTHz磁気光学応答に関しては, 本解析で十分であると考えられる. \\
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/wnlls_global_fitting_results_comparison_v6/energy_levels_HB_comparison.png}
+    \caption{重み付き非線形最小二乗法によるH形式モデルとB形式モデルの各準位のエネルギー固有値. 赤はH形式, 青はB形式の結果を示す. }
+    \label{fig:wnls_E_P_HB}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/wnlls_global_fitting_results_comparison_v6/populations_HB_comparison.png}
+    \caption{重み付き非線形最小二乗法によるH形式モデルとB形式モデルの各準位の占有確率. 赤はH形式, 青はB形式の結果を示す. }
+    \label{fig:wnls_P_HB}
+\end{figure}
+
+\subsection*{磁気感受率}
+\label{subsec:chi_wnlls}
+重み付き非線形最小二乗法によるH形式とB形式の磁気感受率フィッティング結果を図\ref{fig:wnls_chi_HB}に示す. \\
+\textbf{H形式}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/chi_distribution_H_wnlls.png}
+    \caption{重み付き非線形最小二乗法によるH形式の磁気感受率フィッティング結果. 実線は実部, 破線は虚部を示す. }
+    \label{fig:wnls_chi_HB}
+\end{figure}
+\textbf{B形式}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/chi_distribution_B_wnlls.png}
+    \caption{重み付き非線形最小二乗法によるB形式の磁気感受率フィッティング結果. 実線は実部, 破線は虚部を示す. }
+    \label{fig:wnls_chi_B}
+\end{figure}
+
+\subsection*{透過スペクトル}
+\label{subsec:T_wnlls}
+重み付き非線形最小二乗法によるH形式とB形式の透過スペクトルフィッティング結果を図\ref{fig:wnls_T_HB}に示す. \\
+H形式は赤線, B形式は青線, 実験データは点線で示している. H形式は, 実験データに対してピーク位置・線幅共に概ね良好なフィッティングを示していることが分かる.一方で, B形式は高磁場・低温下(\([B(T), T(K)] = [(8.0, 1.5), (9.0, 1.5), (9.0, 4.0), (9.0, 10)]\))においてピーク位置に大きなズレが見られ, 線幅も実験データと比較して過度に広がっていることが分かる. 以上のことから, 重み付き非線形最小二乗法に基づくフィッティング結果においては, H形式がB形式よりも実験データを良好に再現しており, H形式の方が適切であることが示唆される.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/wnlls_global_fitting_results_comparison_v6/fit_all_spectra_HB_comparison.png}
+    \caption{重み付き非線形最小二乗法によるH形式モデルの透過スペクトルフィッティング結果. 赤線はH形式のフィッティング結果を示し, 青線はB形式のフィッティング結果を示し, 点線は実験データを示す. ただし, 実験データとフィッティング結果はフィッティングの便宜上, 各磁場・温度条件でそれぞれ正規化されている.}
+    \label{fig:wnls_T_HB}  
+\end{figure}
+
+\section{ベイズ推定に基づくパラメータ不確実性評価とモデル比較}
+\label{sec:bayes_results}
+本節では, 前節\ref{sec:wnls_results}のフィッティング結果を事前情報として利用し, 重み付き尤度に基づくベイズ推定を用いて, 各モデルのパラメータの事後分布を求めた結果を示す. また, 事後分布からサンプリングしたパラメータセットを用いて, 各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出した結果を提示する. 最後に, PSIS-LOOCVに基づくモデル比較結果も提示する.
+\subsection*{パラメータの事前分布}
+\label{subsec:prior_distributions}
+
+\subsection*{パラメータの事後分布}
+\label{subsec:posterior_distributions}
+\subsection*{パラメータの相関}
+\label{subsec:parameter_correlation}
+\subsection*{エネルギー固有値と占有確率}
+\label{subsec:E_P_bayes}
+\subsection*{磁気感受率}
+\label{subsec:chi_bayes}
+\subsection*{透過スペクトル}
+\label{subsec:T_bayes}
+\subsection*{PSIS-LOOCVに基づくモデル比較結果}
+\label{subsec:model_comparison}
+\section{結果の物理的考察}
+\label{sec:discussion}

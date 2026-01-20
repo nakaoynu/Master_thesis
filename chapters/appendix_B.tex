@@ -1,0 +1,165 @@
+\chapter{Zeeman分裂とスピン歳差運動：一般導出と多準位系への拡張}
+\label{chap:appendix_B}
+
+付録\ref{chap:appendix_B}では, Zeeman分裂という静的なエネルギー固有値の問題が, いかにして動的な古典的歳差運動（Larmor歳差運動）と結びつくかを, Heisenberg描像およびSchr\"odinger描像の両面から定量的に示す. 
+特に, 任意のスピン量子数 \(S\) において古典的運動方程式が再現されることを導出し, \(\text{Gd}^{3+}\) (\(S=7/2\)) のような高スピン系においても同様の議論が展開可能であることを証明する. 
+
+\section{Heisenberg方程式によるLarmor歳差運動の導出}
+
+静磁場 \(\bm{B} = (0, 0, B_0)\) 中のスピン系（磁気モーメント \(\hat{\bm{\mu}} = \gamma \hat{\bm{S}}\)）を考える. ここで \(\gamma = \frac{g \mu_{\text{B}}}{\hbar}\) は磁気回転比である. 
+ハミルトニアンは以下で与えられる. 
+\begin{equation}
+    \hat{H} = -\hat{\bm{\mu}} \cdot \bm{B} = -\gamma B_0 \hat{S}_z = \omega_L \hat{S}_z
+\end{equation}
+ここで \(\omega_L \equiv -\gamma B_0\) をLarmor周波数と定義する. 
+
+スピン演算子 \(\hat{\bm{S}}\) の時間発展は Heisenberg方程式
+\begin{equation}
+    \frac{d}{dt} \hat{\bm{S}} = \frac{1}{i\hbar} [\hat{\bm{S}}, \hat{H}]
+\end{equation}
+に従う. 角運動量の交換関係 \([\hat{S}_i, \hat{S}_j] = i\hbar \epsilon_{ijk} \hat{S}_k\) を用いて各成分を計算する. 
+ここで \(\epsilon_{ijk}\) はLevi-Civita記号であり, 以下のように定義される. 
+
+\begin{equation}
+    \epsilon_{ijk} = 
+    \begin{cases}
+        +1 & ((i,j,k) = (1,2,3), (2,3,1), (3,1,2)) \\
+        -1 & ((i,j,k) = (3,2,1), (2,1,3), (1,3,2)) \\
+        0  & (\text{それ以外})
+    \end{cases}
+\end{equation}
+
+\subsection*{\(x\)成分の導出}
+\begin{align}
+    \frac{d\hat{S}_x}{dt} &= \frac{1}{i\hbar} [\hat{S}_x, \omega_L \hat{S}_z] = \frac{\omega_L}{i\hbar} (-i\hbar \hat{S}_y) = -\omega_L \hat{S}_y
+\end{align}
+
+\subsection*{\(y\)成分の導出}
+\begin{align}
+    \frac{d\hat{S}_y}{dt} &= \frac{1}{i\hbar} [\hat{S}_y, \omega_L \hat{S}_z] = \frac{\omega_L}{i\hbar} (i\hbar \hat{S}_x) = \omega_L \hat{S}_x
+\end{align}
+
+\subsection*{\(z\)成分の導出}
+\begin{align}
+    \frac{d\hat{S}_z}{dt} &= \frac{1}{i\hbar} [\hat{S}_z, \omega_L \hat{S}_z] = 0
+\end{align}
+
+これらをベクトル形式でまとめると, 以下の演算子方程式が得られる. 
+\begin{equation}
+    \frac{d\hat{\bm{S}}}{dt} = \bm{\omega}_L \times \hat{\bm{S}} \quad (\text{ただし } \bm{\omega}_L = (0, 0, \omega_L))
+\end{equation}
+この微分方程式の解は, 
+\begin{align}
+    \hat{S}_x(t) &= \hat{S}_x(0) \cos \omega_L t - \hat{S}_y(0) \sin \omega_L t \\
+    \hat{S}_y(t) &= \hat{S}_y(0) \cos \omega_L t + \hat{S}_x(0) \sin \omega_L t
+\end{align}
+となり, 期待値をとれば古典的な歳差運動 \(\langle \bm{S} \rangle_t\) が得られる. 
+重要な点は, この導出過程においてスピン量子数 \(S\) の値（\(1/2\) か \(7/2\) かなど）に依存する仮定を用いていないことである. したがって, 本理論は\(\text{Gd}^{3+}\) 等の高スピン系にもそのまま適用可能である. 
+
+\section{高スピン系 (\(S=7/2\)) における量子干渉の解釈}
+
+次に, Schr\"odinger描像において, なぜ多数のエネルギー準位を持つ \(\text{Gd}^{3+}\) (\(S=7/2\)) のような系でも, 単一の振動数 \(\omega_L\) が観測されるのかを議論する. 
+
+\(S=7/2\) の場合, 磁気量子数 \(m\) は \(-7/2, -5/2, \dots, +7/2\) の8つの値を取り, エネルギー準位は等間隔に分裂する（Zeeman分裂）. 
+\begin{equation}
+    E_m = \hbar \omega_L m
+\end{equation}
+一般の量子状態 \(|\psi(t)\rangle\) をエネルギー固有状態 \(|m\rangle\) で展開する. 
+\begin{equation}
+    |\psi(t)\rangle = \sum_{m=-S}^{S} c_m e^{-i E_m t / \hbar} |m\rangle = \sum_{m} c_m e^{-i m \omega_L t} |m\rangle
+\end{equation}
+
+
+観測量である横磁化（\(\hat{S}_{x, y}\) ）の期待値を計算する. 
+\subsection*{\(\langle \hat{S}_{\pm} \rangle_t\)の導出}
+\begin{align}
+    \langle \hat{S}_+ \rangle_t &= \langle \psi(t) | \hat{S}_+ | \psi(t) \rangle \notag \\
+    &= \sum_{m, m'} c_m^* e^{i m \omega_L t} c_{m'} e^{-i m' \omega_L t} \langle m | \hat{S}_+ | m' \rangle
+\end{align}
+ここで, 昇降演算子の選択則 \(\langle m | \hat{S}_+ | m' \rangle = \sqrt{S(S+1) - m'(m'+1)} \, \delta_{m, m'+1}\) により, \(m = m' + 1\) の項のみが生き残る. 
+\begin{align}
+    \text{位相因子} &= e^{i (m' + 1) \omega_L t} e^{-i m' \omega_L t} = e^{i \omega_L t}
+\end{align}
+したがって, 期待値は以下のように書ける. 
+\begin{equation}
+    \langle \hat{S}_+ \rangle_t = e^{i \omega_L t} \sum_{m'=-S}^{S-1} c_{m'+1}^* c_{m'} \sqrt{S(S+1) - m'(m'+1)}
+\end{equation}
+
+次に, 降下演算子 \(\hat{S}_-\) の期待値の時間発展を計算する. 
+\begin{align}
+    \langle \hat{S}_- \rangle_t &= \langle \psi(t) | \hat{S}_- | \psi(t) \rangle \notag \\
+    &= \sum_{m, m'} c_m^* e^{i m \omega_L t} c_{m'} e^{-i m' \omega_L t} \langle m | \hat{S}_- | m' \rangle
+\end{align}
+ここで, 降下演算子の選択則 \(\langle m | \hat{S}_- | m' \rangle = \sqrt{S(S+1) - m'(m'-1)} \, \delta_{m, m'-1}\) を適用する. 
+クロネッカーのデルタ \(\delta_{m, m'-1}\) より, 和は \(m = m' - 1\) の項のみが残る. このとき, 時間依存項の位相因子は以下のようになる. 
+\begin{equation}
+    e^{i (m' - 1) \omega_L t} e^{-i m' \omega_L t} = e^{-i \omega_L t}
+\end{equation}
+したがって, 
+\begin{equation}
+    \langle \hat{S}_- \rangle_t = e^{-i \omega_L t} \sum_{m'=-S+1}^{S} c_{m'-1}^* c_{m'} \sqrt{S(S+1) - m'(m'-1)}
+\end{equation}
+ここで, 総和の部分は時間 \(t\) に依存しない定数（初期状態の振幅 \(c_m\) と遷移要素で決まる複素振幅）である. 
+また, 演算子の定義より \(\hat{S}_- = (\hat{S}_+)^\dagger\) であるため, 期待値に関しても \(\langle \hat{S}_- \rangle_t = \langle \hat{S}_+ \rangle_t^*\) が成立していることが確認できる. 
+
+\subsection*{\(\langle \hat{S}_x \rangle_t, \langle \hat{S}_y \rangle_t\) の計算}
+
+スピン演算子の \(x, y\) 成分は昇降演算子を用いて以下のように定義される. 
+\begin{equation}
+    \hat{S}_x = \frac{\hat{S}_+ + \hat{S}_-}{2}, \quad \hat{S}_y = \frac{\hat{S}_+ - \hat{S}_-}{2i}
+\end{equation}
+
+ここで, 計算を簡潔にするため, 時刻 \(t=0\) における横磁化の期待値（複素数）を \(A\) と定義する. 
+\begin{equation}
+    A \equiv \langle \hat{S}_+ \rangle_{t=0} = \sum_{m'} c_{m'+1}^* c_{m'} \sqrt{S(S+1) - m'(m'+1)}
+\end{equation}
+すると, 先ほどの計算結果は以下のように書ける. 
+\begin{equation}
+    \langle \hat{S}_+ \rangle_t = A e^{i \omega_L t}, \quad \langle \hat{S}_- \rangle_t = A^* e^{-i \omega_L t}
+\end{equation}
+初期状態の位相を適切に選び（例：\(x\)軸方向を向いた状態）, \(A\) を実数 \(S_\perp\) （横方向のスピンの大きさ）と仮定すると, \(A = A^* = S_\perp\) となり, 
+
+\begin{align}
+    \langle \hat{S}_x \rangle_t &= \frac{1}{2} \left( S_\perp e^{i \omega_L t} + S_\perp e^{-i \omega_L t} \right) \notag \\
+    &= S_\perp \frac{e^{i \omega_L t} + e^{-i \omega_L t}}{2} = S_\perp \cos(\omega_L t) \\[10pt]
+    \langle \hat{S}_y \rangle_t &= \frac{1}{2i} \left( S_\perp e^{i \omega_L t} - S_\perp e^{-i \omega_L t} \right) \notag \\
+    &= S_\perp \frac{e^{i \omega_L t} - e^{-i \omega_L t}}{2i} = S_\perp \sin(\omega_L t)
+\end{align}
+
+以上より, 任意の \(S\) (例えば \(S=7/2\)) において, 量子力学的期待値 \(\langle \bm{S} \rangle_t\) が \(xy\) 平面内で角振動数 \(\omega_L\) の円運動（歳差運動）を行うことが示された. 
+
+これより \(\langle S_x \rangle_t = \text{Re}[\langle \hat{S}_+ \rangle_t]\) は角振動数 \(\omega_L\) で振動する. 
+
+\section*{結論}
+\(S=7/2\) のような高スピン系ではエネルギー準位が多数存在するが, 
+\begin{enumerate}
+    \item エネルギー準位が等間隔であること (\(E_{m+1} - E_m = \hbar \omega_L\))
+    \item 双極子遷移の選択則が隣接準位間のみを許容すること (\(\Delta m = \pm 1\))
+\end{enumerate}
+の2点により, 量子力学的期待値の時間発展は, 単一の周波数成分 \(\omega_L\) を持つ古典的な歳差運動として観測される. 
+したがって, \(\text{Gd}^{3+}\) を用いた系においても, \(S=1/2\) の場合と同様に, Zeeman分裂を古典的磁化ベクトルの回転運動として記述・解析することが正当化される. 
+ただし, 付録\ref{chap:CF_theory}で後述するように, 結晶場の影響でエネルギー準位が等間隔でなくなる場合, 複数の周波数成分が現れ, 古典的歳差運動の単純なモデルでは説明できなくなる点に注意されたい.
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[>=Latex]
+        % 定義
+        \def\Rx{2.5} % 楕円のx半径
+        \def\Ry{0.8} % 楕円のy半径
+        \def\H{3.5}  % 軸の高さ
+
+        % 座標軸 (B field)
+        \draw[blue, ultra thick, ->] (0, -1) -- (0, \H) node[right, black] {$\bm{B}$};
+        
+        % 歳差運動の軌道 (赤い破線)
+        \draw[red, thick, dashed] (0, 2) ellipse ({\Rx} and {\Ry});
+        \draw[red, thick, ->] (\Rx, 2) arc (0:30:{\Rx} and {\Ry}); % 回転方向の矢印
+        \node at (1.2, 2.5) {\Large $\omega_{\text{L}}$};
+
+        % Angular Momentum Vector L
+        % 原点(0,0)から楕円上の点へ
+        \draw[green!80!black, ultra thick, ->] (0, -0.5) -- (1.5, 2.5) node[right, black] {$\bm{L}$};
+        
+    \end{tikzpicture}
+    \caption{スピン歳差運動の模式図. スピン演算子 \(\vb*{S}\) が静磁場 \(\vb*{B}\) を軸として, Larmor周波数 \(\omega_{\text{L}}\) で歳差回転運動をする.}
+    \label{fig:larmor_precession}
+\end{figure}

@@ -1,0 +1,409 @@
+% ============================================================================
+% 修士論文：共有ガンマモデルによるグローバルフィッティング解析
+% pre_test_v6_shared_gamma.py による解析結果
+% ============================================================================
+
+\chapter{解析方法_wnlls}
+
+\section{理論的背景}
+
+\subsection{磁気感受率の計算}
+
+Gd$_3$Ga$_5$O$_{12}$（GGG）単結晶における磁気ポラリトンの透過スペクトルを解析するため，
+Gd$^{3+}$イオン（$4f^7$, $S = 7/2$）のスピンハミルトニアンに基づく線形応答理論を適用した。
+
+ハミルトニアンは結晶場項とゼーマン項の和として表される：
+\begin{equation}
+\hat{H} = \hat{H}_{\rm CF} + \hat{H}_{\rm Zee}
+\end{equation}
+
+結晶場ハミルトニアンは，立方晶の対称性を反映したStevens演算子を用いて表される：
+\begin{equation}
+\hat{H}_{\rm CF} = B_4 (O_4^0 + 5O_4^4) + B_6 (O_6^0 - 21O_6^4)
+\end{equation}
+ここで，$B_4$および$B_6$は結晶場パラメータ（単位：K）であり，
+$O_n^m$はStevens演算子である。
+
+ゼーマン項は外部磁場$B$と$g$因子を用いて：
+\begin{equation}
+\hat{H}_{\rm Zee} = g \mu_{\rm B} B \hat{S}_z / k_{\rm B}
+\end{equation}
+と表される。
+
+磁気感受率は線形応答理論に基づき，全56遷移（$8 \times 8 - 8 = 56$）を考慮して計算される：
+\begin{equation}
+\chi(\omega) = \sum_{n \neq n'} \frac{(p_n - p_{n'}) |\langle n | \hat{S}_\perp | n' \rangle|^2}
+{\omega_{nn'} - \omega - i\gamma_{nn'}}
+\end{equation}
+ここで，$p_n$はBoltzmann分布による準位$|n\rangle$の占有確率，
+$\omega_{nn'} = (E_{n'} - E_n)/\hbar$は遷移周波数，
+$\gamma_{nn'}$は緩和率，
+$\hat{S}_\perp = (\hat{S}_x + \hat{S}_y)/2$は面内スピン演算子である。
+
+\subsection{比透磁率の計算：H形式とB形式}
+
+本研究では，磁気感受率$\chi$から比透磁率$\mu_r$を計算する際に2種類の形式を比較検討した。
+
+\textbf{H形式}（線形近似）：
+\begin{equation}
+\mu_r^{(H)} = 1 + \chi
+\end{equation}
+
+\textbf{B形式}（非線形補正）：
+\begin{equation}
+\mu_r^{(B)} = \frac{1}{1 - \chi}
+\end{equation}
+
+B形式では$\chi \to 1$での発散を防ぐため，Smart Damping処理を適用した：
+$|1 - \chi| < 10^{-4}$の領域で虚部に$10^{-2}i$を追加する。
+
+\subsection{透過率スペクトルの計算}
+
+透過率はFabry-Perot干渉を考慮して計算される：
+\begin{equation}
+T(\omega) = \left| \frac{4Z}{(1+Z)^2 e^{-i\delta} - (1-Z)^2 e^{i\delta}} \right|^2
+\end{equation}
+ここで，$Z = \sqrt{\mu_r / \varepsilon_{\rm bg}}$は複素インピーダンス，
+$\delta = 2\pi n_{\rm eff} d / \lambda$は位相差，
+$d = 157.8~{\rm \mu m}$は試料厚さ，
+$\varepsilon_{\rm bg}$は背景誘電率である。
+
+\section{共有ガンマモデル（v6）}
+
+\subsection{モデルの物理的根拠}
+
+従来の解析では，各データセット（異なる温度・磁場条件）に対して独立に7個の緩和率
+$\{\gamma_0, \gamma_1, \ldots, \gamma_6\}$を推定していた。
+これは10データセット × 7 = 70個のガンマパラメータを必要とし，
+パラメータ過剰による条件数の悪化（$\sim 10^{16}$）を招いていた。
+
+本研究で提案する\textbf{共有ガンマモデル}では，緩和率$\gamma_k$を
+\textbf{材料固有の特性パラメータ}として，全データセットで共有する：
+\begin{itemize}
+    \item $\gamma_k$：準位$|k\rangle$の固有緩和率（$k = 0, 1, \ldots, 6$）
+    \item 温度依存性：Boltzmann分布により自動的に表現
+    \item 磁場依存性：Zeeman分裂により自動的に表現
+\end{itemize}
+
+この物理的仮定により，パラメータ数は\textbf{84\%削減}される：
+\begin{itemize}
+    \item 従来モデル：5（グローバル） + 70（ガンマ）= 75パラメータ
+    \item 共有ガンマモデル：5（グローバル） + 7（共有ガンマ）= \textbf{12パラメータ}
+\end{itemize}
+
+\subsection{フィッティングパラメータ}
+
+表\ref{tab:parameters_v6}に共有ガンマモデルのパラメータ構成を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{共有ガンマモデルのフィッティングパラメータ}
+\label{tab:parameters_v6}
+\begin{tabular}{llcc}
+\hline
+\textbf{パラメータ} & \textbf{物理的意味} & \textbf{探索範囲} & \textbf{スケーリング係数} \\
+\hline
+\multicolumn{4}{l}{\textit{グローバルパラメータ（5個）}} \\
+$g$ & ランデ$g$因子 & $[1.5, 2.8]$ & 38.0 \\
+$a$ & 結合定数スケール & $[0.1, 5.0]$ & 10.2 \\
+$B_4$ & 結晶場パラメータ & $[0.1, 30]$~mK & 1672.0 \\
+$B_6$ & 結晶場パラメータ & $[-1, 1]$~mK & 25000.0 \\
+$\varepsilon_{\rm bg}$ & 背景誘電率 & $[13.0, 16.0]$ & 17.0 \\
+\hline
+\multicolumn{4}{l}{\textit{共有ガンマパラメータ（7個）}} \\
+$\gamma_0$ & 基底状態緩和率 & $[0.01, 0.5]$~THz & 100.0 \\
+$\gamma_1$ -- $\gamma_6$ & 励起状態緩和率 & $[0.01, 0.5]$~THz & 100.0 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{パラメータスケーリング}
+
+最適化空間での条件数を改善するため，各パラメータにスケーリング係数を適用した。
+目標は，最適化空間において全パラメータの値幅を約50に統一することである：
+\begin{equation}
+\theta_{\rm scaled} = \theta_{\rm physical} \times s_\theta
+\end{equation}
+ここで，$s_\theta$は表\ref{tab:parameters_v6}に示すスケーリング係数である。
+
+\subsection{データセット構成}
+
+表\ref{tab:datasets}に解析対象の10データセットを示す。
+
+\begin{table}[htbp]
+\centering
+\caption{解析データセット（全10条件）}
+\label{tab:datasets}
+\begin{tabular}{ccc}
+\hline
+\textbf{ラベル} & \textbf{磁場 $B$ [T]} & \textbf{温度 $T$ [K]} \\
+\hline
+\multicolumn{3}{l}{\textit{温度依存データ（磁場固定）}} \\
+4K & 9.0 & 4.0 \\
+10K & 9.0 & 10.0 \\
+20K & 9.0 & 20.0 \\
+30K & 9.0 & 30.0 \\
+\hline
+\multicolumn{3}{l}{\textit{磁場依存データ（温度固定）}} \\
+4.2T & 4.2 & 1.5 \\
+5.0T & 5.0 & 1.5 \\
+6.0T & 6.0 & 1.5 \\
+7.0T & 7.0 & 1.5 \\
+8.0T & 8.0 & 1.5 \\
+9.0T & 9.0 & 1.5 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{最適化手法}
+
+最適化にはSciPyの\texttt{least\_squares}関数（Trust Region Reflective法）を使用した。
+目的関数は重み付き残差二乗和である：
+\begin{equation}
+\chi^2 = \sum_{i} \sum_{j} \frac{w_{ij} (T_{ij}^{\rm obs} - T_{ij}^{\rm calc})^2}{\sigma_{ij}^2}
+\end{equation}
+ここで，$i$はデータセット，$j$は周波数点，$w_{ij}$は重み係数である。
+
+重み付けはポラリトン領域（$f < 0.36$~THz）で1.5倍，共振器領域（$f > 0.45$~THz）で1.0倍，
+その他の領域で0.01倍とした。
+
+% ============================================================================
+\chapter{結果と考察}
+
+\section{グローバルフィッティング結果}
+
+\subsection{最適化パラメータ}
+
+表\ref{tab:results_global}にH形式およびB形式で得られたグローバルパラメータを示す。
+
+\begin{table}[htbp]
+\centering
+\caption{共有ガンマモデルによるグローバルパラメータ推定結果}
+\label{tab:results_global}
+\begin{tabular}{lcc}
+\hline
+\textbf{パラメータ} & \textbf{H形式} & \textbf{B形式} \\
+\hline
+$g$ & 1.925 & 2.086 \\
+$a$ & 5.00 & 5.00 \\
+$B_4$ [mK] & 30.0 & 0.159 \\
+$B_6$ [mK] & $-1.00$ & $-0.999$ \\
+$\varepsilon_{\rm bg}$ & 14.00 & 14.13 \\
+\hline
+最終コスト & 147,482 & 139,482 \\
+条件数 & $3.85 \times 10^5$ & $1.15 \times 10^6$ \\
+\hline
+\end{tabular}
+\end{table}
+
+両形式ともに$g$因子はGd$^{3+}$の理論値（$g \approx 2.0$）に近い値を示した。
+結合定数スケール$a$は探索範囲上限の5.0に収束しており，
+実験パラメータ（試料厚さ，スピン密度など）の不確定性を補償していると考えられる。
+
+結晶場パラメータ$B_4$については，H形式とB形式で大きく異なる値が得られた：
+\begin{itemize}
+    \item H形式：$B_4 = 30.0$~mK（探索範囲上限）
+    \item B形式：$B_4 = 0.159$~mK（先行研究値$\approx 2$~mKより1桁小さい）
+\end{itemize}
+この差異は，両形式で異なる最適解が存在することを示唆している。
+
+条件数は共有ガンマモデルにより$10^5$--$10^6$に改善され，
+従来モデルの$10^{16}$から約10桁改善された。
+
+\subsection{共有ガンマパラメータ}
+
+表\ref{tab:results_gamma}に各準位の緩和率を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{共有ガンマパラメータ（緩和率）[THz]}
+\label{tab:results_gamma}
+\begin{tabular}{lcc}
+\hline
+\textbf{準位} & \textbf{H形式} & \textbf{B形式} \\
+\hline
+$\gamma_0$（基底状態） & 0.0245 & 0.0237 \\
+$\gamma_1$ & 0.0130 & 0.144 \\
+$\gamma_2$ & 0.116 & 0.115 \\
+$\gamma_3$ & 0.095 & 0.010 \\
+$\gamma_4$ & 0.010 & 0.010 \\
+$\gamma_5$ & 0.010 & 0.0283 \\
+$\gamma_6$ & 0.010 & 0.010 \\
+\hline
+\end{tabular}
+\end{table}
+
+基底状態の緩和率$\gamma_0$は両形式で約0.024~THzと一致しており，
+これは時間領域に換算すると$\tau_0 \approx 7$~psに相当する。
+高励起状態（$k \geq 4$）では緩和率が下限値0.01~THzに収束する傾向が見られ，
+Boltzmann分布により高励起状態の占有が抑制されるため，
+これらのパラメータの感度が低いことを示している。
+
+\section{フィット品質の統計解析}
+
+\subsection{データセット別の統計量}
+
+表\ref{tab:fit_stats_H}および表\ref{tab:fit_stats_B}に
+各データセットに対するフィット品質の統計量を示す。
+
+\begin{table}[htbp]
+\centering
+\caption{H形式によるフィット品質統計量}
+\label{tab:fit_stats_H}
+\begin{tabular}{lccccc}
+\hline
+\textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & $R^2$ & $|\chi|_{\rm max}$ & $\langle|\chi|\rangle$ \\
+\hline
+4K & 0.117 & 0.224 & 0.721 & 1.10 & 0.164 \\
+10K & 0.112 & 0.246 & 0.747 & 1.04 & 0.140 \\
+20K & 0.108 & 0.225 & 0.717 & 0.78 & 0.098 \\
+30K & 0.118 & 0.290 & 0.652 & 0.62 & 0.074 \\
+\hline
+4.2T & 0.157 & 0.364 & 0.486 & 0.48 & 0.052 \\
+5.0T & 0.146 & 0.330 & 0.540 & 0.81 & 0.071 \\
+6.0T & 0.129 & 0.248 & 0.676 & 1.05 & 0.106 \\
+7.0T & 0.112 & 0.221 & 0.749 & 1.05 & 0.133 \\
+8.0T & 0.117 & 0.229 & 0.759 & 1.05 & 0.151 \\
+9.0T & 0.125 & 0.361 & 0.705 & 1.04 & 0.186 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{B形式によるフィット品質統計量}
+\label{tab:fit_stats_B}
+\begin{tabular}{lccccc}
+\hline
+\textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & $R^2$ & $|\chi|_{\rm max}$ & 不安定\% \\
+\hline
+4K & 0.112 & 0.257 & 0.744 & 1.17 & 4.6 \\
+10K & 0.105 & 0.246 & 0.776 & 0.82 & 0.0 \\
+20K & 0.101 & 0.231 & 0.755 & 0.72 & 0.0 \\
+30K & 0.110 & 0.254 & 0.695 & 0.65 & 0.0 \\
+\hline
+4.2T & 0.156 & 0.340 & 0.493 & 0.70 & 0.0 \\
+5.0T & 0.144 & 0.320 & 0.548 & 1.19 & 1.7 \\
+6.0T & 0.125 & 0.244 & 0.694 & 1.26 & 5.7 \\
+7.0T & 0.108 & 0.212 & 0.764 & 1.26 & 5.7 \\
+8.0T & 0.116 & 0.331 & 0.764 & 1.27 & 5.7 \\
+9.0T & 0.120 & 0.337 & 0.727 & 1.27 & 5.7 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{H形式とB形式の比較}
+
+図\ref{fig:rmse_comparison}は両形式のRMSE比較を示す。
+
+\begin{itemize}
+    \item \textbf{全体的な傾向}：B形式の方がやや低いRMSEを示す（平均RMSE: H形式0.124, B形式0.120）
+    \item \textbf{最終コスト}：B形式（139,482）がH形式（147,482）より5.4\%低い
+    \item \textbf{決定係数$R^2$}：温度依存データでは両形式とも$R^2 > 0.65$を達成
+    \item \textbf{低磁場領域}：4.2T--5.0Tでは両形式とも$R^2 \approx 0.5$と低く，
+          改善の余地がある
+\end{itemize}
+
+\subsection{数値安定性の評価}
+
+B形式では$|\chi| > 1$となる周波数点が一部存在し，
+これは$\mu_r^{(B)} = 1/(1-\chi)$の発散を示唆する。
+表\ref{tab:fit_stats_B}の「不安定\%」列に示すように，
+高磁場（$B \geq 6$~T）で約5.7\%のデータ点が不安定領域に入っている。
+
+Smart Damping処理によりこれらの発散は回避されているが，
+物理的な解釈には注意が必要である。
+
+\section{物理的診断}
+
+\subsection{Boltzmann分布と基底状態占有率}
+
+診断解析の結果，全データセットで基底状態占有率が95\%を超えていることが判明した：
+\begin{itemize}
+    \item 9T/4K：$p_0 = 100\%$（第一励起状態との占有差：$2.6 \times 10^{-61}$）
+    \item 9T/30K：$p_0 = 100\%$（第一励起状態との占有差：$8.4 \times 10^{-9}$）
+    \item 4.2T/1.5K：$p_0 = 100\%$
+\end{itemize}
+
+これは実験条件（$T \ll \Delta E / k_{\rm B}$）において
+基底状態からの遷移のみが支配的であることを示している。
+
+\subsection{エネルギーギャップ}
+
+表\ref{tab:energy_gaps}に各磁場条件での基底状態--第一励起状態間のエネルギーギャップを示す。
+
+\begin{table}[htbp]
+\centering
+\caption{基底状態--第一励起状態間のエネルギーギャップ}
+\label{tab:energy_gaps}
+\begin{tabular}{lccc}
+\hline
+\textbf{磁場 [T]} & \textbf{$\Delta E$ [meV] (H形式)} & \textbf{$\Delta E$ [meV] (B形式)} \\
+\hline
+4.2 & 22.4 & 24.3 \\
+5.0 & 26.7 & 29.0 \\
+6.0 & 32.0 & 34.8 \\
+7.0 & 37.4 & 40.6 \\
+8.0 & 42.7 & 46.4 \\
+9.0 & 48.1 & 52.2 \\
+\hline
+\end{tabular}
+\end{table}
+
+エネルギーギャップは磁場に対してほぼ線形に増加しており，
+これはZeeman効果の支配を反映している。
+B形式の方がやや大きいギャップを与えており，
+結晶場パラメータ$B_4$の差異に起因すると考えられる。
+
+\section{考察}
+
+\subsection{共有ガンマモデルの有効性}
+
+本研究で提案した共有ガンマモデルは，以下の点で従来モデルより優れている：
+
+\begin{enumerate}
+    \item \textbf{パラメータ削減}：75個$\to$12個（84\%削減）
+    \item \textbf{条件数改善}：$10^{16} \to 10^5$--$10^6$（約10桁改善）
+    \item \textbf{物理的解釈}：$\gamma_k$を材料固有の緩和率として明確に解釈可能
+    \item \textbf{汎用性}：異なる温度・磁場条件のデータを統一的に解析可能
+\end{enumerate}
+
+\subsection{モデル形式の選択}
+
+H形式とB形式の比較から，以下の知見が得られた：
+
+\begin{itemize}
+    \item B形式の方がわずかに低いコスト（5.4\%改善）を示すが，
+          数値不安定性（$|\chi| > 1$）の問題がある
+    \item H形式は数値的に安定であり，全データセットで不安定点がゼロ
+    \item 決定係数$R^2$は両形式でほぼ同等（0.65--0.77）
+\end{itemize}
+
+実用的には，数値安定性の観点からH形式が推奨されるが，
+強結合領域ではB形式の非線形補正が物理的により正確である可能性がある。
+
+\subsection{フィット品質の改善余地}
+
+低磁場（4.2T--5.0T）データでは$R^2 \approx 0.5$と低く，
+以下の改善策が考えられる：
+
+\begin{enumerate}
+    \item 磁場依存の緩和率モデル：$\gamma_k(B)$
+    \item 非線形結合効果の導入
+    \item ポラリトンモード領域の重み付け最適化
+    \item 追加の結晶場項（低対称性補正）
+\end{enumerate}
+
+\subsection{結論}
+
+共有ガンマモデルによるグローバルフィッティングにより，
+GGG単結晶の磁気ポラリトン透過スペクトルを統一的に解析することができた。
+主要な物理パラメータ（$g$因子，結晶場パラメータ，緩和率）を
+12個のフィッティングパラメータで記述し，
+条件数の大幅な改善（$10^{16} \to 10^5$）を達成した。
+
+今後の課題として，ベイズ推定によるパラメータ不確かさの定量化，
+および低磁場領域でのモデル改善が挙げられる。
+
+\end{antml:parameter>
+</invoke>
