@@ -5,27 +5,26 @@
 本章では, 本研究で用いる理論的背景について述べる. 
 まず, GGG中の\(\text{Gd}^{3+}\)イオンのスピン状態を記述するハミルトニアンを定義し, 線形応答理論を用いて磁気感受率を導出する. 次に, H形式およびB形式における比透磁率の定式化を行い, 転送行列法によるGGGの透過スペクトル計算方法を説明する. 最後に, これらの理論モデルを実験データと照らし合わせて評価するための, ベイズ推定の統計的枠組みについて述べる. 
 
-\section{Hamiltonian}
+\section{ハミルトニアンの定義}
 \label{sec:theory_hamiltonian}
-GGG結晶中の常磁性体\(\text{Gd}^{3+}\)イオン (\(4f^7 5s^2 p^6, L=0, S=7/2\)) のスピン状態は, 主に結晶場相互作用と外部磁場によるゼーマン相互作用によって記述される. 全ハミルトニアン \(\hat{\mathcal{H}}\) は以下のように表される\(^{\cite{Yamada2024}}\). 
+静磁場\(\hat{\vb*{B}}_{\text{ext}}\)を印加したGGG結晶中の常磁性体\(\text{Gd}^{3+}\)イオン (\(4f^7 5s^2 p^6, L=0, S=7/2\)) のスピン状態は, 主に結晶場相互作用\(\hat{\mathcal{H}}_{\text{\text{CF}}}\)と静磁場によるZeeman分裂\(\hat{\mathcal{H}}_{\text{\text{Zeeman}}}\)による無摂動項\(\hat{\mathcal{H}}_{0}\)と, \(\text{Gd}^{3+}\)イオンとGGGの共振器モードのZeeman相互作用\(\hat{\mathcal{H}}_{H,B}^{'}\)による摂動項によって記述される. 全ハミルトニアン \(\hat{\mathcal{H}}\) は以下のように表される\(^{\cite{Sakata2025}}\). 
     
-\begin{equation}
-\hat{\mathcal{H}} =\hat{\mathcal{H}}_{\text{\text{CF}}} + \hat{\mathcal{H}}_{\text{\text{Zeeman}}} \label{H_total}
-\end{equation}
+\begin{align}
+\hat{\mathcal{H}} &= \hat{\mathcal{H}}_{0} + \hat{\mathcal{H}}_{H,B}^{'} \label{H_0} \\
+&= \hat{\mathcal{H}}_{\text{CF}} + \hat{\mathcal{H}}_{\text{Zeeman}} + \hat{\mathcal{H}}_{H,B}^{'} \label{H_total}
+\end{align}
 
-ここで, 式\ref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{CF}}\)は結晶場ハミルトニアンである. 結晶場ハミルトニアン \(\hat{\mathcal{H}}_{CF}\) は Stevens演算子 \(O_k^q\) を基底として展開され, その展開係数である結晶場パラメータ \(B_k^q\) が相互作用の強度と対称性を決定する. 
+ここで, 式\ref{H_total}の第1項\(\hat{\mathcal{H}}_{\text{CF}}\)は結晶場ハミルトニアンである. 結晶場ハミルトニアン \(\hat{\mathcal{H}}_{CF}\) は Stevens演算子 \(O_k^q\) を基底として展開され, その展開係数である結晶場パラメータ \(B_k^q\) が相互作用の強度と対称性を決定する. 
 詳細は付録\ref{chap:CF_theory}にて記載する. 
-
 \begin{equation}
 \hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
 \end{equation}
-
-また, 式\ref{H_total}の第3項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部磁場\(\hat{\vb*{B}}_{ext}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
+式\ref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部磁場\(\hat{\vb*{B}}_{\text{ext}}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
 \begin{equation}
-\hat{\mathcal{H}}_{\text{Zeeman}} = g \mu_{B} \hat{S} \cdot \hat{B}_{ext}
+\hat{\mathcal{H}}_{\text{Zeeman}} = g \mu_{B} \hat{\vb*{S}} \cdot \hat{\vb*{B}}_{\text{ext}}
 \end{equation}
-
-ここで, \(g\)はg因子, \(\mu_{B}\)はボーア磁子である. この全ハミルトニアン\(\hat{\mathcal{H}}\)を対角化することで, 磁場中のエネルギー固有値\(E_{n}\)と固有状態\(\ket{\psi_{n}}\)が得られる. 
+% ここで, \(g\)はg因子, \(\mu_{B}\)はボーア磁子である. \\ 前述しているため省略可能
+式\ref{H_total}の第3項\(\hat{\mathcal{H}}_{H,B}^{'}\)は, 式\ref{def:H_B}, 式\ref{def:H_H}で定義した\(\text{Gd}^{3+}\)イオンの磁気モーメントと振動磁場とのZeeman相互作用を表す摂動項である. 
 
 \section{線形応答理論に基づく磁気感受率の導出}
 \label{sec:linear_response}
@@ -40,7 +39,7 @@ GGG結晶中の常磁性体\(\text{Gd}^{3+}\)イオン (\(4f^7 5s^2 p^6, L=0, S=
 \chi_{ij}(\omega) = - \frac{N \mu_{0}}{i \hbar} \int_{0}^{\infty} dt e^{i \omega t} \langle [\hat{d}_{i}(t), \hat{d}_{j}] \rangle
 \end{equation}
 
-ハミルトニアンの固有状態\(\ket{\psi_n}\)を用いて磁気感受率を計算すると, 以下の形式で与えられる. 
+式\ref{H_0}の無摂動ハミルトニアン\(\hat{\mathcal{H}}_{0}\)の固有エネルギー\(E_{n}\)と固有状態\(\ket{\psi_n}\)を用いて磁気感受率を計算すると, 以下の形式で与えられる. 
 \begin{equation}
 \chi_{ij}(\omega) = - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} (P_{n} - P_{n'}) \{ \frac{\langle \psi_{n}| \hat{d}_{i} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{j} | \psi_n \rangle}{\omega + i \gamma - \Delta \omega} - \frac{\langle \psi_{n}| \hat{d}_{j} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{i} | \psi_n \rangle}{\omega + i \gamma + \Delta \omega} \}
 \label{eq:chi_linear}
