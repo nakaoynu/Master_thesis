@@ -1,0 +1,47 @@
+\chapter{プログラム実装}
+\label{chap:implementation}
+
+\section{重み付き非線形最小二乗法の実装}
+
+\section{ベイズ推定の実装}
+\subsection{PyMCにおけるWAICの計算}
+\label{subsec:waic_implementation}
+
+PyMC\cite{Abril-Pla2023}およびArviZ\cite{arviz_2019}ライブラリでは，
+\texttt{az.waic()}関数によりWAICを計算する．計算手順は以下の通りである：
+
+\begin{enumerate}
+    \item SMC/MCMCサンプリングを実行し，サンプル\texttt{trace}（InferenceData形式）を取得
+    \item \texttt{pm.compute\_log\_likelihood(trace)}により各データ点の対数尤度を計算
+    \item 計算結果を\texttt{trace.log\_likelihood}に格納（形状：chains $\times$ draws $\times$ n\_obs）
+    \item \texttt{az.waic(trace)}を実行し，以下を計算：
+    \begin{itemize}
+        \item 各データ点$i$について，対数尤度$L_i^{(s)}$のサンプル列を取得
+        \item $\mathrm{lppd}_i = \log\left(\frac{1}{S}\sum_{s=1}^{S} \exp(L_i^{(s)})\right)$を計算（log-sum-exp安定化）
+        \item $p_{\mathrm{WAIC},i} = \mathrm{Var}(L_i^{(s)})$を計算
+        \item $\widehat{\mathrm{lppd}} = \sum_{i=1}^{N} \mathrm{lppd}_i$
+        \item $\hat{p}_{\mathrm{WAIC}} = \sum_{i=1}^{N} p_{\mathrm{WAIC},i}$
+        \item $\widehat{\mathrm{elpd}}_{\mathrm{WAIC}} = \widehat{\mathrm{lppd}} - \hat{p}_{\mathrm{WAIC}}$
+        \item $\mathrm{SE} = \sqrt{N \cdot \mathrm{Var}(\mathrm{lppd}_i - p_{\mathrm{WAIC},i})}$
+    \end{itemize}
+    \item $\widehat{\mathrm{elpd}}_{\mathrm{WAIC}}$, $\hat{p}_{\mathrm{WAIC}}$, $\mathrm{SE}$を取得
+\end{enumerate}
+
+本研究での実装コード（Python/PyMC）：
+\begin{verbatim}
+import pymc as pm
+import arviz as az
+
+# SMCサンプリング実行
+with model:
+    trace = pm.sample_smc(draws=10000, chains=16)
+    
+    # log_likelihoodを計算してtraceに追加
+    pm.compute_log_likelihood(trace, model=model)
+
+# WAIC計算
+waic_result = az.waic(trace)
+print(f"elpd_waic: {waic_result.elpd_waic:.2f}")
+print(f"p_waic: {waic_result.p_waic:.2f}")
+print(f"SE: {waic_result.se:.2f}")
+\end{verbatim}

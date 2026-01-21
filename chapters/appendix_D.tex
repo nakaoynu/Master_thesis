@@ -1,188 +1,102 @@
-\chapter{結晶場理論}
-\label{chap:CF_theory}
-凝縮系物理学, 特に希土類磁性体の研究において, 結晶場理論は物質の巨視的な磁気特性を理解するための不可欠な理論的枠組みを提供している. 付録\ref{chap:CF_theory}では, Hutchingsの定義に基づくStevens演算子（GGGの解析に必要となる\(O_2^0\)から\(O_6^6\)まで）の完全な数式と定義を網羅的に解説する. さらに, Stevens演算子を用いた結晶場ハミルトニアンの構築方法を記述する. 
+\chapter{超強結合領域におけるZeemanポラリトンの定量的記述}
+\label{chap:zeeman_polariton}
 
-\section{等価演算子法}
-孤立したイオンが結晶格子内に配置された際, 周囲の配位子が形成する静電ポテンシャルは, イオンの電子状態, 特に\(4f\)電子や\(3d\)電子のエネルギー準位を分裂させる. この現象を定量的に記述するために, K.W.H. Stevensによって導入され, M.T. Hutchingsによって体系化された「演算子等価法」は, 現代磁性物理学の礎石となっている\(^{\cite{Hutchings1964}}\).
-Stevens演算子（\(O_k^q\)）は, 複雑な空間積分を要する静電ポテンシャルの計算を, 角運動量演算子 \(\vb*{J}\) の代数的な操作へと還元することを可能にした. この形式化により, 結晶の点群対称性をハミルトニアンに直接反映させることが容易となり, 実験データ（磁化率, 比熱, 電子スピン共鳴など）との比較が可能な理論モデルの構築が飛躍的に効率化された. 特に, GGGのような幾何学的フラストレーションを持つ系や, 近年の量子光学におけるZeemanポラリトンの形成といった先端的研究において, 高次のStevens演算子を含むハミルトニアンの正確な記述は極めて重要である\(^{\cite{Zeeman}}\).
-
-\subsection{理論的背景}
-結晶場理論の核心は, 結晶内の磁性イオンが感じる静電ポテンシャル \(V(\vb*{r})\) を, イオンの全角運動量 \(J\) の関数として表現することにある. 一般に, ポテンシャル \(V(x, y, z)\) はラプラス方程式 \(\nabla^2 V = 0\) を満たすため, 球面調和関数 \(Y_k^q(\theta, \phi)\) を用いて展開可能である.
-
+\section{電磁場の量子化}
+\section{ベクトルポテンシャルの導入}
+クーロンゲージ（\(\nabla \cdot \vb*{A} = 0\)）を採用し, 体積 \(V\) のキャビティ内における単一モードの電磁場を考える. 
+ベクトルポテンシャル \(\hat{\vb*{A}}(\vb*{r}, t)\) を, キャビティの固有モード関数 \(\vb*{u}(\vb*{r})\) を用いて以下のように量子化する. 
 \begin{equation}
-V(r, \theta, \phi) = \sum_{k=0}^{\infty} \sum_{q=-k}^{k} A_k^q r^k Y_k^q(\theta, \phi)
+    \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} \vb*{u}(\vb*{r}) + \hat{a}^\dagger \vb*{u}^*(\vb*{r}) \right)
+\end{equation}
+ここで, \(\hat{a}, \hat{a}^\dagger\) はそれぞれ光子の消滅・生成演算子であり, 交換関係 \([\hat{a}, \hat{a}^\dagger] = 1\) を満たす. \(\omega_c\) はキャビティの共鳴角周波数である. 
+
+\section*{磁場演算子の導出}
+磁束密度演算子 \(\hat{\vb*{B}}(\vb*{r})\) は, ベクトルポテンシャルの回転として定義される. 
+\begin{equation}
+    \hat{\vb*{B}}(\vb*{r}) = \nabla \times \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} (\nabla \times \vb*{u}(\vb*{r})) + \hat{a}^\dagger (\nabla \times \vb*{u}^*(\vb*{r})) \right)
 \end{equation}
 
-ここで, \(A_k^q\) は周囲の電荷分布によって決まる係数である. しかし, 量子力学的な期待値を計算する際, 波動関数を含む積分を直接行うことは非常に煩雑である. Stevensは, 特定の角運動量多重項（\(J\) または \(L\) が一定の空間）内において, デカルト座標 \((x, y, z)\) の多項式\(f(x,y,z)\)と, 角運動量演算子 \((J_x, J_y, J_z)\) の間に一対一の対応関係（等価性）が存在することを見出した. これはWigner-Eckartの定理に基づいている\(^{\cite{Hutchings1964}}\).
-
-等価性は以下のように記述される.
-
-\begin{equation}
-\sum_{i} f(x_i, y_i, z_i) \equiv \theta_k \langle r^k \rangle O_k^q(\vb*{J})
-\end{equation}
-
-ここで, 左辺は電子座標の関数, 右辺は等価な角運動量演算子である. \(\theta_k\) は「Stevens因子」と呼ばれ, 電子配置（例：\(4f^7\)）と軌道角運動量 \(L\) に依存する定数であり, 通常 \(k=2, 4, 6\) に対してそれぞれ \(\alpha_J, \beta_J, \gamma_J\) と表記される\(^{\cite{Hutchings1964}}\). \(\langle r^k \rangle\) は\(4f\)電子の動径波動関数に対する \(r^k\) の期待値である.
-
-\subsection{Hutchingsによる標準化とテッセラル調和関数}
-1964年, M.T. Hutchingsは「Solid State Physics」誌において, Stevens演算子の定義を標準化し, その行列要素を表にまとめた\(^{\cite{Hutchings1964}}\). Hutchingsの形式では, 複素数を含む球面調和関数ではなく, 実数関数であるテッセラル調和関数（または実球面調和関数）\(Z_{kq}\) に対応するように演算子が定義されている.
-
-結晶場ハミルトニアンは一般に以下のように書かれる.
-
-\begin{equation}
-\mathcal{H}_{CF} = \sum_{k, q} B_k^q O_k^q
-\end{equation}
-
-ここで, 結晶場パラメータ \(B_k^q\) は \(A_k^q \langle r^k \rangle \theta_k\) を含んだ物理量として扱われる. この形式は, 実験家がスペクトルデータからパラメータを決定する際の標準的な記述となっている.
-
-重要な点は, 演算子の順序交換である. 量子力学において \(J_x, J_y, J_z\) は可換ではない（\([J_x, J_y] = i\hbar J_z\)）ため, 座標の多項式（例：\(x^2 y^2\)）を演算子に変換する際には, 可能なすべての順序の平均を取る「対称化」が必要となる. Hutchingsの定義する \(O_k^q\) は, この対称化が既に適用された形になっている.
-
-\section{Stevens演算子の詳細定義と明示的公式}
-本節では, Hutchings (1964) の定義に従い, GGGの解析に用いられる主要なStevens演算子の明示的な数式を提示する. これらは, 角運動量演算子 \(J_z\) および昇降演算子 \(J_\pm = J_x \pm iJ_y\) を用いて記述される. また, 表記の簡略化のために \(X \equiv J(J+1)\) を用いる.
-
-\subsection{2次の演算子（\(k=2\)）}
-2次の項は, 結晶場の最も主要な異方性を記述する. これらはスピンハミルトニアンにおける \(D\) 項（軸性異方性）および \(E\) 項（面内異方性）に対応する.
-
-\subsubsection*{\(O_2^0\):}
-この演算子は, ルジャンドル多項式の \(3z^2 - r^2\) 成分に対応する. 最も基本的かつ強力な結晶場項であり, 主軸（z軸）方向の異方性を支配する.
-\begin{equation}
-O_2^0 = 3J_z^2 - X
-\end{equation}
-
-\subsubsection*{\(O_2^2\):}
-この演算子は, テッセラル調和関数の \((x^2 - y^2)\) 成分, すなわち \(r^2 \sin^2\theta \cos 2\phi\) に対応する. xy面内での対称性の破れ（斜方晶歪みなど）を表す.
-\begin{equation}
-O_2^2 = \frac{1}{2} (J_+^2 + J_-^2)
-\end{equation}
-ここで, 係数 \(\frac{1}{2}\) は正規化のために導入されている. \(J_+^2\) と \(J_-^2\) の和をとることで, 実数の演算子となっていることがわかる.
-
-\subsection{4次の演算子（ \(k=4\)）}
-4次の項は, 立方対称性を持つ結晶場において支配的な役割を果たす.
-
-\subsubsection*{\(O_4^0\):}
-ルジャンドル多項式の \(35z^4 - 30r^2z^2 + 3r^4\) に対応する.
-\begin{equation}
-O_4^0 = 35J_z^4 - 30XJ_z^2 + 25J_z^2 - 6X + 3X^2
-\end{equation}
-この式は, 4次の演算子の中で対角成分のみを持つ唯一の項である.
-
-\subsubsection*{\(O_4^2\):}
-この項は \((7z^2 - r^2)(x^2 - y^2)\) の対称化に対応する.
-\begin{equation}
-O_4^2 = \frac{1}{4} \left[ (7J_z^2 - X - 5)(J_+^2 + J_-^2) + (J_+^2 + J_-^2)(7J_z^2 - X - 5) \right]
-\end{equation}
-数値計算においては上記のような対称化形式をそのまま実装することが誤りを防ぐ上で推奨される.
-
-\subsubsection*{\(O_4^4\):}
-立方対称場において \(O_4^0\) と共に現れる重要な項で, \((x^4 + y^4 - 6x^2y^2)\) の成分に関連する.
-\begin{equation}
-O_4^4 = \frac{1}{2} (J_+^4 + J_-^4)
-\end{equation}
-立方対称（\(O_h\)）の結晶場ポテンシャルは, しばしば \(B_4 (O_4^0 + 5O_4^4)\) という特定の線形結合で表される.
-\subsection{6次の演算子（\(k=6\)）}
-6次の項は, \(f\)電子系（ランタノイド, アクチノイド）において初めて現れる高次の多重極相互作用である.
-
-\subsubsection*{\(O_6^0\):}
-\begin{equation}
-\begin{split}
-O_6^0 = 231J_z^6 - 315XJ_z^4 + 735J_z^4 + 105X^2J_z^2 \\
-- 525XJ_z^2 + 294J_z^2 - 5X^3 + 40X^2 - 60X
-\end{split}
-\end{equation}
-非常に高次の \(J_z\) のべき乗を含んでおり, 計算においては数値的なオーバーフローや精度落ちに注意が必要である.
-
-\subsubsection*{\(O_6^2\):}
-\begin{equation}
-O_6^2 = \frac{1}{4} \left[ (33J_z^4 - 18XJ_z^2 - 123J_z^2 + X^2 + 10X + 102)(J_+^2 + J_-^2) + \text{h.c.} \right]
-\end{equation}
-ここで "h.c." はエルミート共役を意味する.
-
-\subsubsection*{\(O_6^4\):}
-\begin{equation}
-O_6^4 = \frac{1}{4} \left[ (11J_z^2 - X - 38)(J_+^4 + J_-^4) + (J_+^4 + J_-^4)(11J_z^2 - X - 38) \right]
-\end{equation}
-
-\subsubsection*{\(O_6^6\):}
-六方晶系において重要となる項である.
-\begin{equation}
-O_6^6 = \frac{1}{2} (J_+^6 + J_-^6)
-\end{equation}
-
-\section{結晶場理論とStevens演算子}
-\label{sec:CF_Stevens}
-GGGは立方晶系（空間群\(Ia\bar{3}d\)）に属するが, 磁性を担う\(\text{Gd}^{3+}\)イオン（\(4f^7, ^8S_{7/2}\)）が占有する\(24c\)サイトは, 局所的には低い対称性（\(D_{2}\)点群）を有している. この局所的な結晶場の異方性は, スピン軌道相互作用を通じて基底状態の縮退を解き, 微細構造を形成する上で決定的な役割を果たす. 
-\(\text{Gd}^{3+}\)イオンは半閉殻構造を持つS状態イオン（\(L=0\)）であり, 第一近似としては結晶場の影響を受けにくいとされる. しかし, 高次の摂動効果により, 基底多重項\(^8S_{7/2}\)はゼロ磁場下でもわずかに分裂する. \(D_{2}\)対称性を持つ結晶場ハミルトニアン\(\mathcal{H}_{\text{CF}}\)は, 以下の形式で記述される\(^{\cite{White2007}}\).
-
-\begin{equation}
-\mathcal{H}_{\text{CF}} = \sum_{k=2,4,6} \sum_{q=0,2,4,6} B_k^q O_k^q
-\end{equation}
-
-ここで, \(B_k^q\)は結晶場パラメータであり, \(O_k^q\)はStevens演算子である. 
-\(Gd^{3+}\) (\(S=7/2\)) の場合, 以下の物理的制約により項の数が絞り込まれる：
+\section*{ファラデー配置におけるモード設定}
+本実験系（ファラデー配置）に合わせ, 以下の幾何学的条件を設定する. 
 \begin{itemize}
-    \item パリティ: 4f軌道内（同一パリティ）の行列要素であるため, 偶数のランク \(k\) のみが残る. 
-    \item スピンの大きさ: 演算子 \(O_k^q\) の行列要素が非ゼロであるためには, \(k \le 2S\) でなければならない. \(2S = 7\) であるため, \(k = 2, 4, 6\) の項が許容される. 
-    \item 対称性 (\(D_2\)): 点群 \(D_2\) の対称操作（3つの主軸周りの \(C_2\) 回転）に対し不変であるためには, 射影成分 \(q\) は偶数でなければならない (\(q = 0, 2, 4, 6\)). 
+    \item 光の伝搬方向（波数ベクトル）: \(\vb*{k} \parallel z\)
+    \item 静磁場方向: \(\vb*{B}_{\text{DC}} \parallel z\)
+    \item キャビティモード: \(z\) 軸方向に定在波を形成する直線偏光モード
 \end{itemize}
-これらの要請により, 以下の9つの項が主要な寄与を持つ. 
-
+ここで, 磁場が \(x\) 軸方向に偏光している（\(\vb*{B} \parallel x\)）ようなモードを考える. 電磁波の横波性により電場は \(y\) 方向成分を持つため, ベクトルポテンシャルのモード関数を以下のように仮定できる. 
 \begin{equation}
-    \begin{aligned} 
-        \mathcal{H}_{\text{CF}} &= B_2^0 O_2^0 + B_2^2 O_2^2 \\ 
-                                 &+ B_4^0 O_4^0 + B_4^2 O_4^2 + B_4^4 O_4^4 \\ 
-                                 &+ B_6^0 O_6^0 + B_6^2 O_6^2 + B_6^4 O_6^4 + B_6^6 O_6^6 
-    \end{aligned}
+    \vb*{u}(\vb*{r}) = u(z) \vb*{e}_y
+\end{equation}
+これの回転をとると, 
+\begin{equation}
+    \nabla \times \vb*{u}(\vb*{r}) = \mqty|\vb*{e}_x & \vb*{e}_y & \vb*{e}_z \\ \partial_x & \partial_y & \partial_z \\ 0 & u(z) & 0| = -\frac{d u(z)}{dz} \vb*{e}_x
+\end{equation}
+となる. スピン集団が配置されている位置（例えば \(z=0\)）において磁場が腹（最大振幅）になると仮定し, その局所的な空間微分値を定数 \(C\) （無次元量のオーダー）として扱うと, 
+\begin{equation}
+    \hat{\vb*{B}} = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \frac{k c}{\omega_c} C (\hat{a} + \hat{a}^\dagger) \vb*{e}_x
+\end{equation}
+のように整理できる. ここで \(\omega_c = c k, c=\frac{1}{\sqrt{\epsilon_0 \mu_0}}\) の関係を用い, すべての定数を真空磁場揺らぎ振幅 \(B_{\text{vac}}\) に押し込めると, 最終的に以下の簡潔な形を得る. 
+\begin{equation}
+    \hat{\vb*{B}} = B_{\text{vac}} (\hat{a} + \hat{a}^\dagger) \vb*{e}_x, \quad B_{\text{vac}} \equiv C \sqrt{\frac{\hbar \omega_c \mu_0}{2V}}
+    \label{eq:B_field}
+\end{equation}
+これにより, 直線偏光モードの量子化磁場が定義された. 
+
+\section{磁気双極子相互作用}
+\section*{ハミルトニアンの定義}
+\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) は, ゼーマン・エネルギーの形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = - \sum_{i=1}^N \hat{\boldsymbol{\mu}}_i \cdot \hat{\vb*{B}}
+\end{equation}
+磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_L \mu_B \hat{\vb*{S}}_i\) である（\(g_L\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{int}} = g_L \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
 \end{equation}
 
-山田の先行研究では, 近似的に
-\[
-\hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
-\]
-という立方体対称成分(\(k=4\))と六方晶成分(\(k=6\))のみを考慮した簡略化モデルが提案されている\(^{\cite{Yamada2024}}\). 
-これらの演算子によって, \(\Delta m \neq 1\)の禁制遷移を許容し, ハミルトニアンの固有状態 \(|\psi_n\rangle\) を純粋な \(|m\rangle\) 状態（Zeeman準位）ではなく, それらの線形結合（混成状態）とする. 
-このハミルトニアンで用いられたStevens演算子の行列表示は以下の通りである. 
-\begin{align*}
-O_4^0 &= 60 \times
-\begin{pmatrix}
-7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & -13 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & -3 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 9 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 9 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & -3 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & -13 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 7
-\end{pmatrix} \\[10pt]
-O_4^4 &= 12 \times
-\begin{pmatrix}
-0 & 0 & 0 & 0 & \sqrt{35} & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 5\sqrt{3} & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 5\sqrt{3} & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & \sqrt{35} \\
-\sqrt{35} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 5\sqrt{3} & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 5\sqrt{3} & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & \sqrt{35} & 0 & 0 & 0 & 0
-\end{pmatrix} \\[10pt]
-O_6^0 &= 1260 \times
-\begin{pmatrix}
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & -5 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 9 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & -5 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & -5 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 9 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & -5 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{pmatrix} \\[10pt]
-O_6^4 &= 60 \times
-\begin{pmatrix}
-0 & 0 & 0 & 0 & 3\sqrt{35} & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & -7\sqrt{3} & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & -7\sqrt{3} & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 3\sqrt{35} \\
-3\sqrt{35} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & -7\sqrt{3} & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & -7\sqrt{3} & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 3\sqrt{35} & 0 & 0 & 0 & 0
-\end{pmatrix}
-\end{align*}
+\section*{昇降演算子による展開と反回転項}
+スピン演算子の \(x\) 成分を昇降演算子 \(\hat{S}_\pm^i = \hat{S}_x^i \pm i \hat{S}_y^i\) を用いて \(\hat{S}_x^i = \frac{1}{2}(\hat{S}_+^i + \hat{S}_-^i)\) と書き換える. 
+さらに, 集団スピン演算子 \(\hat{J}_\pm = \sum_i \hat{S}_\pm^i\) を導入する. 
+\begin{align}
+    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_L \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
+    &= \frac{g_L \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{回転項}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{反回転項}} \right]
+\end{align}
+この式変形により, エネルギー保存則を一見破るように見える項（光子生成かつスピン励起 \(\hat{a}^\dagger \hat{J}_+\), およびその逆過程）が自然に出現することがわかる. これらがUSC領域で重要となる反回転項である. 
+
+\section*{Dickeモデルハミルトニアン}
+単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_L \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g_{\text{eff}} = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g_{\text{eff}}}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-) \label{Dicke_Hamiltonian}
+\end{equation}
+ここで \(\omega_s\) は静磁場によるLarmor周波数である. 
+以上より, 直線偏光モードを持つキャビティ場とスピン系の磁気双極子相互作用から, 反回転項を含むDickeハミルトニアンが第一原理的に導出された. 
+
+\section{Holstein-Primakoff変換によるボゾン化}
+熱力学的極限（\(N \gg 1\)）かつ低励起極限（\(\langle \hat{J}_z \rangle \approx -N/2\)）において, 集団スピン演算子に対してHolstein-Primakoff変換を適用し, スピン自由度をボゾン演算子\(\hat{b}, \hat{b}^\dagger\)（マグノン）に写像する. 
+\begin{align}
+    \hat{J}_+ &\simeq \sqrt{N} \hat{b}^\dagger, \quad \hat{J}_- \simeq \sqrt{N} \hat{b} \\
+    \hat{J}_z &= -N/2 + \hat{b}^\dagger \hat{b}
+\end{align}
+これらをDickeハミルトニアン(式\ref{Dicke_Hamiltonian})に代入し, 定数項を除くと, 以下の2次形式ボゾンハミルトニアン（Hopfieldハミルトニアン）が得られる. 
+\begin{equation}
+    \hat{\mathcal{H}}_{\text{Hop}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{b}^\dagger \hat{b} + \hbar g_{\text{eff}} (\hat{a}^\dagger + \hat{a})(\hat{b}^\dagger + \hat{b}) 
+    \label{eq:Hopfield}
+\end{equation}
+式(\ref{eq:Hopfield})は, \(\hat{a}^\dagger \hat{b}^\dagger\)（光子・マグノンの同時生成）および\(\hat{a}\hat{b}\)（同時消滅）を含んでおり, RWAでは記述できない物理現象を示唆している. 
+
+\section{Bogoliubov変換と固有エネルギー}
+このハミルトニアン(式\ref{eq:Hopfield})を対角化するために, 一般化されたBogoliubov変換（Hopfield変換）を導入し, 新たな固有演算子（ポラリトン演算子）\(\hat{p}_k\) (\(k=\text{LP, UP}\)) を定義する. 
+\begin{equation}
+    \hat{p}_k = w_k \hat{a} + x_k \hat{b} + y_k \hat{a}^\dagger + z_k \hat{b}^\dagger
+\end{equation}
+Heisenbergの運動方程式に基づく行列形式の固有値問題を解くことで, Zeemanポラリトンの分散関係（固有エネルギー \(E_{\pm} = \hbar \Omega_{\pm}\)）は以下のように導出される. 
+\begin{equation}
+    \Omega_{\pm}^2 = \frac{1}{2} \left[ \omega_c^2 + \omega_s^2 \pm \sqrt{(\omega_c^2 - \omega_s^2)^2 + 16 g_{\text{eff}}^2 \omega_c \omega_s} \right]
+\end{equation}
+この結果は, USC領域において固有振動数が結合強度\(g_{\text{eff}}\)に対して非線形に依存することを示している. 特に\(\Omega_-\)（Lower Polariton）は, Bloch-Siegertシフトを含んだエネルギー準位となる. 
+\section{基底状態の量子性}
+Dickeモデルにおける真の基底状態（USC真空）\(|G_{\text{USC}}\rangle\) は, ポラリトン消滅演算子に対し \(\hat{p}_k |G_{\text{USC}}\rangle = 0\) を満たす状態として定義される. しかし, 元の粒子演算子（\(\hat{a}, \hat{b}\)）に対しては真空ではない. 
+すなわち, 
+\begin{equation}
+    \langle G_{\text{USC}} | \hat{a}^\dagger \hat{a} | G_{\text{USC}} \rangle \neq 0, \quad \langle G_{\text{USC}} | \hat{b}^\dagger \hat{b} | G_{\text{USC}} \rangle \neq 0
+\end{equation}
+となり, 基底状態においても有限の光子数とマグノン数が存在する（仮想光子の衣をまとう）. これは, 系がスクイーズド真空状態にあることを意味し, キャビティ量子電磁力学（Cavity QED）における顕著な量子効果の一つである. 

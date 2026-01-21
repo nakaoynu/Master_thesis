@@ -63,15 +63,15 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 
 \section{比透磁率の定式化}
 \label{sec:theory_permeability}
-本節では，前節で導出した線形応答理論に基づく磁気感受率\(\chi^{+}\)と電磁気学で用いられる磁気感受率\(\chi\)との対応関係を導出し，H形式およびB形式における比透磁率\(\mu_{r}\)の定式化について説明する.\\
+本節では，前節で導出した線形応答理論に基づく磁気感受率\(\chi^{+}\)と電磁気学で用いられる磁気感受率\(\chi\)との対応関係を導出し，H形式およびB形式における比透磁率\(\mu_{r}^{(H,B)}\)の定式化について説明する.\\
 電磁気学では，一般に磁化\(\vb*{M}\)は磁場\(\vb*{H}\)に比例すると仮定される．本研究でも慣例に従い，式\ref{eq:M_H_form}の形で磁化\(\vb*{M}\)を記述する．
 \begin{equation}
 \label{def:susceptibility_LRT_EM}
 \vb*{M} = \chi \vb*{H} = \chi^{+} \vb*{H} 
 \end{equation}
-この関係を用いると, H形式における比透磁率\(\mu_{rH}\)は次式で与えられる.
+この関係を用いると, H形式における比透磁率\(\mu_{r}^{(H)}\)は次式で与えられる.
 \begin{equation}    
-\mu_{rH} = 1 + \chi = 1 + \chi^{+}
+\mu_{r}^{(H)} = 1 + \chi = 1 + \chi^{+}
 \end{equation}
 一般に, 磁場\(\vb*{H}\)と磁束密度\(\vb*{B}\), 磁化\(\vb*{M}\)の関係は, 真空の透磁率\(\mu_{0}\)を用いて次式のように表される.
 \begin{equation}
@@ -88,9 +88,9 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \begin{equation}
 \chi^{+} = \frac{\chi}{1 + \chi}
 \end{equation}
-よって, B形式の比透磁率\(\mu_{rB}\)は次式で与えられる．
+よって, B形式の比透磁率\(\mu_{r}^{(B)}\)は次式で与えられる．
 \begin{equation}
-\mu_{rB} = 1 + \chi = \frac{1}{1 - \chi^{+}}
+\mu_{r}^{(B)} = 1 + \chi = \frac{1}{1 - \chi^{+}}
 \end{equation}
 
 \section{転送行列法による透過スペクトルの計算方法}
@@ -242,7 +242,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \end{equation}
 \section{ベイズ推定}
 \label{sec:method_bayesian}
-物理実験, 特にGGGの分光測定のような複雑な系においては, 観測データにノイズが含まれるだけでなく, 理論モデル自体にも不確実性が存在する. 従来の最小二乗法（最尤推定）による点推定では, パラメータ間の相関や多峰性を捉えきれず, 過学習のリスクも高い. 本章では, これらの問題を解決し, 厳密な不確実性評価を可能にするベイズ推論の枠組みを詳述する. 
+物理実験, 特にGGGの分光測定のような複雑な系においては, 観測データにノイズが含まれるだけでなく, 理論モデル自体にも不確実性が存在する. 従来の最小二乗法（最尤推定）による点推定では, パラメータ間の相関や多峰性を捉えきれず, 過学習のリスクも高い. 本章では, これらの問題を解決し, 厳密な不確実性評価を可能にするベイズ推定の枠組みを詳述する. 
 \subsubsection{ベイズの定理}
 ベイズ推定は, 観測データ \(D\) に基づいてモデルパラメータ \(\theta\) の確率分布を更新する枠組みである. ベイズの定理により, 事後分布 \(p(\theta|D)\) は以下のように表される.
 \begin{equation}
@@ -257,7 +257,7 @@ p(\theta|D) = \frac{\mathcal{L}(\theta | D) p(\theta)}{p(D)} \label{equation_bay
 \begin{equation}
 \mathcal{L}(\theta | D) = \prod_{i} \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{(D_i - f(x_i; \theta))^2}{2\sigma^2} \right)
 \end{equation}
-ここで, \(f(x_i; \theta)\) はモデル関数, \(\sigma\) は観測ノイズの標準偏差である. 尤度関数は, 観測データとモデル予測の一致度を定量化し, パラメータ推定において重要な役割を果たす.
+ここで, \(f(x_i; \theta)\) はモデル関数, \(\sigma\) は観測ノイズの標準偏差である. 尤度関数は, 観測データとモデル予測の一致度を定量化し, パラメータ推定において重要な役割を果たす. 本研究で使用する尤度関数については，第\ref{subsec:likelihood}節で詳述する.
 
 \subsubsection*{周辺尤度}
 周辺尤度 \(p(D)\) は, 観測データ \(D\) が得られる全確率を表し, 事後分布の正規化定数として機能する. これは, 全てのパラメータ空間にわたる尤度関数と事前分布の積分によって計算される.
@@ -268,7 +268,8 @@ p(\theta|D) = \frac{\mathcal{L}(\theta | D) p(\theta)}{p(D)} \label{equation_bay
 \subsubsection*{事後分布}
 事後分布 \(p(\theta|D)\) は, 式\ref{equation_bayesian}にあるように, 観測データに基づいて更新されたパラメータの確率分布を表す. 事後分布は, 事前分布と尤度関数の積に比例し, 正規化定数 \(p(D)\) によって正規化される. 
 事後分布からは, パラメータの最頻値（MAP推定値）, 平均値, 分散などの統計量を計算できる.
-ベイズ推論のゴールは, この事後分布の形状（平均, 分散, 相関構造など）を明らかにすることである. しかし, GGGのモデルのようにパラメータが多数存在し, モデルが非線形である場合, 事後分布を解析的に求めることは事実上不可能であり, 後述する数値計算手法（マルコフ連鎖モンテカルロ法など）が必要となる. 
+ベイズ推定の最大の目的は, 得られた事後分布 \(p(\vb*{\theta} | D)\) から, パラメータの期待値および 95\% 最高密度区間を算出することである. 事後分布の広がりが鋭いほど推定精度が高く, 分布が多峰性を示す場合は, モデル内のパラメータ間に強い相関が存在するか, あるいは物理モデルが現象を記述するのに不十分である可能性を示唆する.\\
+しかし, GGGのモデルのようにパラメータが多数存在し, モデルが非線形である場合, 事後分布を解析的に求めることは事実上不可能であり, 後述する数値計算手法（マルコフ連鎖モンテカルロ法や逐次モンテカルロ法など）が必要となる. 
 
 \section{マルコフ連鎖モンテカルロ法}
 \label{sec:method_mcmc}
@@ -301,21 +302,182 @@ p(\theta|D) = \frac{\mathcal{L}(\theta | D) p(\theta)}{p(D)} \label{equation_bay
 \end{enumerate}
 このアルゴリズムは, 事後分布の形状に適応的にサンプリングを行うことで, 高次元空間や相関の強いパラメータ空間でも効率的にサンプルを生成できる. 
 
-\subsection{NUTS(No-U-Return Sampler)}
-NUTS (No-U-Turn Sampler) は, ハミルトニアンモンテカルロ法 (HMC) を基盤とした現代のベイズ統計ソフトウェア（Stan, PyMCなど）で標準エンジンとなっている最先端アルゴリズムである. \(^{\cite{Hoffman2014}}\)HMCは, 物理学のハミルトニアン力学系の概念を利用して, パラメータ空間を効率的に探索する手法であり, 以下に概要を示す. 
-\subsubsection*{HMCの基礎}
-HMCは, パラメータ \(\theta\) に対して仮想的な運動量 \(p\) を導入し, ハミルトニアン \(H(\theta, p) = U(\theta) + K(p)\) を定義する. ここで, \(U(\theta) = -\log P(\theta|D)\) はポテンシャルエネルギー, \(K(p) = \frac{1}{2} p^T M^{-1} p\) は運動エネルギーであり, \(M\) は質量行列である. HMCは, レヴィ・カンター方程式に基づいて \((\theta, p)\) の時間発展をシミュレートし, 新しい候補状態を生成する. この方法により, 高次元空間でも効率的にサンプリングが可能となる.
-\subsubsection*{NUTSの革新性}
-HMCの最大の課題は, 積分ステップ数\(L\)の調整である. \(L\)が短すぎるとランダムウォークになり, 長すぎると軌道が一周して元の位置に戻ってしまい（Uターン）, 計算資源を浪費する. 
-NUTSは, 以下の手順でこれを自動化する：
-\begin{enumerate}
-    \item \textbf{再帰的な二分木の構築}: ハミルトニアン力学系のシミュレーションを前進と後退の両方向に行い, ツリー構造を再帰的に構築する.
-    \item \textbf{No-U-Turn停止条件の判定}: 構築された軌道の始点\(\theta^-\)と終点\(\theta^+\)を結ぶベクトルと, 終点の運動量ベクトル\(r^+\)の内積を確認する. これが負になった（\(( \theta^+ - \theta^- ) \cdot r^+ < 0\)）, すなわち粒子が来た道を戻り始めた時点で, 木の拡張を停止する.
-    \item \textbf{詳細釣り合いの維持}: 新しい候補状態を選択する際に, 停止位置までの軌道上の点から, スライスサンプリングの考え方を応用して次の点を抽出する.これにより, 詳細釣り合い条件を満たすように確率的に選択を行う.
-\end{enumerate}
-これにより, 高次元かつ相関の強いGGGの結晶場パラメータ空間においても, 極めて高い効率（有効サンプルサイズの最大化）で事後分布を探索することが可能となる. 
+\section{逐次モンテカルロ法}
+\label{sec:method_smc}
+逐次モンテカルロ法（Sequential Monte Carlo: SMC）\(^{\cite{DelMoral2006, Chopin2002}}\)は, 粒子フィルタを静的パラメータ推定に拡張した手法であり，前節\ref{sec:method_mcmc}で述べたMCMC法と比較して多峰性分布への対応力が高い特徴を持つ. 本研究で扱う様な複雑なモデルに対するベイズ推定においても有効であり，本研究ではSMC法を採用した. 本節では，SMCの基本的な理論基盤とアルゴリズムについて説明する.
+\subsubsection{SMCの理論的基盤}
+SMCサンプラーは，事前分布\(p(\bm{\theta})\)から事後分布\(p(\bm{\theta}|\mathcal{D})\)への
+連続的な分布列（tempering sequence）を構築し，粒子（サンプル）を逐次的に移動させる\(^{\cite{Neal2001}}\)．
+中間分布\(\pi_t(\bm{\theta})\)を次のように定義する：
+\begin{equation}
+    \pi_t(\bm{\theta}) \propto p(\bm{\theta}) \cdot p(\mathcal{D}|\bm{\theta})^{\beta_t}
+    \label{eq:smc_tempering}
+\end{equation}
+ここで\(\beta_t \in [0, 1]\)は逆温度パラメータであり，\(\beta_0 = 0\)（事前分布）から\(\beta_T = 1\)（事後分布）まで
+単調増加するスケジュールに従う．
 
-\section{LOO-CV(Leave-One-Out Cross-Validation)}
+\subsubsection{SMCアルゴリズム}
+
+SMCアルゴリズムは以下の3つのステップを\(\beta_t = 1\)に達するまで繰り返す\(^{\cite{Doucet2001}}\)：
+
+\begin{enumerate}
+    \item \textbf{初期化}：事前分布からN個の粒子\(\{\bm{\theta}^{(i)}\}_{i=1}^{N}\)を生成し，\(t=0\)，\(\beta_0=0\)とする．
+    
+    \item \textbf{反復ステップ}（\(\beta_t < 1\)の間繰り返す）：
+    \begin{itemize}
+        \item[(a)] \textbf{重み付け}：各粒子の重要度重み\(w^{(i)} \propto \pi_{t+1}(\bm{\theta}^{(i)})/\pi_t(\bm{\theta}^{(i)})\)を計算
+        \item[(b)] \textbf{有効サンプルサイズ計算}：\(\mathrm{ESS} = (\sum w^{(i)})^2 / \sum (w^{(i)})^2\)
+        \item[(c)] \textbf{リサンプリング}（\(\mathrm{ESS} <\) 閾値の場合のみ）：重みに比例して粒子を複製・除去
+        \item[(d)] \textbf{変異}：MCMCカーネルで各粒子を移動させ多様性を回復
+        \item[(e)] \textbf{更新}：\(t \leftarrow t+1\)，逆温度\(\beta_t\)を更新
+    \end{itemize}
+    
+    \item \textbf{終了}：\(\beta_t = 1\)に達したら事後分布サンプルとして出力．
+\end{enumerate}
+
+\textbf{Step 1: 重み付け}\par\noindent
+各粒子の重要度重みを，隣接する中間分布の尤度比として計算する：
+\begin{equation}
+    w_t^{(i)} = \frac{\pi_{t}(\bm{\theta}^{(i)})}{\pi_{t-1}(\bm{\theta}^{(i)})} 
+    = p(\mathcal{D}|\bm{\theta}^{(i)})^{\beta_t - \beta_{t-1}}
+    \label{eq:smc_weight}
+\end{equation}
+この増分的な重み付けにより，尤度の急激な変化による重みの縮退を防ぐ．
+
+\textbf{Step 2: リサンプリング}\par\noindent
+有効サンプルサイズ（ESS）が閾値を下回った場合，重みに比例して粒子を複製・除去する：
+\begin{equation}
+    \mathrm{ESS} = \frac{\left(\sum_{i=1}^{N} w_t^{(i)}\right)^2}{\sum_{i=1}^{N} \left(w_t^{(i)}\right)^2}
+    \label{eq:ess}
+\end{equation}
+リサンプリング後，すべての重みは均一化される（\(w^{(i)} = 1/N\)）．
+
+\textbf{Step 3: 変異}\par\noindent
+リサンプリングで生じた粒子の多重化を解消するため，
+各粒子にMCMCカーネル\(K_t(\bm{\theta}' | \bm{\theta})\)を適用して多様性を回復する：
+\begin{equation}
+    \bm{\theta}^{(i)} \leftarrow K_t(\cdot | \bm{\theta}^{(i)})
+    \label{eq:smc_mutation}
+\end{equation}
+本研究ではMetropolis-Hastings法に基づくランダムウォークカーネルを使用した．
+
+\subsubsection{逆温度スケジュール}
+
+逆温度\(\beta_t\)のスケジュールは適応的に決定される．
+各ステップで目標ESS（通常は\(N/2\)）を達成する\(\beta_{t+1}\)を二分法で探索する\(^{\cite{DelMoral2006}}\)：
+\begin{equation}
+    \beta_{t+1} = \underset{\beta \in [\beta_t, 1]}{\arg\min} 
+    \left| \mathrm{ESS}(\beta) - \frac{N}{2} \right|
+    \label{eq:adaptive_beta}
+\end{equation}
+
+\subsubsection{SMCの利点}
+
+SMCサンプラーには以下の利点がある：
+\begin{enumerate}
+    \item \textbf{多峰性分布への対応}：
+    事前分布から出発し，尤度を徐々に導入するため，局所解への収束を回避しやすい．
+    
+    \item \textbf{周辺尤度の推定}：
+    各ステップの正規化定数から周辺尤度\(p(\mathcal{D})\)を自然に推定できる：
+    \begin{equation}
+        \hat{p}(\mathcal{D}) = \prod_{t=1}^{T} \frac{1}{N}\sum_{i=1}^{N} w_t^{(i)}
+        \label{eq:marginal_likelihood}
+    \end{equation}
+    
+    \item \textbf{並列化の容易さ}：
+    粒子間の演算は独立であり，大規模並列計算に適している．
+    
+    \item \textbf{収束診断の明確さ}：
+    ESSにより各ステップでの推定品質をモニタリングできる．
+\end{enumerate}
+
+\section{モデル評価・比較手法}
+\label{sec:model_comparison}
+% =============================================================================
+
+\subsection{WAIC（Widely Applicable Information Criterion）}
+\label{subsec:waic}
+
+WAIC（Widely Applicable Information Criterion，広く適用可能な情報量規準）は，
+渡辺澄夫によって提案されたベイズモデルの予測精度評価指標である\(^{\cite{Watanabe2010}}\)．
+AIC（Akaike Information Criterion）\(^{\cite{Akaike1974}}\)をベイズモデルに一般化したものであり，
+モデルの複雑さに対するペナルティを自動的に調整する．
+
+\subsubsection{WAICの数学的定義}
+
+WAICは以下の2つの成分から構成される\(^{\cite{Watanabe2010}}\)：
+
+\textbf{1. ログ点予測密度（log pointwise predictive density, lppd）}\par\noindent
+
+各データ点$y_i$に対する事後予測分布の対数尤度の総和：
+\begin{equation}
+    \mathrm{lppd} = \sum_{i=1}^{N} \log \left( \mathbb{E}_{\mathrm{post}}\left[ p(y_i|\bm{\theta}) \right] \right)
+    = \sum_{i=1}^{N} \log \left( \int p(y_i|\bm{\theta}) p(\bm{\theta}|\mathcal{D}) d\bm{\theta} \right)
+    \label{eq:lppd_def}
+\end{equation}
+
+MCMCサンプル$\{\bm{\theta}^{(s)}\}_{s=1}^{S}$を用いた推定量：
+\begin{equation}
+    \widehat{\mathrm{lppd}} = \sum_{i=1}^{N} \log \left( \frac{1}{S}\sum_{s=1}^{S} p(y_i|\bm{\theta}^{(s)}) \right)
+    \label{eq:lppd_estimate}
+\end{equation}
+
+\textbf{2. 有効パラメータ数（effective number of parameters, $p_{\mathrm{WAIC}}$）}\par\noindent
+事後分布における対数尤度の分散の総和として定義される：
+\begin{equation}
+    p_{\mathrm{WAIC}} = \sum_{i=1}^{N} \mathrm{Var}_{\mathrm{post}}\left[ \log p(y_i|\bm{\theta}) \right]
+    \label{eq:pwaic_def}
+\end{equation}
+
+MCMCサンプルを用いた推定量：
+\begin{equation}
+    \hat{p}_{\mathrm{WAIC}} = \sum_{i=1}^{N} \left( 
+    \frac{1}{S-1}\sum_{s=1}^{S} \left( \log p(y_i|\bm{\theta}^{(s)}) - \overline{\log p(y_i|\bm{\theta})} \right)^2
+    \right)
+    \label{eq:pwaic_estimate}
+\end{equation}
+ここで$\overline{\log p(y_i|\bm{\theta})} = \frac{1}{S}\sum_{s=1}^{S} \log p(y_i|\bm{\theta}^{(s)})$である．
+
+\textbf{WAICの定義式}\par\noindent
+elpdスケール（expected log predictive density）でのWAIC：
+\begin{equation}
+    \widehat{\mathrm{elpd}}_{\mathrm{WAIC}} = \widehat{\mathrm{lppd}} - \hat{p}_{\mathrm{WAIC}}
+    \label{eq:elpd_waic}
+\end{equation}
+
+AIC/BICと同様の偏差スケール（deviance scale）でのWAIC：
+\begin{equation}
+    \mathrm{WAIC} = -2 \cdot \widehat{\mathrm{elpd}}_{\mathrm{WAIC}} = -2(\widehat{\mathrm{lppd}} - \hat{p}_{\mathrm{WAIC}})
+    \label{eq:waic_deviance}
+\end{equation}
+
+\textbf{WAICが小さいほど（elpdが大きいほど）予測性能が良い}と判断される．
+
+\subsubsection{WAICの標準誤差}
+
+モデル比較における不確実性を評価するため，WAICの標準誤差を計算する：
+\begin{equation}
+    \mathrm{SE}(\widehat{\mathrm{elpd}}_{\mathrm{WAIC}}) = \sqrt{N \cdot \mathrm{Var}\left[ \widehat{\mathrm{elpd}}_i \right]}
+    \label{eq:waic_se}
+\end{equation}
+ここで\(\widehat{\mathrm{elpd}}_i\)は各データ点のelpd貢献度である．
+具体的な実装方法は，付録\ref{subsec:waic_implementation}にて記載する．
+
+\subsubsection{WAICとAICの関係}
+
+WAICはAICのベイズ版として解釈できる. 
+最尤推定に基づくAICでは有効パラメータ数がモデルのパラメータ数\(k\)に等しいと仮定するが，
+WAICでは事後分布の広がりを考慮して\(p_{\mathrm{WAIC}}\)を推定する\cite{Gelman2014WAIC}：
+\begin{align}
+    \mathrm{AIC} &= -2\log p(\mathcal{D}|\hat{\bm{\theta}}_{\mathrm{MLE}}) + 2k \\
+    \mathrm{WAIC} &= -2\widehat{\mathrm{lppd}} + 2\hat{p}_{\mathrm{WAIC}}
+\end{align}
+
+事後分布が点推定に収束する極限（データ数\(N \to \infty\)）では\(p_{\mathrm{WAIC}} \to k\)となり，
+WAICはAICに漸近する. 
+
+\subsection{LOO-CV(Leave-One-Out Cross-Validation)}
 \label{sec:method_loo_cv}
 ベイズモデルの予測性能を評価し, 過学習を防ぐための主要な手法として, 1個抜き交差検証（Leave-One-Out Cross-Validation: LOOCV）がある\(^{\cite{Stone1974LOO}}\). 
 LOOCVは, 観測データセット \(D = \{(x_i, y_i)\}_{i=1}^{N}\) に対して, 各データ点を一つずつ検証用データとして取り除き, 残りのデータでモデルを学習し, 取り除いたデータ点に対する予測性能を評価する手法である. 具体的な手順は以下の通りである.
@@ -332,5 +494,27 @@ LOOCVは, データセット全体を用いたモデルの汎化性能を評価�
 \subsubsection*{PSIS-LOOによる高速化}
 PSIS-LOO (Pareto Smoothed Importance Sampling Leave-One-Out) は, LOOCVの計算コストを大幅に削減するための近似手法である\(^{\cite{Vehtari2017}}\). 単純なLOOCVは, データ点数\(N\)回分のMCMC実行を要し, 計算コストが膨大である. そこで, 全データを用いた事後分布\(p(\theta | y)\)からのサンプル\(\theta^s\)を利用して, \(p(\theta | y_{-i})\)を近似する重点サンプリング（Importance Sampling: IS）が用いられる. 
 ISの重みは \(w_i^s \propto 1 / p(y_i | \theta^s)\) となるが, この重みの分散はしばしば発散し, 推定が不安定になる. 
-PSIS (Pareto Smoothed Importance Sampling)は, この重み分布の裾を一般化パレート分布で近似・平滑化することで, 分散を劇的に低減させる. 推定されたパレート分布の形状パラメータ\(k\)は, 近似の信頼性を診断する指標としても機能する（\(k < 0.7\)なら信頼できる）. 
-この手法により, 1回のMCMCシミュレーションの結果のみを用いて, 厳密なLOOCVとほぼ同等の精度でモデル評価・比較を行うことが可能となり, GGGのハミルトニアンモデル選択において強力なツールとなる. 
+PSIS (Pareto Smoothed Importance Sampling)は, この重み分布の裾を一般化パレート分布で近似・平滑化することで, 分散を劇的に低減させる. 推定されたパレート分布の形状パラメータであるPareto \(k\)は, 近似の信頼性を診断する指標としても機能する（\(k < 0.7\)なら信頼できる）. 
+この手法により, 1回のMCMCシミュレーションの結果のみを用いて, 厳密なLOOCVとほぼ同等の精度でモデル評価・比較を行うことが可能となり, GGGのハミルトニアンモデル選択において強力なツールとなる. \\
+Pareto \(k\)診断により，各データ点の影響度と推定の信頼性を評価できる：
+\begin{itemize}
+    \item \(k < 0.5\)：良好（信頼できる推定）
+    \item \(0.5 \leq k < 0.7\)：許容範囲
+    \item \(0.7 \leq k < 1.0\)：警告
+    \item \(k \geq 1.0\)：不良（推定が不安定）
+\end{itemize}
+
+\subsection{モデル比較の判定基準}
+
+H形式とB形式のモデル比較には, elpd差とその標準誤差を用いる：
+\begin{equation}
+    \Delta\mathrm{elpd} = \mathrm{elpd}_{\mathrm{H}} - \mathrm{elpd}_{\mathrm{B}}
+    \label{eq:elpd_diff}
+\end{equation}
+
+統計的に有意な差の判定基準：
+\begin{equation}
+    |\Delta\mathrm{elpd}| > 2 \times \mathrm{SE}(\Delta\mathrm{elpd})
+    \label{eq:significance}
+\end{equation}
+この条件を満たさない場合，両モデルは「引き分け」と判定する．

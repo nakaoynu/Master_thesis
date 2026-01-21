@@ -1,102 +1,64 @@
-\chapter{超強結合領域におけるZeemanポラリトンの定量的記述}
-\label{chap:zeeman_polariton}
+\chapter{H形式とB形式のSRPT発現可能性の違い}
+\label{chap:SRPT_realization}
 
-\section{電磁場の量子化}
-\section{ベクトルポテンシャルの導入}
-クーロンゲージ（\(\nabla \cdot \vb*{A} = 0\)）を採用し, 体積 \(V\) のキャビティ内における単一モードの電磁場を考える. 
-ベクトルポテンシャル \(\hat{\vb*{A}}(\vb*{r}, t)\) を, キャビティの固有モード関数 \(\vb*{u}(\vb*{r})\) を用いて以下のように量子化する. 
-\begin{equation}
-    \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} \vb*{u}(\vb*{r}) + \hat{a}^\dagger \vb*{u}^*(\vb*{r}) \right)
-\end{equation}
-ここで, \(\hat{a}, \hat{a}^\dagger\) はそれぞれ光子の消滅・生成演算子であり, 交換関係 \([\hat{a}, \hat{a}^\dagger] = 1\) を満たす. \(\omega_c\) はキャビティの共鳴角周波数である. 
+電磁気学において, 磁場を表す物理量には磁束密度\(\vb*{B}\)と磁場の強さ\(\vb*{H}\)の二種類が存在する. これらは真空中では\(\vb*{B} = \mu_0 \vb*{H}\)という単純な比例関係にあるが, GGGのような磁性体内では, その定義と物理的役割に本質的な差異が生じる. \ref{sec:theory_permeability}節でも述べたように, 転送行列法による光学特性の計算においては, どちらの形式を採用するかによって透磁率や境界条件の定義が異なるため, 明確な区別が必要である.
+本付録では, 一般の物質中における電磁波の分散関係を導出し, その過程で\(\vb*{B}\)形式と\(\vb*{H}\)形式の違いがどのように分散関係に影響を与えるかを明らかにする. これにより, Zeemanポラリトンの分散関係が両形式でどのように異なるかを理解し, SRPT発現可能性の違いを理論的に裏付ける基礎を提供する.
 
-\section*{磁場演算子の導出}
-磁束密度演算子 \(\hat{\vb*{B}}(\vb*{r})\) は, ベクトルポテンシャルの回転として定義される. 
-\begin{equation}
-    \hat{\vb*{B}}(\vb*{r}) = \nabla \times \hat{\vb*{A}}(\vb*{r}) = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \left( \hat{a} (\nabla \times \vb*{u}(\vb*{r})) + \hat{a}^\dagger (\nabla \times \vb*{u}^*(\vb*{r})) \right)
-\end{equation}
-
-\section*{ファラデー配置におけるモード設定}
-本実験系（ファラデー配置）に合わせ, 以下の幾何学的条件を設定する. 
-\begin{itemize}
-    \item 光の伝搬方向（波数ベクトル）: \(\vb*{k} \parallel z\)
-    \item 静磁場方向: \(\vb*{B}_{\text{DC}} \parallel z\)
-    \item キャビティモード: \(z\) 軸方向に定在波を形成する直線偏光モード
-\end{itemize}
-ここで, 磁場が \(x\) 軸方向に偏光している（\(\vb*{B} \parallel x\)）ようなモードを考える. 電磁波の横波性により電場は \(y\) 方向成分を持つため, ベクトルポテンシャルのモード関数を以下のように仮定できる. 
-\begin{equation}
-    \vb*{u}(\vb*{r}) = u(z) \vb*{e}_y
-\end{equation}
-これの回転をとると, 
-\begin{equation}
-    \nabla \times \vb*{u}(\vb*{r}) = \mqty|\vb*{e}_x & \vb*{e}_y & \vb*{e}_z \\ \partial_x & \partial_y & \partial_z \\ 0 & u(z) & 0| = -\frac{d u(z)}{dz} \vb*{e}_x
-\end{equation}
-となる. スピン集団が配置されている位置（例えば \(z=0\)）において磁場が腹（最大振幅）になると仮定し, その局所的な空間微分値を定数 \(C\) （無次元量のオーダー）として扱うと, 
-\begin{equation}
-    \hat{\vb*{B}} = \sqrt{\frac{\hbar}{2\epsilon_0 \omega_c V}} \frac{k c}{\omega_c} C (\hat{a} + \hat{a}^\dagger) \vb*{e}_x
-\end{equation}
-のように整理できる. ここで \(\omega_c = c k, c=\frac{1}{\sqrt{\epsilon_0 \mu_0}}\) の関係を用い, すべての定数を真空磁場揺らぎ振幅 \(B_{\text{vac}}\) に押し込めると, 最終的に以下の簡潔な形を得る. 
-\begin{equation}
-    \hat{\vb*{B}} = B_{\text{vac}} (\hat{a} + \hat{a}^\dagger) \vb*{e}_x, \quad B_{\text{vac}} \equiv C \sqrt{\frac{\hbar \omega_c \mu_0}{2V}}
-    \label{eq:B_field}
-\end{equation}
-これにより, 直線偏光モードの量子化磁場が定義された. 
-
-\section{磁気双極子相互作用}
-\section*{ハミルトニアンの定義}
-\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) は, ゼーマン・エネルギーの形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
-\begin{equation}
-    \hat{\mathcal{H}}_{\text{int}} = - \sum_{i=1}^N \hat{\boldsymbol{\mu}}_i \cdot \hat{\vb*{B}}
-\end{equation}
-磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_L \mu_B \hat{\vb*{S}}_i\) である（\(g_L\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
-\begin{equation}
-    \hat{\mathcal{H}}_{\text{int}} = g_L \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
-\end{equation}
-
-\section*{昇降演算子による展開と反回転項}
-スピン演算子の \(x\) 成分を昇降演算子 \(\hat{S}_\pm^i = \hat{S}_x^i \pm i \hat{S}_y^i\) を用いて \(\hat{S}_x^i = \frac{1}{2}(\hat{S}_+^i + \hat{S}_-^i)\) と書き換える. 
-さらに, 集団スピン演算子 \(\hat{J}_\pm = \sum_i \hat{S}_\pm^i\) を導入する. 
+\section{一般の物質中における電磁波の分散関係の導出}
+\subsection{マクスウェル方程式と構成方程式}
+電荷密度 \(\rho = 0\) および電流密度 \(\vb*{J} = \vb*{0}\) の一般の物質中におけるMaxwell方程式は以下の通りである. 
 \begin{align}
-    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_L \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
-    &= \frac{g_L \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{回転項}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{反回転項}} \right]
+    \nabla \cdot \vb*{D} &= 0 \\
+    \nabla \cdot \vb*{B} &= 0 \\
+    \nabla \times \vb*{E} &= -\frac{\partial \vb*{B}}{\partial t} \label{eq:Faraday} \\
+    \nabla \times \vb*{H} &= \frac{\partial \vb*{D}}{\partial t} \label{eq:Ampere}
 \end{align}
-この式変形により, エネルギー保存則を一見破るように見える項（光子生成かつスピン励起 \(\hat{a}^\dagger \hat{J}_+\), およびその逆過程）が自然に出現することがわかる. これらがUSC領域で重要となる反回転項である. 
-
-\section*{Dickeモデルハミルトニアン}
-単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_L \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g_{\text{eff}} = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
-\begin{equation}
-    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g_{\text{eff}}}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-) \label{Dicke_Hamiltonian}
-\end{equation}
-ここで \(\omega_s\) は静磁場によるLarmor周波数である. 
-以上より, 直線偏光モードを持つキャビティ場とスピン系の磁気双極子相互作用から, 反回転項を含むDickeハミルトニアンが第一原理的に導出された. 
-
-\section{Holstein-Primakoff変換によるボゾン化}
-熱力学的極限（\(N \gg 1\)）かつ低励起極限（\(\langle \hat{J}_z \rangle \approx -N/2\)）において, 集団スピン演算子に対してHolstein-Primakoff変換を適用し, スピン自由度をボゾン演算子\(\hat{b}, \hat{b}^\dagger\)（マグノン）に写像する. 
+ここで, 線形応答を示す等方的な物質を仮定し, 周波数領域における構成方程式を導入する. 
+電束密度 \(\vb*{D}\) および磁束密度 \(\vb*{B}\) は, それぞれ電場 \(\vb*{E}\) および磁場 \(\vb*{H}\) と以下の関係にある. 
 \begin{align}
-    \hat{J}_+ &\simeq \sqrt{N} \hat{b}^\dagger, \quad \hat{J}_- \simeq \sqrt{N} \hat{b} \\
-    \hat{J}_z &= -N/2 + \hat{b}^\dagger \hat{b}
+    \vb*{D} &= \epsilon_0 \epsilon_r(\omega) \vb*{E} \\
+    \vb*{B} &= \mu_0 \mu_r(\omega) \vb*{H}
 \end{align}
-これらをDickeハミルトニアン(式\ref{Dicke_Hamiltonian})に代入し, 定数項を除くと, 以下の2次形式ボゾンハミルトニアン（Hopfieldハミルトニアン）が得られる. 
-\begin{equation}
-    \hat{\mathcal{H}}_{\text{Hop}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{b}^\dagger \hat{b} + \hbar g_{\text{eff}} (\hat{a}^\dagger + \hat{a})(\hat{b}^\dagger + \hat{b}) 
-    \label{eq:Hopfield}
-\end{equation}
-式(\ref{eq:Hopfield})は, \(\hat{a}^\dagger \hat{b}^\dagger\)（光子・マグノンの同時生成）および\(\hat{a}\hat{b}\)（同時消滅）を含んでおり, RWAでは記述できない物理現象を示唆している. 
+\(\epsilon_0, \mu_0\) は真空の誘電率と透磁率であり, \(\epsilon_r(\omega), \mu_r(\omega)\) はそれぞれ物質の比誘電率と比透磁率である. 
 
-\section{Bogoliubov変換と固有エネルギー}
-このハミルトニアン(式\ref{eq:Hopfield})を対角化するために, 一般化されたBogoliubov変換（Hopfield変換）を導入し, 新たな固有演算子（ポラリトン演算子）\(\hat{p}_k\) (\(k=\text{LP, UP}\)) を定義する. 
+\subsection{波動方程式の導出}
+式(\ref{eq:Faraday})の両辺の回転をとる. 
 \begin{equation}
-    \hat{p}_k = w_k \hat{a} + x_k \hat{b} + y_k \hat{a}^\dagger + z_k \hat{b}^\dagger
+    \nabla \times (\nabla \times \vb*{E}) = -\frac{\partial}{\partial t} (\nabla \times \vb*{B})
 \end{equation}
-Heisenbergの運動方程式に基づく行列形式の固有値問題を解くことで, Zeemanポラリトンの分散関係（固有エネルギー \(E_{\pm} = \hbar \Omega_{\pm}\)）は以下のように導出される. 
+左辺に対し, ベクトル解析の恒等式 \(\nabla \times (\nabla \times \vb*{A}) = \nabla(\nabla \cdot \vb*{A}) - \nabla^2 \vb*{A}\) を適用する. 均質な媒質中では \(\nabla \cdot \vb*{E} = 0\) となるため, 左辺は \(-\nabla^2 \vb*{E}\) となる. 
+右辺に対し, \(\vb*{B} = \mu_0 \mu_r \vb*{H}\) および式(\ref{eq:Ampere})を代入する. 
+\begin{align}
+    -\nabla^2 \vb*{E} &= -\mu_0 \mu_r \frac{\partial}{\partial t} (\nabla \times \vb*{H}) \nonumber \\
+    &= -\mu_0 \mu_r \frac{\partial}{\partial t} \left( \epsilon_0 \epsilon_r \frac{\partial \vb*{E}}{\partial t} \right) \nonumber \\
+    &= -\epsilon_0 \mu_0 \epsilon_r \mu_r \frac{\partial^2 \vb*{E}}{\partial t^2}
+\end{align}
+真空中の光速 \(c = 1/\sqrt{\epsilon_0 \mu_0}\) を用いて整理すると, 以下の波動方程式が得られる. 
 \begin{equation}
-    \Omega_{\pm}^2 = \frac{1}{2} \left[ \omega_c^2 + \omega_s^2 \pm \sqrt{(\omega_c^2 - \omega_s^2)^2 + 16 g_{\text{eff}}^2 \omega_c \omega_s} \right]
+    \left( \nabla^2 - \frac{\epsilon_r \mu_r}{c^2} \frac{\partial^2}{\partial t^2} \right) \vb*{E}(\vb*{r}, t) = 0
 \end{equation}
-この結果は, USC領域において固有振動数が結合強度\(g_{\text{eff}}\)に対して非線形に依存することを示している. 特に\(\Omega_-\)（Lower Polariton）は, Bloch-Siegertシフトを含んだエネルギー準位となる. 
-\section{基底状態の量子性}
-Dickeモデルにおける真の基底状態（USC真空）\(|G_{\text{USC}}\rangle\) は, ポラリトン消滅演算子に対し \(\hat{p}_k |G_{\text{USC}}\rangle = 0\) を満たす状態として定義される. しかし, 元の粒子演算子（\(\hat{a}, \hat{b}\)）に対しては真空ではない. 
-すなわち, 
+
+\subsection{平面波解と分散関係}
+単色平面波解 \(\vb*{E}(\vb*{r}, t) = \vb*{E}_0 e^{i(\vb*{k} \cdot \vb*{r} - \omega t)}\) を仮定し, 波動方程式に代入する. 
+空間微分 \(\nabla \to i\vb*{k}\), 時間微分 \(\partial/\partial t \to -i\omega\) の置き換えにより, 
 \begin{equation}
-    \langle G_{\text{USC}} | \hat{a}^\dagger \hat{a} | G_{\text{USC}} \rangle \neq 0, \quad \langle G_{\text{USC}} | \hat{b}^\dagger \hat{b} | G_{\text{USC}} \rangle \neq 0
+    -k^2 \vb*{E}_0 + \frac{\epsilon_r \mu_r}{c^2} \omega^2 \vb*{E}_0 = 0
 \end{equation}
-となり, 基底状態においても有限の光子数とマグノン数が存在する（仮想光子の衣をまとう）. これは, 系がスクイーズド真空状態にあることを意味し, キャビティ量子電磁力学（Cavity QED）における顕著な量子効果の一つである. 
+非自明な解（\(\vb*{E}_0 \neq \vb*{0}\)）が存在するための条件として, 以下の分散関係式が得られる. 
+\begin{equation}
+    k^2 = \epsilon_r(\omega) \mu_r(\omega) \frac{\omega^2}{c^2}
+\end{equation}
+あるいは, 屈折率 \(n(\omega) = \sqrt{\epsilon_r(\omega) \mu_r(\omega)}\) を用いて, 
+\begin{equation}
+    \frac{ck}{\omega} = \sqrt{\epsilon_r(\omega) \mu_r(\omega)}
+    \label{eq:dispersion_general}
+\end{equation}
+と表される. この式(\ref{eq:dispersion_general})が, 一般の物質中における光子（ポラリトン）の分散関係の基礎式である. 
+本研究で扱うZeemanポラリトンの場合, \(\mu_r(\omega)\) の定義（B形式またはH形式）によって右辺の周波数依存性が変化し, 分散曲線の形状に図\ref{fig:dispersion_relation}のように決定的な影響を与える. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/dispersion_relation.png}
+    \caption{一般の物質中における光子（ポラリトン）の分散関係. 比誘電率 \(\epsilon_r(\omega)\) および比透磁率 \(\mu_r(\omega)\) の周波数依存性により, 分散曲線の形状が決定される. Zeemanポラリトンの場合, \(\mu_r(\omega)\) の定義（B形式またはH形式）によって分散関係が変化する. ただし, \(\omega_0\)は\(\omega_{\text{cav}}=\omega_{\text{EPR}}\)を満たす共鳴周波数}
+    \label{fig:dispersion_relation}
+\end{figure}

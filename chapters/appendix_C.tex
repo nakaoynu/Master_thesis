@@ -1,64 +1,188 @@
-\chapter{H形式とB形式のSRPT発現可能性の違い}
-\label{chap:SRPT_realization}
+\chapter{結晶場理論}
+\label{chap:CF_theory}
+凝縮系物理学, 特に希土類磁性体の研究において, 結晶場理論は物質の巨視的な磁気特性を理解するための不可欠な理論的枠組みを提供している. 付録\ref{chap:CF_theory}では, Hutchingsの定義に基づくStevens演算子（GGGの解析に必要となる\(O_2^0\)から\(O_6^6\)まで）の完全な数式と定義を網羅的に解説する. さらに, Stevens演算子を用いた結晶場ハミルトニアンの構築方法を記述する. 
 
-電磁気学において, 磁場を表す物理量には磁束密度\(\vb*{B}\)と磁場の強さ\(\vb*{H}\)の二種類が存在する. これらは真空中では\(\vb*{B} = \mu_0 \vb*{H}\)という単純な比例関係にあるが, GGGのような磁性体内では, その定義と物理的役割に本質的な差異が生じる. \ref{sec:theory_permeability}節でも述べたように, 転送行列法による光学特性の計算においては, どちらの形式を採用するかによって透磁率や境界条件の定義が異なるため, 明確な区別が必要である.
-本付録では, 一般の物質中における電磁波の分散関係を導出し, その過程で\(\vb*{B}\)形式と\(\vb*{H}\)形式の違いがどのように分散関係に影響を与えるかを明らかにする. これにより, Zeemanポラリトンの分散関係が両形式でどのように異なるかを理解し, SRPT発現可能性の違いを理論的に裏付ける基礎を提供する.
+\section{等価演算子法}
+孤立したイオンが結晶格子内に配置された際, 周囲の配位子が形成する静電ポテンシャルは, イオンの電子状態, 特に\(4f\)電子や\(3d\)電子のエネルギー準位を分裂させる. この現象を定量的に記述するために, K.W.H. Stevensによって導入され, M.T. Hutchingsによって体系化された「演算子等価法」は, 現代磁性物理学の礎石となっている\(^{\cite{Hutchings1964}}\).
+Stevens演算子（\(O_k^q\)）は, 複雑な空間積分を要する静電ポテンシャルの計算を, 角運動量演算子 \(\vb*{J}\) の代数的な操作へと還元することを可能にした. この形式化により, 結晶の点群対称性をハミルトニアンに直接反映させることが容易となり, 実験データ（磁化率, 比熱, 電子スピン共鳴など）との比較が可能な理論モデルの構築が飛躍的に効率化された. 特に, GGGのような幾何学的フラストレーションを持つ系や, 近年の量子光学におけるZeemanポラリトンの形成といった先端的研究において, 高次のStevens演算子を含むハミルトニアンの正確な記述は極めて重要である\(^{\cite{Zeeman}}\).
 
-\section{一般の物質中における電磁波の分散関係の導出}
-\subsection{マクスウェル方程式と構成方程式}
-電荷密度 \(\rho = 0\) および電流密度 \(\vb*{J} = \vb*{0}\) の一般の物質中におけるMaxwell方程式は以下の通りである. 
-\begin{align}
-    \nabla \cdot \vb*{D} &= 0 \\
-    \nabla \cdot \vb*{B} &= 0 \\
-    \nabla \times \vb*{E} &= -\frac{\partial \vb*{B}}{\partial t} \label{eq:Faraday} \\
-    \nabla \times \vb*{H} &= \frac{\partial \vb*{D}}{\partial t} \label{eq:Ampere}
-\end{align}
-ここで, 線形応答を示す等方的な物質を仮定し, 周波数領域における構成方程式を導入する. 
-電束密度 \(\vb*{D}\) および磁束密度 \(\vb*{B}\) は, それぞれ電場 \(\vb*{E}\) および磁場 \(\vb*{H}\) と以下の関係にある. 
-\begin{align}
-    \vb*{D} &= \epsilon_0 \epsilon_r(\omega) \vb*{E} \\
-    \vb*{B} &= \mu_0 \mu_r(\omega) \vb*{H}
-\end{align}
-\(\epsilon_0, \mu_0\) は真空の誘電率と透磁率であり, \(\epsilon_r(\omega), \mu_r(\omega)\) はそれぞれ物質の比誘電率と比透磁率である. 
+\subsection{理論的背景}
+結晶場理論の核心は, 結晶内の磁性イオンが感じる静電ポテンシャル \(V(\vb*{r})\) を, イオンの全角運動量 \(J\) の関数として表現することにある. 一般に, ポテンシャル \(V(x, y, z)\) はラプラス方程式 \(\nabla^2 V = 0\) を満たすため, 球面調和関数 \(Y_k^q(\theta, \phi)\) を用いて展開可能である.
 
-\subsection{波動方程式の導出}
-式(\ref{eq:Faraday})の両辺の回転をとる. 
 \begin{equation}
-    \nabla \times (\nabla \times \vb*{E}) = -\frac{\partial}{\partial t} (\nabla \times \vb*{B})
-\end{equation}
-左辺に対し, ベクトル解析の恒等式 \(\nabla \times (\nabla \times \vb*{A}) = \nabla(\nabla \cdot \vb*{A}) - \nabla^2 \vb*{A}\) を適用する. 均質な媒質中では \(\nabla \cdot \vb*{E} = 0\) となるため, 左辺は \(-\nabla^2 \vb*{E}\) となる. 
-右辺に対し, \(\vb*{B} = \mu_0 \mu_r \vb*{H}\) および式(\ref{eq:Ampere})を代入する. 
-\begin{align}
-    -\nabla^2 \vb*{E} &= -\mu_0 \mu_r \frac{\partial}{\partial t} (\nabla \times \vb*{H}) \nonumber \\
-    &= -\mu_0 \mu_r \frac{\partial}{\partial t} \left( \epsilon_0 \epsilon_r \frac{\partial \vb*{E}}{\partial t} \right) \nonumber \\
-    &= -\epsilon_0 \mu_0 \epsilon_r \mu_r \frac{\partial^2 \vb*{E}}{\partial t^2}
-\end{align}
-真空中の光速 \(c = 1/\sqrt{\epsilon_0 \mu_0}\) を用いて整理すると, 以下の波動方程式が得られる. 
-\begin{equation}
-    \left( \nabla^2 - \frac{\epsilon_r \mu_r}{c^2} \frac{\partial^2}{\partial t^2} \right) \vb*{E}(\vb*{r}, t) = 0
+V(r, \theta, \phi) = \sum_{k=0}^{\infty} \sum_{q=-k}^{k} A_k^q r^k Y_k^q(\theta, \phi)
 \end{equation}
 
-\subsection{平面波解と分散関係}
-単色平面波解 \(\vb*{E}(\vb*{r}, t) = \vb*{E}_0 e^{i(\vb*{k} \cdot \vb*{r} - \omega t)}\) を仮定し, 波動方程式に代入する. 
-空間微分 \(\nabla \to i\vb*{k}\), 時間微分 \(\partial/\partial t \to -i\omega\) の置き換えにより, 
-\begin{equation}
-    -k^2 \vb*{E}_0 + \frac{\epsilon_r \mu_r}{c^2} \omega^2 \vb*{E}_0 = 0
-\end{equation}
-非自明な解（\(\vb*{E}_0 \neq \vb*{0}\)）が存在するための条件として, 以下の分散関係式が得られる. 
-\begin{equation}
-    k^2 = \epsilon_r(\omega) \mu_r(\omega) \frac{\omega^2}{c^2}
-\end{equation}
-あるいは, 屈折率 \(n(\omega) = \sqrt{\epsilon_r(\omega) \mu_r(\omega)}\) を用いて, 
-\begin{equation}
-    \frac{ck}{\omega} = \sqrt{\epsilon_r(\omega) \mu_r(\omega)}
-    \label{eq:dispersion_general}
-\end{equation}
-と表される. この式(\ref{eq:dispersion_general})が, 一般の物質中における光子（ポラリトン）の分散関係の基礎式である. 
-本研究で扱うZeemanポラリトンの場合, \(\mu_r(\omega)\) の定義（B形式またはH形式）によって右辺の周波数依存性が変化し, 分散曲線の形状に図\ref{fig:dispersion_relation}のように決定的な影響を与える. 
+ここで, \(A_k^q\) は周囲の電荷分布によって決まる係数である. しかし, 量子力学的な期待値を計算する際, 波動関数を含む積分を直接行うことは非常に煩雑である. Stevensは, 特定の角運動量多重項（\(J\) または \(L\) が一定の空間）内において, デカルト座標 \((x, y, z)\) の多項式\(f(x,y,z)\)と, 角運動量演算子 \((J_x, J_y, J_z)\) の間に一対一の対応関係（等価性）が存在することを見出した. これはWigner-Eckartの定理に基づいている\(^{\cite{Hutchings1964}}\).
 
-\begin{figure}
-    \centering
-    \includegraphics[width=1.0\textwidth]{figures/dispersion_relation.png}
-    \caption{一般の物質中における光子（ポラリトン）の分散関係. 比誘電率 \(\epsilon_r(\omega)\) および比透磁率 \(\mu_r(\omega)\) の周波数依存性により, 分散曲線の形状が決定される. Zeemanポラリトンの場合, \(\mu_r(\omega)\) の定義（B形式またはH形式）によって分散関係が変化する. ただし, \(\omega_0\)は\(\omega_{\text{cav}}=\omega_{\text{EPR}}\)を満たす共鳴周波数}
-    \label{fig:dispersion_relation}
-\end{figure}
+等価性は以下のように記述される.
+
+\begin{equation}
+\sum_{i} f(x_i, y_i, z_i) \equiv \theta_k \langle r^k \rangle O_k^q(\vb*{J})
+\end{equation}
+
+ここで, 左辺は電子座標の関数, 右辺は等価な角運動量演算子である. \(\theta_k\) は「Stevens因子」と呼ばれ, 電子配置（例：\(4f^7\)）と軌道角運動量 \(L\) に依存する定数であり, 通常 \(k=2, 4, 6\) に対してそれぞれ \(\alpha_J, \beta_J, \gamma_J\) と表記される\(^{\cite{Hutchings1964}}\). \(\langle r^k \rangle\) は\(4f\)電子の動径波動関数に対する \(r^k\) の期待値である.
+
+\subsection{Hutchingsによる標準化とテッセラル調和関数}
+1964年, M.T. Hutchingsは「Solid State Physics」誌において, Stevens演算子の定義を標準化し, その行列要素を表にまとめた\(^{\cite{Hutchings1964}}\). Hutchingsの形式では, 複素数を含む球面調和関数ではなく, 実数関数であるテッセラル調和関数（または実球面調和関数）\(Z_{kq}\) に対応するように演算子が定義されている.
+
+結晶場ハミルトニアンは一般に以下のように書かれる.
+
+\begin{equation}
+\mathcal{H}_{CF} = \sum_{k, q} B_k^q O_k^q
+\end{equation}
+
+ここで, 結晶場パラメータ \(B_k^q\) は \(A_k^q \langle r^k \rangle \theta_k\) を含んだ物理量として扱われる. この形式は, 実験家がスペクトルデータからパラメータを決定する際の標準的な記述となっている.
+
+重要な点は, 演算子の順序交換である. 量子力学において \(J_x, J_y, J_z\) は可換ではない（\([J_x, J_y] = i\hbar J_z\)）ため, 座標の多項式（例：\(x^2 y^2\)）を演算子に変換する際には, 可能なすべての順序の平均を取る「対称化」が必要となる. Hutchingsの定義する \(O_k^q\) は, この対称化が既に適用された形になっている.
+
+\section{Stevens演算子の詳細定義と明示的公式}
+本節では, Hutchings (1964) の定義に従い, GGGの解析に用いられる主要なStevens演算子の明示的な数式を提示する. これらは, 角運動量演算子 \(J_z\) および昇降演算子 \(J_\pm = J_x \pm iJ_y\) を用いて記述される. また, 表記の簡略化のために \(X \equiv J(J+1)\) を用いる.
+
+\subsection{2次の演算子（\(k=2\)）}
+2次の項は, 結晶場の最も主要な異方性を記述する. これらはスピンハミルトニアンにおける \(D\) 項（軸性異方性）および \(E\) 項（面内異方性）に対応する.
+
+\subsubsection*{\(O_2^0\):}
+この演算子は, ルジャンドル多項式の \(3z^2 - r^2\) 成分に対応する. 最も基本的かつ強力な結晶場項であり, 主軸（z軸）方向の異方性を支配する.
+\begin{equation}
+O_2^0 = 3J_z^2 - X
+\end{equation}
+
+\subsubsection*{\(O_2^2\):}
+この演算子は, テッセラル調和関数の \((x^2 - y^2)\) 成分, すなわち \(r^2 \sin^2\theta \cos 2\phi\) に対応する. xy面内での対称性の破れ（斜方晶歪みなど）を表す.
+\begin{equation}
+O_2^2 = \frac{1}{2} (J_+^2 + J_-^2)
+\end{equation}
+ここで, 係数 \(\frac{1}{2}\) は正規化のために導入されている. \(J_+^2\) と \(J_-^2\) の和をとることで, 実数の演算子となっていることがわかる.
+
+\subsection{4次の演算子（ \(k=4\)）}
+4次の項は, 立方対称性を持つ結晶場において支配的な役割を果たす.
+
+\subsubsection*{\(O_4^0\):}
+ルジャンドル多項式の \(35z^4 - 30r^2z^2 + 3r^4\) に対応する.
+\begin{equation}
+O_4^0 = 35J_z^4 - 30XJ_z^2 + 25J_z^2 - 6X + 3X^2
+\end{equation}
+この式は, 4次の演算子の中で対角成分のみを持つ唯一の項である.
+
+\subsubsection*{\(O_4^2\):}
+この項は \((7z^2 - r^2)(x^2 - y^2)\) の対称化に対応する.
+\begin{equation}
+O_4^2 = \frac{1}{4} \left[ (7J_z^2 - X - 5)(J_+^2 + J_-^2) + (J_+^2 + J_-^2)(7J_z^2 - X - 5) \right]
+\end{equation}
+数値計算においては上記のような対称化形式をそのまま実装することが誤りを防ぐ上で推奨される.
+
+\subsubsection*{\(O_4^4\):}
+立方対称場において \(O_4^0\) と共に現れる重要な項で, \((x^4 + y^4 - 6x^2y^2)\) の成分に関連する.
+\begin{equation}
+O_4^4 = \frac{1}{2} (J_+^4 + J_-^4)
+\end{equation}
+立方対称（\(O_h\)）の結晶場ポテンシャルは, しばしば \(B_4 (O_4^0 + 5O_4^4)\) という特定の線形結合で表される.
+\subsection{6次の演算子（\(k=6\)）}
+6次の項は, \(f\)電子系（ランタノイド, アクチノイド）において初めて現れる高次の多重極相互作用である.
+
+\subsubsection*{\(O_6^0\):}
+\begin{equation}
+\begin{split}
+O_6^0 = 231J_z^6 - 315XJ_z^4 + 735J_z^4 + 105X^2J_z^2 \\
+- 525XJ_z^2 + 294J_z^2 - 5X^3 + 40X^2 - 60X
+\end{split}
+\end{equation}
+非常に高次の \(J_z\) のべき乗を含んでおり, 計算においては数値的なオーバーフローや精度落ちに注意が必要である.
+
+\subsubsection*{\(O_6^2\):}
+\begin{equation}
+O_6^2 = \frac{1}{4} \left[ (33J_z^4 - 18XJ_z^2 - 123J_z^2 + X^2 + 10X + 102)(J_+^2 + J_-^2) + \text{h.c.} \right]
+\end{equation}
+ここで "h.c." はエルミート共役を意味する.
+
+\subsubsection*{\(O_6^4\):}
+\begin{equation}
+O_6^4 = \frac{1}{4} \left[ (11J_z^2 - X - 38)(J_+^4 + J_-^4) + (J_+^4 + J_-^4)(11J_z^2 - X - 38) \right]
+\end{equation}
+
+\subsubsection*{\(O_6^6\):}
+六方晶系において重要となる項である.
+\begin{equation}
+O_6^6 = \frac{1}{2} (J_+^6 + J_-^6)
+\end{equation}
+
+\section{結晶場理論とStevens演算子}
+\label{sec:CF_Stevens}
+GGGは立方晶系（空間群\(Ia\bar{3}d\)）に属するが, 磁性を担う\(\text{Gd}^{3+}\)イオン（\(4f^7, ^8S_{7/2}\)）が占有する\(24c\)サイトは, 局所的には低い対称性（\(D_{2}\)点群）を有している. この局所的な結晶場の異方性は, スピン軌道相互作用を通じて基底状態の縮退を解き, 微細構造を形成する上で決定的な役割を果たす. 
+\(\text{Gd}^{3+}\)イオンは半閉殻構造を持つS状態イオン（\(L=0\)）であり, 第一近似としては結晶場の影響を受けにくいとされる. しかし, 高次の摂動効果により, 基底多重項\(^8S_{7/2}\)はゼロ磁場下でもわずかに分裂する. \(D_{2}\)対称性を持つ結晶場ハミルトニアン\(\mathcal{H}_{\text{CF}}\)は, 以下の形式で記述される\(^{\cite{White2007}}\).
+
+\begin{equation}
+\mathcal{H}_{\text{CF}} = \sum_{k=2,4,6} \sum_{q=0,2,4,6} B_k^q O_k^q
+\end{equation}
+
+ここで, \(B_k^q\)は結晶場パラメータであり, \(O_k^q\)はStevens演算子である. 
+\(Gd^{3+}\) (\(S=7/2\)) の場合, 以下の物理的制約により項の数が絞り込まれる：
+\begin{itemize}
+    \item パリティ: 4f軌道内（同一パリティ）の行列要素であるため, 偶数のランク \(k\) のみが残る. 
+    \item スピンの大きさ: 演算子 \(O_k^q\) の行列要素が非ゼロであるためには, \(k \le 2S\) でなければならない. \(2S = 7\) であるため, \(k = 2, 4, 6\) の項が許容される. 
+    \item 対称性 (\(D_2\)): 点群 \(D_2\) の対称操作（3つの主軸周りの \(C_2\) 回転）に対し不変であるためには, 射影成分 \(q\) は偶数でなければならない (\(q = 0, 2, 4, 6\)). 
+\end{itemize}
+これらの要請により, 以下の9つの項が主要な寄与を持つ. 
+
+\begin{equation}
+    \begin{aligned} 
+        \mathcal{H}_{\text{CF}} &= B_2^0 O_2^0 + B_2^2 O_2^2 \\ 
+                                 &+ B_4^0 O_4^0 + B_4^2 O_4^2 + B_4^4 O_4^4 \\ 
+                                 &+ B_6^0 O_6^0 + B_6^2 O_6^2 + B_6^4 O_6^4 + B_6^6 O_6^6 
+    \end{aligned}
+\end{equation}
+
+山田の先行研究では, 近似的に
+\[
+\hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
+\]
+という立方体対称成分(\(k=4\))と六方晶成分(\(k=6\))のみを考慮した簡略化モデルが提案されている\(^{\cite{Yamada2024}}\). 
+これらの演算子によって, \(\Delta m \neq 1\)の禁制遷移を許容し, ハミルトニアンの固有状態 \(|\psi_n\rangle\) を純粋な \(|m\rangle\) 状態（Zeeman準位）ではなく, それらの線形結合（混成状態）とする. 
+このハミルトニアンで用いられたStevens演算子の行列表示は以下の通りである. 
+\begin{align*}
+O_4^0 &= 60 \times
+\begin{pmatrix}
+7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -13 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -3 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 9 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 9 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -3 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -13 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 7
+\end{pmatrix} \\[10pt]
+O_4^4 &= 12 \times
+\begin{pmatrix}
+0 & 0 & 0 & 0 & \sqrt{35} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 5\sqrt{3} & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 5\sqrt{3} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \sqrt{35} \\
+\sqrt{35} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 5\sqrt{3} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 5\sqrt{3} & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & \sqrt{35} & 0 & 0 & 0 & 0
+\end{pmatrix} \\[10pt]
+O_6^0 &= 1260 \times
+\begin{pmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -5 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 9 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -5 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -5 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 9 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -5 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{pmatrix} \\[10pt]
+O_6^4 &= 60 \times
+\begin{pmatrix}
+0 & 0 & 0 & 0 & 3\sqrt{35} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -7\sqrt{3} & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -7\sqrt{3} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 3\sqrt{35} \\
+3\sqrt{35} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -7\sqrt{3} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -7\sqrt{3} & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 3\sqrt{35} & 0 & 0 & 0 & 0
+\end{pmatrix}
+\end{align*}

@@ -28,6 +28,12 @@
 \titleformat*{\section}{\gtfamily\bfseries\large}
 \titleformat*{\subsection}{\gtfamily\bfseries\normalsize}
 \usepackage{bm}
+
+% --- その他便利パッケージ ---
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{geometry}
 \usepackage{tikz}
 \usetikzlibrary{arrows,arrows.meta, decorations.pathreplacing, calc, bending, shapes.geometric, positioning, fit, backgrounds}
@@ -56,21 +62,22 @@
 \include{chapters/introduction}
 \include{chapters/theory}
 \include{chapters/method}
+\include{chapters/thesis_chapter_v6_analysis}
+\include{chapters/analysis_results_chapter}
 \include{chapters/results}
 \include{chapters/conclusion}
 \include{chapters/acknowledgments}
-% \include{chapters/thesis_chapter_bayes}
-% \include{chapters/thesis_chapter_v6_analysis}
 
 \appendix
 \include{chapters/appendix_A}
 \include{chapters/appendix_B}
+\include{chapters/appendix_C}
 \include{chapters/appendix_D}
 \include{chapters/appendix_E}
-\include{chapters/appendix_C}
 \include{chapters/appendix_F}
 \include{chapters/appendix_G}
 \include{chapters/appendix_circular}
+\include{chapters/appendix_coding}
 
 \nocite{*}
 \bibliographystyle{naturemag} % 参考文献のスタイルを指定
