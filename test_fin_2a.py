@@ -795,6 +795,183 @@ def compare_models_loo(eval_H, eval_B):
 
 
 # ============================================================================
+# ベイズファクター計算（SMC対応）
+# ============================================================================
+def compute_bayes_factor_smc(trace_H, trace_B):
+    """
+    SMCサンプリング結果からベイズファクターを推定
+    
+    SMCサンプラーは周辺尤度（marginal likelihood）の推定値を
+    sample_stats.log_marginal_likelihoodとして保存します。
+    
+    ベイズファクター: BF_{H/B} = P(D|M_H) / P(D|M_B)
+    対数ベイズファクター: log(BF) = log(P(D|M_H)) - log(P(D|M_B))
+    
+    Jeffreys (1961) の解釈基準:
+    |log₁₀(BF)|  |ln(BF)|   強さ
+    0 - 0.5      0 - 1.15   ほぼ証拠なし
+    0.5 - 1      1.15 - 2.3 弱い証拠
+    1 - 2        2.3 - 4.6  中程度の証拠
+    > 2          > 4.6      強い証拠
+    
+    Returns:
+        dict: ベイズファクター関連の統計量
+    """
+    print(f"\n{'='*80}")
+    print("ベイズファクター計算（SMC周辺尤度ベース）")
+    print(f"{'='*80}")
+    
+    result = {}
+    
+    try:
+        # SMCのsample_statsから周辺尤度を取得
+        has_lml_H = hasattr(trace_H, 'sample_stats') and 'log_marginal_likelihood' in trace_H.sample_stats
+        has_lml_B = hasattr(trace_B, 'sample_stats') and 'log_marginal_likelihood' in trace_B.sample_stats
+        
+        if not has_lml_H or not has_lml_B:
+            print("  ⚠️ SMC周辺尤度が保存されていません")
+            print("     PyMC >= 5.0 の sample_smc() で計算されます")
+            
+            # 代替: WAIC差分からの近似BF（Bridge Samplingの代替）
+            print("\n  → WAICベースの近似ベイズファクターを計算...")
+            return _compute_approximate_bf_from_waic(trace_H, trace_B)
+        
+        # 周辺尤度の取得（全チェーンの平均）
+        lml_H = float(trace_H.sample_stats['log_marginal_likelihood'].values.mean())
+        lml_B = float(trace_B.sample_stats['log_marginal_likelihood'].values.mean())
+        
+        # チェーン間の標準偏差（不確実性推定）
+        lml_H_std = float(trace_H.sample_stats['log_marginal_likelihood'].values.std())
+        lml_B_std = float(trace_B.sample_stats['log_marginal_likelihood'].values.std())
+        
+        # 対数ベイズファクター（H形式 vs B形式）
+        log_BF = lml_H - lml_B
+        log_BF_se = np.sqrt(lml_H_std**2 + lml_B_std**2)
+        
+        # log10スケールへの変換
+        log10_BF = log_BF / np.log(10)
+        
+        print(f"\n📊 周辺尤度 (log scale):")
+        print(f"  H形式: {lml_H:.2f} ± {lml_H_std:.2f}")
+        print(f"  B形式: {lml_B:.2f} ± {lml_B_std:.2f}")
+        print(f"\n📊 ベイズファクター:")
+        print(f"  log(BF_{{H/B}}): {log_BF:.2f} ± {log_BF_se:.2f}")
+        print(f"  log₁₀(BF_{{H/B}}): {log10_BF:.2f}")
+        
+        # Jeffreysの解釈基準
+        abs_log_BF = abs(log_BF)
+        if abs_log_BF < 1.15:  # |log10| < 0.5
+            strength = "ほぼ証拠なし (Barely worth mentioning)"
+        elif abs_log_BF < 2.3:  # |log10| < 1
+            strength = "弱い証拠 (Substantial)"
+        elif abs_log_BF < 4.6:  # |log10| < 2
+            strength = "中程度の証拠 (Strong)"
+        else:
+            strength = "強い証拠 (Decisive)"
+        
+        if log_BF > 0:
+            winner = "H-form"
+            favor = "H形式を支持"
+        elif log_BF < 0:
+            winner = "B-form"
+            favor = "B形式を支持"
+        else:
+            winner = "引き分け"
+            favor = "どちらも同等"
+        
+        print(f"\n📊 Jeffreys (1961) 解釈:")
+        print(f"  {favor}: {strength}")
+        print(f"\n  🏆 推奨モデル: {winner}")
+        
+        result = {
+            'log_marginal_likelihood_H': lml_H,
+            'log_marginal_likelihood_B': lml_B,
+            'log_marginal_likelihood_H_std': lml_H_std,
+            'log_marginal_likelihood_B_std': lml_B_std,
+            'log_BF': log_BF,
+            'log_BF_se': log_BF_se,
+            'log10_BF': log10_BF,
+            'interpretation': strength,
+            'winner': winner,
+            'method': 'SMC marginal likelihood'
+        }
+        
+    except Exception as e:
+        print(f"❌ ベイズファクター計算エラー: {e}")
+        import traceback
+        traceback.print_exc()
+        result = {'error': str(e), 'winner': 'N/A'}
+    
+    return result
+
+
+def _compute_approximate_bf_from_waic(trace_H, trace_B):
+    """
+    WAICベースの近似ベイズファクター計算
+    
+    WAIC（広く適用可能な情報量規準）からELPDを用いて
+    ベイズファクターを近似する方法。
+    
+    注意: これは厳密なベイズファクターではなく、
+    予測性能に基づく近似値です。
+    """
+    result = {'method': 'WAIC approximation (fallback)'}
+    
+    try:
+        # WAIC計算
+        if 'log_likelihood' not in trace_H or 'log_likelihood' not in trace_B:
+            print("  ⚠️ log_likelihoodが保存されていないため計算不可")
+            result['error'] = 'log_likelihood not available'
+            result['winner'] = 'N/A'
+            return result
+        
+        waic_H = az.waic(trace_H)
+        waic_B = az.waic(trace_B)
+        
+        # ELPD差分からの近似log(BF)
+        # ELPD ≈ log(predictive performance) なので
+        # ΔELPD ≈ log(BF) の近似として使用
+        elpd_diff = waic_H.elpd_waic - waic_B.elpd_waic
+        se_diff = np.sqrt(waic_H.se**2 + waic_B.se**2)
+        
+        print(f"\n📊 WAIC近似ベイズファクター:")
+        print(f"  ELPD H形式: {waic_H.elpd_waic:.2f} ± {waic_H.se:.2f}")
+        print(f"  ELPD B形式: {waic_B.elpd_waic:.2f} ± {waic_B.se:.2f}")
+        print(f"  ΔELPD (≈log BF): {elpd_diff:.2f} ± {se_diff:.2f}")
+        
+        # 有意性判定
+        if abs(elpd_diff) < 2 * se_diff:
+            winner = "引き分け"
+            interpretation = "有意な差なし"
+        elif elpd_diff > 0:
+            winner = "H-form"
+            interpretation = "H形式が優れた予測性能"
+        else:
+            winner = "B-form"
+            interpretation = "B形式が優れた予測性能"
+        
+        print(f"\n  {interpretation}")
+        print(f"  🏆 推奨モデル: {winner}")
+        
+        result.update({
+            'elpd_H': float(waic_H.elpd_waic),
+            'elpd_B': float(waic_B.elpd_waic),
+            'elpd_diff': float(elpd_diff),
+            'se_diff': float(se_diff),
+            'log_BF': float(elpd_diff),  # 近似値として
+            'interpretation': interpretation,
+            'winner': winner
+        })
+        
+    except Exception as e:
+        print(f"  ⚠️ WAIC近似計算エラー: {e}")
+        result['error'] = str(e)
+        result['winner'] = 'N/A'
+    
+    return result
+
+
+# ============================================================================
 # プロット関数（既存のものを流用、calculate_transmission_for_paramsのみ追加）
 # ============================================================================
 def calculate_transmission_for_params(freq, B, T, g, a, B4, B6, eps, gamma_array, model_form='H'):
@@ -2093,6 +2270,11 @@ def main():
         comparison_result = compare_models_loo(loo_H, loo_B)
     
     # ============================================================================
+    # ベイズファクター計算
+    # ============================================================================
+    bf_result = compute_bayes_factor_smc(trace_H, trace_B)
+    
+    # ============================================================================
     # 可視化（修士論文用）
     # ============================================================================
     print(f"\n{'='*80}")
@@ -2190,12 +2372,13 @@ def main():
     params_B_df.to_csv(results_dir / 'parameters_B.csv', index=False)
     print("  ✓ parameters_B.csv")
     
-    # モデル評価結果保存（v7: SMC対応）
+    # モデル評価結果保存（v7: SMC対応 + BF追加）
     if loo_H is not None and loo_B is not None:
         eval_results = {
             'H_form': loo_H,  # compute_model_evaluationの結果
             'B_form': loo_B,
-            'comparison': comparison_result if comparison_result else {},
+            'comparison_waic': comparison_result if comparison_result else {},
+            'comparison_bayes_factor': bf_result if bf_result else {},
             'timestamp': timestamp,
             'sampler': SAMPLER_TYPE,
             'likelihood': LIKELIHOOD_TYPE,
@@ -2219,7 +2402,9 @@ def main():
     print(f"  尤度: {LIKELIHOOD_TYPE} (ν={NU_STUDENTT})")
     print(f"  階層γモデル: {'ON' if USE_HIERARCHICAL_GAMMA else 'OFF'}")
     if comparison_result is not None:
-        print(f"  推奨モデル: {comparison_result.get('winner', 'N/A')}")
+        print(f"  推奨モデル (WAIC): {comparison_result.get('winner', 'N/A')}")
+    if bf_result is not None:
+        print(f"  推奨モデル (BayesFactor): {bf_result.get('winner', 'N/A')} (logBF={bf_result.get('log_BF', 0):.2f})")
     print(f"{'='*80}\n")
 
 
