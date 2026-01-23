@@ -29,7 +29,6 @@
 まず, Kritzellらの実験データ\(^{\cite{Kritzell2024}}\)に対して重み付き非線形最小二乗法を適用し, HモデルとBモデル, それぞれのモデルのパラメータをフィッティングした. このフィッティングパラメータに基づき, 各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出した結果を以下に示す.
 
 \subsection{最適化パラメータと評価指標の比較}
-\subsection{最適化パラメータと評価指標の比較}
 \label{subsec:wnlls_parameters}
 表\ref{tab:parameters_results_wnlls}に, 重み付き非線形最小二乗法に基づくHモデルおよびBモデルの最適化パラメータと評価指標を示す.
 \begin{table}[htbp]
@@ -99,7 +98,6 @@
 \begin{tabular}{lccccc}
 \hline
 \textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & \(R^2\) & \( |\chi^{+}|_{\rm max} \)\\
-\textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & \(R^2\) & \( |\chi^{+}|_{\rm max} \)\\
 \hline
 \multicolumn{3}{@{}l@{}}{\text{温度変化(9.0T)}} \\
 4K & 0.117 & 0.224 & 0.721 & 1.10\\
@@ -125,7 +123,6 @@
 \begin{tabular}{lccccc}
 \hline
 \textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & \(R^2\) & \( |\chi^{+}|_{\rm max} \) & 不安定\% \\
-\textbf{ラベル} & \textbf{RMSE} & \textbf{Max Error} & \(R^2\) & \( |\chi^{+}|_{\rm max} \) & 不安定\% \\
 \hline
 4K & 0.112 & 0.257 & 0.744 & 1.17 & 4.6 \\
 10K & 0.105 & 0.246 & 0.776 & 0.82 & 0.0 \\
@@ -146,7 +143,6 @@
 \textbf{HモデルとBモデルの比較}\\
 \begin{itemize}
     \item \textbf{全体的な傾向}：Bモデルの方がやや低いRMSE\footnote{\(\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}\)で定義される. 予測値と実測値の「平均的な誤差」を示す指標である.}を示す（平均RMSE: Hモデル0.124, Bモデル0.120）
-    \item \textbf{最終コスト}\footnote{式\ref{eq:objective_function}で計算される目的関数である.}：Bモデル（139,482）がHモデル（147,482）より5.4\%低い
     \item \textbf{最終コスト}\footnote{式\ref{eq:objective_function}で計算される目的関数である.}：Bモデル（139,482）がHモデル（147,482）より5.4\%低い
     \item \textbf{決定係数\(R^2\)}\footnote{\(R^2 = 1 - (\text{残差平方和}) / (\text{全平方和})\)で定義される.観測データの分散がモデルによってどれだけ説明されるかを示す指標である.\(R^2=1\)はモデルによるデータの完全再現を意味する.}：温度依存データでは両モデルとも\(R^2 > 0.65\)を達成
     \item \textbf{低磁場領域}：4.2T--5.0Tでは両モデルとも\(R^2 \approx 0.5\)と低く，
