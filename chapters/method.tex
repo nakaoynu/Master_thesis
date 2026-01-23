@@ -317,7 +317,7 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
 \subsubsection{事前分布の設定}
 \label{subsec:priors}
 
-各パラメータの事前分布は物理的制約に基づいて設定した．表\ref{tab:priors}に一覧を示す．ただし，表\ref{tab:scaling}と同様のスケーリング係数を適用し, 最適化空間で同程度の変動幅を持つようにした．
+各パラメータの事前分布は物理的制約に基づいて設定した．表\ref{tab:priors}に一覧を示す．ただし，表\ref{tab:scaling}と同様のスケーリング係数を適用し, 最適化空間で同程度の変動幅を持つようにした．また, HモデルとBモデルの事前分布図をそれぞれ図\ref{fig:prior_H}，図\ref{fig:prior_B}にプロットする. 
 
 \begin{table}[h]
     \centering
@@ -345,6 +345,20 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
         \bottomrule
     \end{tabular}
 \end{table}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/prior_distributions_H.png}
+    \caption{H形式モデルの事前分布}
+    \label{fig:prior_H}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/prior_distributions_B.png}
+    \caption{B形式モデルの事前分布}
+    \label{fig:prior_B}
+\end{figure}
 
 \subsection{プログラムの全体フロー}
 図\ref{fig:flowchart_bayesian}にて, ベイズ推定を行うプログラムコードの全体フローチャートを示す. 

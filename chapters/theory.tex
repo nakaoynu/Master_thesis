@@ -18,12 +18,14 @@
 詳細は付録\ref{chap:CF_theory}にて記載する. 
 \begin{equation}
 \hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
+\label{eq:H_CF}
 \end{equation}
 式\ref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部磁場\(\hat{\vb*{B}}_{\text{ext}}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
 \begin{equation}
-\hat{\mathcal{H}}_{\text{Zeeman}} = g \mu_{B} \hat{\vb*{S}} \cdot \hat{\vb*{B}}_{\text{ext}}
+\hat{\mathcal{H}}_{\text{Zeeman}} = g_{J} \mu_{B} \hat{\vb*{S}} \cdot \hat{\vb*{B}}_{\text{ext}}
+\label{eq:H_Zeeman}
 \end{equation}
-% ここで, \(g\)はg因子, \(\mu_{B}\)はボーア磁子である. \\ 前述しているため省略可能
+% ここで, \(g_{J}\)はg因子, \(\mu_{B}\)はボーア磁子である. \\ 前述しているため省略可能
 式\ref{H_total}の第3項\(\hat{\mathcal{H}}_{H,B}^{'}\)は, 式\ref{def:H_B}, 式\ref{def:H_H}で定義した\(\text{Gd}^{3+}\)イオンの磁気モーメントと振動磁場とのZeeman相互作用を表す摂動項である. 
 
 \section{線形応答理論に基づく磁気感受率の導出}
@@ -72,6 +74,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 この関係を用いると, H形式における比透磁率\(\mu_{r}^{(H)}\)は次式で与えられる.
 \begin{equation}    
 \mu_{r}^{(H)} = 1 + \chi = 1 + \chi^{+}
+\label{eq:mu_rH}
 \end{equation}
 一般に, 磁場\(\vb*{H}\)と磁束密度\(\vb*{B}\), 磁化\(\vb*{M}\)の関係は, 真空の透磁率\(\mu_{0}\)を用いて次式のように表される.
 \begin{equation}
@@ -91,6 +94,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 よって, B形式の比透磁率\(\mu_{r}^{(B)}\)は次式で与えられる．
 \begin{equation}
 \mu_{r}^{(B)} = 1 + \chi = \frac{1}{1 - \chi^{+}}
+\label{eq:mu_rB}
 \end{equation}
 
 \section{転送行列法による透過スペクトルの計算方法}
