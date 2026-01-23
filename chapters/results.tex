@@ -86,9 +86,7 @@
 56遷移すべてを考慮したモデルの\(10^{16}\)から約10桁改善された. 
 
 \subsection{フィッティング品質の統計解析}
-\subsection{フィッティング品質の統計解析}
 \label{subsec:wnlls_statistical_analysis}
-\textbf{データセット別の統計量}\\
 \textbf{データセット別の統計量}\\
 
 表\ref{tab:fit_stats_H}および表\ref{tab:fit_stats_B}に
@@ -146,7 +144,6 @@
 \clearpage
 
 \textbf{HモデルとBモデルの比較}\\
-\textbf{HモデルとBモデルの比較}\\
 \begin{itemize}
     \item \textbf{全体的な傾向}：Bモデルの方がやや低いRMSE\footnote{\(\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}\)で定義される. 予測値と実測値の「平均的な誤差」を示す指標である.}を示す（平均RMSE: Hモデル0.124, Bモデル0.120）
     \item \textbf{最終コスト}\footnote{式\ref{eq:objective_function}で計算される目的関数である.}：Bモデル（139,482）がHモデル（147,482）より5.4\%低い
@@ -165,8 +162,6 @@ Bモデルでは\( |\chi^{+}| > 1 \)となる周波数点が一部存在し，
 
 \subsection{物理的解釈}
 \textbf{エネルギー固有値}\\
-\subsection{物理的解釈}
-\textbf{エネルギー固有値}\\
 \label{subsec:E_P_wnlls}
 磁気感受率\(\chi^{+} (\omega)\)の計算で用した各準位 \(k\)のエネルギー固有値 \(E_0^{k}\)を図\ref{fig:wnls_E_P_HB}に示す. \\
 各準位間の分裂幅が等間隔であることは，式\eqref{eq:H_Zeeman}で定義されるZeeman分裂の効果が支配的であり，式\eqref{eq:H_CF}による結晶場ハミルトニアンの寄与が相対的に小さいことを示唆する．実際に，フィッティング結果の図\ref{fig:wnls_E_P_HB}を見ると，Hモデル・Bモデルともに各準位のエネルギー固有値は磁場に対してほぼ線形に増加しており，Zeeman効果の支配を反映していることが分かる．本解析では，立方晶系GGGで本来支配的となる2次の結晶場項\(B_2\)を考慮していないため\footnote{\(B_2\)項は基底状態のゼロ磁場分裂を決定する主要項であり，通常\(B_4, B_6\)より1--2桁大きい．}，\(B_4, B_6\)が見かけ上過小評価されている可能性がある．ただし，後述するスペクトルフィッティング結果（図\ref{fig:wnlls_T_HB}）において，全10条件でRMSE \(< 0.16\)という高い記述精度が得られており，Kritzellらが報告したGGGのTHz磁気光学応答の再現には，本近似モデルで十分であると考えられる．\\
@@ -179,7 +174,6 @@ Bモデルでは\( |\chi^{+}| > 1 \)となる周波数点が一部存在し，
     \label{fig:wnls_E_P_HB}
 \end{figure}
 
-\textbf{エネルギーギャップ}\\
 \textbf{エネルギーギャップ}\\
 表\ref{tab:energy_gaps}に各磁場条件での基底状態--第一励起状態間のエネルギーギャップを示す. 
 
@@ -380,24 +374,17 @@ Bモデルの形式では, \(|\chi^{+}| \to 1\)の極限で\(|\mu_r^{B}| \to \in
 \textbf{全体的なフィッティング品質}
 
 両モデルともに全10条件において実験データのピーク構造を良好に再現している. 統計的指標（表\ref{tab:fit_stats_H}, \ref{tab:fit_stats_B}）を見ると, 両モデルのRMSEは平均で約0.004の差（Hモデル0.124, Bモデル0.120）であり, R²も同程度である. 各条件での特徴を以下に述べる：
-両モデルともに全10条件において実験データのピーク構造を良好に再現している. 統計的指標（表\ref{tab:fit_stats_H}, \ref{tab:fit_stats_B}）を見ると, 両モデルのRMSEは平均で約0.004の差（Hモデル0.124, Bモデル0.120）であり, R²も同程度である. 各条件での特徴を以下に述べる：
 
 \textbf{温度依存性}（9.0T, 温度変化系列）
 
 \begin{enumerate}
     \item \textbf{4K--10K条件}: 
-    \item \textbf{4K--10K条件}: 
     \begin{itemize}
-        \item Hモデル: 4つの主要ピーク（約0.17, 0.3, 0.52, 0.78~THz）の位置・線幅が実験と良好に一致（RMSE = 0.117）
-        \item Bモデル: 同様に実験データを良好に再現しており, RMSEはわずかに低い値（0.112）を示す. ピーク位置がHモデルに比べて低周波側にシフトする差異が見られるものの, 誤差範囲内である
         \item Hモデル: 4つの主要ピーク（約0.17, 0.3, 0.52, 0.78~THz）の位置・線幅が実験と良好に一致（RMSE = 0.117）
         \item Bモデル: 同様に実験データを良好に再現しており, RMSEはわずかに低い値（0.112）を示す. ピーク位置がHモデルに比べて低周波側にシフトする差異が見られるものの, 誤差範囲内である
     \end{itemize}
     \item \textbf{20K--30K条件}:
-    \item \textbf{20K--30K条件}:
     \begin{itemize}
-        \item 両モデルの差異は高温になるほど小さくなる傾向（表\ref{tab:fit_stats_H}, \ref{tab:fit_stats_B}のRMSEが収束）\\
-        これは, 高温条件では多くの準位が熱的に占有されるため, 磁気感受率\(\chi^{+}\)が複数の遷移の平均的な効果で決定され, 両モデルの微小な差異が透過スペクトルに与える影響が相対的に小さくなるためと考えられる
         \item 両モデルの差異は高温になるほど小さくなる傾向（表\ref{tab:fit_stats_H}, \ref{tab:fit_stats_B}のRMSEが収束）\\
         これは, 高温条件では多くの準位が熱的に占有されるため, 磁気感受率\(\chi^{+}\)が複数の遷移の平均的な効果で決定され, 両モデルの微小な差異が透過スペクトルに与える影響が相対的に小さくなるためと考えられる
     \end{itemize}
@@ -622,7 +609,7 @@ $B_4$パラメータはHモデルで$14.95 \pm 22.09$~mK, Bモデルで$4.79 \pm
 \subsection{モデル比較}
 \label{subsec:model_comparison}
 
-\ref{subsec:model_selection_criterion}節で述べたWAICおよびPSIS-LOOCVを用いて, HモデルとBモデルの予測性能を定量的に比較した. 表\ref{tab:waic_loo_results}に結果を示す.
+\ref{sec:model_comparison}節で述べたWAICおよびPSIS-LOOCVを用いて, HモデルとBモデルの予測性能を定量的に比較した. 表\ref{tab:waic_loo_results}に結果を示す.
 
 \begin{table}[htbp]
 \centering
