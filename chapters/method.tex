@@ -246,6 +246,14 @@ Student-t分布は自由度\(\nu\)によって裾の重さが制御される：
     \item \(\nu \to \infty\)：\textbf{正規分布}に収束．
 \end{itemize}
 
+各値での分布形状を図\ref{fig:studentt_distribution}に示す．
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{student_t.png}
+    \caption{異なる自由度\(\nu\)におけるStudent-t分布の確率密度関数}
+    \label{fig:studentt_distribution}
+\end{figure}
+
 自由度\(\nu\)が小さいほど裾が重くなり，外れ値の影響を受けにくくなる．
 一方，\(\nu\)が小さすぎると推定効率が低下する．
 Langeら\(^{\cite{Lange1989}}\)の研究に基づき，頑健性と効率性のトレードオフを考慮して\(\nu = 4\)を採用した．
