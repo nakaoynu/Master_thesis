@@ -64,7 +64,7 @@
 \end{table}
 \clearpage
 \textbf{フィッティング結果に関する考察}\\
-両形式ともに\(g_{J}\)因子はGd\(^{3+}\)の理論値（\(g \approx 2.0\)）に近い値を示した. 
+両形式ともに\(g\)因子はGd\(^{3+}\)の理論値（\(g_{J} \approx 2.0\)）に近い値を示した. 
 結合定数スケール\(a\)は探索範囲上限の5.0に収束しており，
 実験パラメータ（GGG試料の膜厚，スピン密度など）の不確定性を補償していると考えられる. 
 
@@ -75,9 +75,9 @@
 \end{itemize}
 この差異は，両形式で異なる最適解が存在することを示唆している. \\
 
-基底状態の緩和率\(\gamma_0\)は両形式で約0.024~THzと一致しており，
+基底状態の緩和係数\(\gamma_0\)は両形式で約0.024~THzと一致しており，
 これは時間領域に換算すると\(\tau_0 \approx 7\)~psに相当する. 
-高励起状態（\(k \geq 4\)）では緩和率が下限値0.01~THzに収束する傾向が見られ，
+高励起状態（\(k \geq 4\)）では緩和係数が下限値0.01~THzに収束する傾向が見られ，
 高温領域ではBoltzmann分布により高励起状態の占有が抑制されるため，
 これらのパラメータ\(\gamma_{k \geq 4}\)の感度が平均値として低いことを示している. 
 
@@ -163,7 +163,7 @@ Bモデルでは\( |\chi^{+}| > 1 \)となる周波数点が一部存在し，
 各準位間の分裂幅が等間隔であることは，式\eqref{eq:H_Zeeman}で定義されるZeeman分裂の効果が支配的であり，式\eqref{eq:H_CF}による結晶場ハミルトニアンの寄与が相対的に小さいことを示唆する．実際に，フィッティング結果の図\ref{fig:wnls_E_P_HB}を見ると，Hモデル・Bモデルともに各準位のエネルギー固有値は磁場に対してほぼ線形に増加しており，Zeeman効果の支配を反映していることが分かる．本解析では，立方晶系GGGで本来支配的となる2次の結晶場項\(B_2\)を考慮していないため\footnote{\(B_2\)項は基底状態のゼロ磁場分裂を決定する主要項であり，通常\(B_4, B_6\)より1--2桁大きい．}，\(B_4, B_6\)が見かけ上過小評価されている可能性がある．ただし，後述するスペクトルフィッティング結果（図\ref{fig:wnlls_T_HB}）において，全10条件でRMSE \(< 0.16\)という高い記述精度が得られており，Kritzellらが報告したGGGのTHz磁気光学応答の再現には，本近似モデルで十分であると考えられる．\\
 \begin{figure}
     \centering
-    \includegraphics[width=1.0\textwidth]{figures/wnlls_global_fitting_results_comparison_v6/energy_levels_HB_comparison.png}
+    \includegraphics[width=1.0\textwidth]{energy_levels_HB_comparison.png}
     \caption{重み付き非線形最小二乗法によるHモデルとBモデルの各準位のエネルギー固有値. 赤はHモデル, 青はBモデルの結果を示す. }
     \label{fig:wnls_E_P_HB}
 \end{figure}
@@ -199,7 +199,7 @@ B形式の方がやや大きいギャップを与えており，
 
 \begin{figure}
     \centering
-    \includegraphics[width=1.0\textwidth]{figures/wnlls_global_fitting_results_comparison_v6/populations_HB_comparison.png}
+    \includegraphics[width=1.0\textwidth]{populations_HB_comparison.png}
     \caption{重み付き非線形最小二乗法によるHモデルとBモデルの各準位の占有確率. 赤はHモデル, 青はBモデルの結果を示す. }
     \label{fig:wnls_P_HB}
 \end{figure}
@@ -284,7 +284,7 @@ Bモデルは全磁場条件でHモデルより約2~meV大きなエネルギー�
 \textbf{温度・磁場依存性}
 
 \begin{itemize}
-    \item \textbf{温度依存性}（9T, 温度変化系列）：温度上昇に伴い, \(\mathrm{Im}[\chi^{+}]\)のピーク高さが減少し, 線幅が広がる傾向が両モデルで再現されている. これはBoltzmann分布による高励起状態の熱的占有増加と, 緩和率\(\gamma_k\)の準位依存性を反映している.
+    \item \textbf{温度依存性}（9T, 温度変化系列）：温度上昇に伴い, \(\mathrm{Im}[\chi^{+}]\)のピーク高さが減少し, 線幅が広がる傾向が両モデルで再現されている. これはBoltzmann分布による高励起状態の熱的占有増加と, 緩和係数\(\gamma_k\)の準位依存性を反映している.
     
     \item \textbf{磁場依存性}（1.5K, 磁場変化系列）：磁場増加に伴い, Zeemanポラリトンが形成されるまでの過程が両モデルで捉えられている. これはUSC領域に到達するために必要なZeeman分裂の大きさを反映している.
 \end{itemize}
@@ -336,15 +336,15 @@ Bモデルの形式では, \(|\chi^{+}| \to 1\)の極限で\(|\mu_r^{B}| \to \in
 表\ref{tab:fit_stats_B}の「不安定\%」列は, \(|\chi^{+}| > 1\)となり\(\mu_r^{B}\)が負値となる周波数点の割合を示しており, 高磁場条件（6T--9T）で約5.7\%のデータ点が数値的に不安定な領域に入っていることを示す. 一方, Hモデルでは\(\mu_r^{H} = 1 + \chi^{+}\)という線形関係のため, このような発散は生じない.
 
 \begin{figure}
-    \centering
-    \includegraphics[width=1.0\textwidth]{global_fitting_results_H_v6/chi_distribution_H.png}
+        \centering
+        \includegraphics[width=1.0\textwidth]{chi_distribution_H.png}
     \caption{重み付き非線形最小二乗法によるHモデルの磁気感受率フィッティング結果. 実線は実部, 破線は虚部を示す. }
     \label{fig:wnls_chi_H}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=1.0\textwidth]{global_fitting_results_B_v6/chi_distribution_B.png}
+    \includegraphics[width=1.0\textwidth]{chi_distribution_B.png}
     \caption{重み付き非線形最小二乗法によるBモデルの磁気感受率フィッティング結果. 実線は実部, 破線は虚部を示す. }
     \label{fig:wnls_chi_B}
 \end{figure}
@@ -407,7 +407,7 @@ Bモデルの形式では, \(|\chi^{+}| \to 1\)の極限で\(|\mu_r^{B}| \to \in
     
     \item \textbf{数値安定性}: 表\ref{tab:fit_stats_B}に示すように, Bモデルでは\(|\chi^{+}|_{\rm max} \gtrsim 1.2\)となり, 比透磁率\(\mu_r^{B} = 1/(1-\chi^{+})\)が数値的に不安定な領域（高磁場で約5.7\%のデータ点）に入る. 一方, Hモデルでは\(\mu_r^{H} = 1 + \chi^{+}\)という線形関係のため, このような発散は生じない.
     
-    \item \textbf{緩和率パラメータ}: Bモデルでは\(\gamma_1 = 0.145\)~THzとHモデルの0.013~THzに比べて約11倍大きい（表\ref{tab:parameters_results_wnlls}）. この差異は両モデルの数学的形式の違いを反映していると考えられる.
+    \item \textbf{緩和係数パラメータ}: Bモデルでは\(\gamma_1 = 0.145\)~THzとHモデルの0.013~THzに比べて約11倍大きい（表\ref{tab:parameters_results_wnlls}）. この差異は両モデルの数学的形式の違いを反映していると考えられる.
 \end{enumerate}
 
 以上の解析から, 重み付き非線形最小二乗法に基づくフィッティングでは, \textbf{両モデルともに実験データを良好に再現しており}, 統計的指標（RMSE, R², Final Cost）に基づく限り, \textbf{誤差論の観点からモデル間の有意差を結論付けることはできなかった}. ただし, 数値安定性の観点からは, Hモデルの方が\(\mu_r\)の計算において発散のリスクが低く, 実装上の利点を持つ. 最終的なモデル選択には, 次節\ref{sec:bayes_results}で示すベイズ推定に基づくモデル比較が必要である.
@@ -439,7 +439,7 @@ Bモデルの形式では, \(|\chi^{+}| \to 1\)の極限で\(|\mu_r^{B}| \to \in
 \end{tabular}
 \end{table}
 
-Hモデルでは平均$\hat{R} = 1.0005$と理想的な収束を示し, 有効サンプルサイズ（ESS）も平均120,974と十分な値を得た. 一方, Bモデルでは平均$\hat{R} = 1.0075$とHモデルと比べてやや高く, 特に緩和率パラメータ$\gamma_k$に関連する一部のパラメータでESS $\approx 300\text{--}700$\footnote{標準的なESSの基準値は400以上}とやや低い値が見られた. これはBモデルの事後分布が複雑な形状を持ち, サンプリングが困難であることを示唆している. ただし, 両モデルともにVehtariらに基づくランク正規化$\hat{R} < 1.05$の基準\(^{\cite{Vehtari2021rank}}\)を満たしており, 両モデルともに収束は良好であると判断できる. 
+Hモデルでは平均$\hat{R} = 1.0005$と理想的な収束を示し, 有効サンプルサイズ（ESS）も平均120,974と十分な値を得た. 一方, Bモデルでは平均$\hat{R} = 1.0075$とHモデルと比べてやや高く, 特に緩和係数パラメータ$\gamma_k$に関連する一部のパラメータでESS $\approx 300\text{--}700$\footnote{標準的なESSの基準値は400以上}とやや低い値が見られた. これはBモデルの事後分布が複雑な形状を持ち, サンプリングが困難であることを示唆している. ただし, 両モデルともにVehtariらに基づくランク正規化$\hat{R} < 1.05$の基準\(^{\cite{Vehtari2021rank}}\)を満たしており, 両モデルともに収束は良好であると判断できる. 
 
 \subsection{パラメータの事後分布}
 \label{subsec:posterior_distributions}
@@ -498,14 +498,14 @@ $\gamma_6$ [THz] & 0.092 & 0.064 & 0.010 & 0.193 & 1.02 \\
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/posterior_distributions_H.png}
+    \includegraphics[width=1.0\textwidth]{posterior_distributions_H.png}
     \caption{Hモデルのパラメータ事後分布. 各パラメータの周辺事後分布と94\%高密度区間（HDI）を示す.赤破線は平均値, 黄色破線は中央値を示す.}
     \label{fig:posterior_H}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/posterior_distributions_B.png}
+    \includegraphics[width=1.0\textwidth]{posterior_distributions_B.png}
     \caption{Bモデルのパラメータ事後分布. 各パラメータの周辺事後分布と94\%高密度区間（HDI）を示す.赤破線は平均値, 黄色破線は中央値を示す.}
     \label{fig:posterior_B}
 \end{figure}
@@ -518,9 +518,9 @@ Hモデルの$g_{J} = 1.910$はGd$^{3+}$の理論値（$g_{J} \approx 2.0$）か
 
 $B_4$パラメータはHモデルで$14.95 \pm 22.09$~mK, Bモデルで$4.79 \pm 6.09$~mKと大きな不確実性を持つ. これは, 透過スペクトルが$B_4$に対する感度が比較的低いことを示唆している. $B_6$パラメータは両モデルともにゼロ周辺に分布しており, 6次の結晶場効果が本測定条件では観測されていないことを示す.
 
-\textbf{緩和率パラメータについて}
+\textbf{緩和係数パラメータについて}
 
-緩和率$\gamma_k$は準位依存性を示し, 特に$k=1\text{--}3$の中間準位で大きな値（$\gamma \approx 0.14\text{--}0.17$~THz）を取る傾向が両モデルで見られる. Hモデルでは基底状態の緩和率$\gamma_0 = 0.023$~THzが特徴的に小さく, 高励起状態（$k \geq 4$）でも$\gamma \approx 0.01$~THzと低い. 一方, Bモデルでは$\gamma_2 = 0.010$~THzが異常に小さく, 他の準位とは異なる挙動を示す.
+緩和係数$\gamma_k$は準位依存性を示し, 特に$k=1\text{--}3$の中間準位で大きな値（$\gamma \approx 0.14\text{--}0.17$~THz）を取る傾向が両モデルで見られる. Hモデルでは基底状態の緩和係数$\gamma_0 = 0.023$~THzが特徴的に小さく, 高励起状態（$k \geq 4$）でも$\gamma \approx 0.01$~THzと低い. 一方, Bモデルでは$\gamma_2 = 0.010$~THzが異常に小さく, 他の準位とは異なる挙動を示す.
 \clearpage
 
 \subsection{パラメータの相関}
@@ -530,14 +530,14 @@ $B_4$パラメータはHモデルで$14.95 \pm 22.09$~mK, Bモデルで$4.79 \pm
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{bayesian_results_scaled_loocv_20260119_063734/pair_plot_H.png}
+    \includegraphics[width=0.9\textwidth]{pair_plot_H.png}
     \caption{Hモデルのパラメータ間相関（ペアプロット）. 対角成分は周辺事後分布, 非対角成分は2次元周辺分布を示す.}
     \label{fig:pairplot_H}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{bayesian_results_scaled_loocv_20260119_063734/pair_plot_B.png}
+    \includegraphics[width=0.9\textwidth]{pair_plot_B.png}
     \caption{Bモデルのパラメータ間相関（ペアプロット）. 対角成分は周辺事後分布, 非対角成分は2次元周辺分布を示す.}
     \label{fig:pairplot_B}
 \end{figure}
@@ -552,7 +552,7 @@ $B_4$パラメータはHモデルで$14.95 \pm 22.09$~mK, Bモデルで$4.79 \pm
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/posterior_predictive_spectra_HB_comparison.png}
+    \includegraphics[width=1.0\textwidth]{posterior_predictive_spectra_HB_comparison.png}
     \caption{事後予測透過スペクトル. 赤線/青線は各モデルの事後予測平均, 各色の陰影領域は94\%信用区間, オレンジ色の塗りつぶし領域はポラリトン重み付き（\(\times 2.0\)）, 緑色の塗りつぶし領域は共振器モード重み付き（\(\times 1.0\)）の領域を示す.灰色点は実験データを示す.}
     \label{fig:posterior_predictive_HB}
 \end{figure}
@@ -713,10 +713,10 @@ Hモデルの比透磁率$\mu_r^{H} = 1 + \chi^{+}$とBモデルの比透磁率$
 \begin{itemize}
     \item $g$因子：Hモデル1.97, Bモデル2.04
     \item 結晶場パラメータ$B_4$：Hモデル30.0~mK, Bモデル0.159~mK（約200倍の差）
-    \item 緩和率$\gamma_1$：Hモデル0.013~THz, Bモデル0.145~THz（約11倍の差）
+    \item 緩和係数$\gamma_1$：Hモデル0.013~THz, Bモデル0.145~THz（約11倍の差）
 \end{itemize}
 
-これらのパラメータの差異は, 両モデルの数学的形式の違いを補償する方向に働いている. 特に, Bモデルでは$\mu_r^{B}$の発散を抑制するために緩和率が大きくなる傾向があり, 結果として観測される透過スペクトルは両モデルで類似する.
+これらのパラメータの差異は, 両モデルの数学的形式の違いを補償する方向に働いている. 特に, Bモデルでは$\mu_r^{B}$の発散を抑制するために緩和係数が大きくなる傾向があり, 結果として観測される透過スペクトルは両モデルで類似する.
 
 \subsubsection*{データの情報量と識別能力}
 
@@ -753,7 +753,7 @@ Hモデルの比透磁率$\mu_r^{H} = 1 + \chi^{+}$とBモデルの比透磁率$
 \begin{enumerate}
     \item \textbf{結晶場パラメータの不完全性}：本解析では2次の結晶場項$B_2$を考慮していない. 立方晶系GGGでは$B_2$項が$B_4, B_6$より1--2桁大きいことが知られており\(^{\cite{Yamada2024}}\), この項を含めることでモデルの記述精度が向上する可能性がある.
     
-    \item \textbf{緩和率の準位依存性}：本研究では緩和率$\gamma_k$を準位ごとに独立なパラメータとして扱ったが, 物理的にはスピン-格子緩和やスピン-スピン緩和に基づく系統的な依存性が存在するはずである. より物理的に動機付けられた緩和率モデルの導入が望まれる.
+    \item \textbf{緩和係数の準位依存性}：本研究では緩和係数$\gamma_k$を準位ごとに独立なパラメータとして扱ったが, 物理的にはスピン-格子緩和やスピン-スピン緩和に基づく系統的な依存性が存在するはずである. より物理的に動機付けられた緩和係数モデルの導入が望まれる.
     
     \item \textbf{多体効果の無視}：本解析は単一イオンモデルに基づいており, $\text{Gd}^{3+}$イオン間の交換相互作用を無視している. 高スピン密度条件では, 多体効果が重要となる可能性がある.
     

@@ -12,7 +12,7 @@
     \label{eq:gamma_approximation}
 \end{equation}
 この物理的意味は, 緩和過程が主に初期状態（低エネルギー側）の特性で決まるという仮定である. 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{共有\(\gamma\)モデル}
 \begin{tabular}{lcccc}
@@ -35,7 +35,7 @@
 \label{sec:parameters_to_estimate}
 本解析において推定対象となる主要なパラメータ群とその物理的役割を Table \ref{tab:parameters_1} にまとめる. 
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{本解析における推定パラメータ群とその物理的役割}
     \label{tab:parameters_1}
@@ -44,9 +44,9 @@
         \toprule
         \textbf{記号} & \textbf{パラメータ名称} & \textbf{物理的役割とモデルへの寄与} \\
         \midrule
-        \(g\) & g因子 & ゼーマンエネルギー \(\muB g B\) を決定し, スペクトルの共鳴中心周波数を支配する.  \\
+        \(g_{J}\) & g因子 & ゼーマンエネルギー \(\muB g_{J} B\) を決定し, スペクトルの共鳴中心周波数を支配する.  \\
         \(B_{4}, B_{6}\) & 結晶場パラメータ & ゼロ磁場分裂や準位の混合を引き起こし, ピークの微細構造（分裂幅）やポラリトンモードに寄与する. \\
-        \(\gamma_{i}\) & 緩和率 & 遷移の寿命 \(\tau = 1/\gamma\) に対応し, スペクトルの線幅（Lorentzian幅）を決定する. コヒーレンスの減衰や散乱過程を反映する.  \\
+        \(\gamma_{i}\) & 緩和係数 & 遷移の寿命 \(\tau = 1/\gamma\) に対応し, スペクトルの線幅（Lorentzian幅）を決定する. コヒーレンスの減衰や散乱過程を反映する.  \\
         \(a_{\vb*{scale}}\) & スケーリング係数 & 実効的なスピン密度や試料充填率に依存する吸収強度の絶対値を補正する係数. \(\chi \propto a_{\vb*{scale}} \cdot g^2\) の関係を持つ.  \\
         \(\varepsilon_{\vb*{bg}}\) & 背景誘電率 & 磁気共鳴以外のバックグラウンド透過率および高次の共振器モードを決定する.  \\
         \bottomrule
@@ -57,7 +57,7 @@
 \label{sec:wnlls}
 本節では, スペクトルフィッティングに用いる重み付き非線形最小二乗法の詳細について述べる.
 本研究におけるスペクトルフィッティングでは, モデルパラメータ \(\bm{\theta}\) に対する物理的な制約条件（正値性や上下限）の遵守に加え, スペクトル形状の重要な特徴（共鳴ピークやディップ構造等）を精度よく再現することが求められる. 
-均等な重み付けでは, 信号強度の小さい領域やノイズの影響により, 主要な特徴のフィッティング精度が損なわれる可能性がある. そのため, 各データ点の重要度を任意に調整可能な\textbf{重み付き信頼領域反射法}（Weighted Trust Region Reflective algorithm: Weighted-TRF）を採用した. 
+均等な重み付けでは, 信号強度の小さい領域やノイズの影響により, 主要な特徴のフィッティング精度が損なわれる可能性がある. そのため, 各データ点の重要度を任意に調整可能な\textbf{重み付き信頼領域反射法}（Weighted Trust Region Reflective algorithm: Weighted-TRF）\(^{\cite{Branch1999}}\)を採用した. 
 
 \subsection{目的関数と制約条件}
 観測データベクトルを \(\bm{y}^{\mathrm{obs}}\), モデル関数を \(\bm{f}(\bm{\theta})\) とする. 各データ点 \(i\) に対する重要度を示す重み係数を \(w_i\) とし, これを対角成分に持つ重み行列 \(\vb*{W} = \mathrm{diag}(w_1, \dots, w_N)\) を導入する. 
@@ -87,18 +87,18 @@ Weighted-TRF法は反復解法であり, 第 \(k\) ステップにおけるパ�
 重み行列 \(\vb*{W}\) の導入により, 重要度の高いデータ点での残差を優先的に減少させる探索方向が選択される. 
 
 \subsection{Levenberg-Marquardt法との比較}
-一般に非線形最小二乗法の標準解法として知られるLevenberg-Marquardt (LM) 法は, ダンピング係数 \(\lambda\) を用いて最急降下法とガウス・ニュートン法を補間する強力な手法であるが, 本質的には制約なし問題を対象としている. LM法で境界条件を扱う場合, 変数のクリッピングやペナルティ関数などのヒューリスティックな処理が必要となり, 数値的な不安定性を招く恐れがある. 
+一般に非線形最小二乗法の標準解法として知られるLevenberg-Marquardt法\(^{\cite{More1978}}\)は, ダンピング係数 \(\lambda\) を用いて最急降下法とガウス・ニュートン法を補間する強力な手法であるが, 本質的には制約なし問題を対象としている. LM法で境界条件を扱う場合, 変数のクリッピングやペナルティ関数などのヒューリスティックな処理が必要となり, 数値的な不安定性を招く恐れがある. 
 
 \subsection{フィッティング手法とプログラムの全体フロー}    
 \label{subsec:wnlls_method}
-まず, Kritzellらの実験データを読み込み, 磁場・温度ごとにデータを分割する. 次に, 各モデル(H形式, B形式)について, 手作業でフィッティングした際の知見を活かした初期パラメータを設定し, 重み付き非線形最小二乗法を適用してフィッティングを行う. フィッティングには\texttt{Scipy}ライブラリの\texttt{optimize}モジュールに含まれる\texttt{curve\_fit}関数を使用し, 各パラメータの最適値と共分散行列を取得する. 最後に, フィッティング結果を用いて各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出し, 結果を保存する. 重み付け方法としては, ピーク検出アルゴリズムにより特定された共鳴中心周波数および半値全幅（FWHM）内の領域に対して大きな値を与え, それ以外の領域には小さな値を与える. ただし, ポラリトン形成領域のフィッティングが困難だった為, ポラリトン形成領域の方が高次共振器モードよりも高く設定した.
+まず, Kritzellらの実験データを読み込み, 磁場・温度ごとにデータを分割する. 次に, 各モデル(H形式, B形式)について, 手作業でフィッティングした際の知見を活かした初期パラメータを設定し, 重み付き非線形最小二乗法を適用してフィッティングを行う. フィッティングには\texttt{Scipy}ライブラリの\texttt{optimize}モジュールに含まれる\texttt{least\_squares}関数を使用し, 各パラメータの最適値と共分散行列を取得する. 最後に, フィッティング結果を用いて各準位のエネルギー固有値と占有確率, 磁気感受率, 透過スペクトルを算出し, 結果を保存する. 重み付け方法としては, ピーク検出アルゴリズムにより特定された共鳴中心周波数および半値全幅（FWHM）内の領域に対して大きな値を与え, それ以外の領域には小さな値を与える. ただし, ポラリトン形成領域のフィッティングが困難だった為, ポラリトン形成領域の方が高次共振器モードよりも高く設定した.
 図\ref{fig:flowchart_wnlls}に, 重み付き非線形最小二乗法の全体フローチャートを示す. 初期条件は表\ref{tab:parameters_initial_wnlls}, フィッティング条件は表\ref{tab:stepwise_fitting_parameters}の通りである．サンプリング効率を向上させるため，各パラメータをスケーリングして最適化空間で同程度の変動幅を持つようにした：
 \begin{equation}
     \theta_{\mathrm{scaled}} = \theta_{\mathrm{physical}} \times s_\theta
 \end{equation}
 スケーリング係数\(s_\theta\)を表\ref{tab:scaling}に示す．
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{重み付き非線形最小二乗法の全パラメータの初期条件}
 \begin{tabular}{lcccc}
@@ -106,7 +106,7 @@ Weighted-TRF法は反復解法であり, 第 \(k\) ステップにおけるパ�
 \textbf{カテゴリ} & \textbf{パラメータ} & \textbf{初期値} & \textbf{範囲}\\
 \midrule
 \multirow{5}{*}{Global (5個)} 
- & \(g\) & 1.95 & [1.5, 2.8]\\
+ & \(g_{J}\) & 1.95 & [1.5, 2.8]\\
  & \(a\) & 1.0 & [0.1, 5.0]\\
  & \(B_4\) & 2.02 mK & [0.1, 30] mK\\
  & \(B_6\) & \(-0.012\) mK & [-1.0, 1.0] mK\\
@@ -159,7 +159,7 @@ Weighted-TRF法は反復解法であり, 第 \(k\) ステップにおけるパ�
 \toprule
 パラメータ & スケーリング係数 \(s_\theta\) & スケール後の範囲 \\
 \midrule
-\(g\) & 38.0 & \([57, 106]\) \\
+\(g_{J}\) & 38.0 & \([57, 106]\) \\
 \(a\) & 10.2 & \([1.0, 102]\) \\
 \(B_4\) & 1672.0 & \([0.017, 83.6]\) \\
 \(B_6\) & 25000.0 & \([-50, 50]\) \\
@@ -169,7 +169,7 @@ Weighted-TRF法は反復解法であり, 第 \(k\) ステップにおけるパ�
 \end{tabular}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
     node distance=1.2cm,
@@ -268,7 +268,7 @@ Student-t分布の主要な統計量は以下の通りである：
 ここで\(\sigma_0 = 0.01\)は基準標準偏差，\(w_i\)は各データ点の重みである．
 
 重みは物理的重要性に基づいて表\ref{tab:bayes_weights}のように設定した：
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{ベイズ推定における周波数領域ごとの重み付け定義}
     \label{tab:bayes_weights}
@@ -292,7 +292,7 @@ Student-t分布の主要な統計量は以下の通りである：
 \label{sec:hierarchical_model}
 \subsubsection{階層モデルの必要性}
 
-7つの緩和率パラメータ\(\gamma_1, \ldots, \gamma_7\)は個別に推定すると識別不能性の問題が生じる．
+7つの緩和係数パラメータ\(\gamma_1, \ldots, \gamma_7\)は個別に推定すると識別不能性の問題が生じる．
 すなわち，異なる\(\gamma_i\)の組み合わせが同程度の尤度を与え，事後分布が多峰性を示す．
 この問題を解決するため，\(\gamma_i\)を共通のハイパーパラメータから生成される階層モデルを採用した．
 
@@ -319,7 +319,7 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
 
 各パラメータの事前分布は物理的制約に基づいて設定した．表\ref{tab:priors}に一覧を示す．ただし，表\ref{tab:scaling}と同様のスケーリング係数を適用し, 最適化空間で同程度の変動幅を持つようにした．また, HモデルとBモデルの事前分布図をそれぞれ図\ref{fig:prior_H}，図\ref{fig:prior_B}にプロットする. また, HモデルとBモデルの事前分布図をそれぞれ図\ref{fig:prior_H}，図\ref{fig:prior_B}にプロットする. 
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{ベイズモデルの事前分布設定}
     \label{tab:priors}
@@ -327,7 +327,7 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
         \toprule
         パラメータ & 分布型 & パラメータ & 物理的根拠 \\
         \midrule
-        \(g\) & TruncatedNormal & \(\mu=2.0\), \(\sigma=0.05\), \([1.5, 2.8]\) & Gd\(^{3+}\)理論値 \\
+        \(g_{J}\) & TruncatedNormal & \(\mu=2.0\), \(\sigma=0.05\), \([1.5, 2.8]\) & Gd\(^{3+}\)理論値 \\
         \addlinespace
         \(a\) & HalfNormal & \(\sigma=2.0\), \([0.1, 10.0]\) & 低値優先，正値制約 \\
         \addlinespace
@@ -346,23 +346,23 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
     \end{tabular}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/prior_distributions_H.png}
+    \includegraphics[width=1.0\textwidth]{prior_distributions_H.png}
     \caption{H形式モデルの事前分布. 赤点線は重み付き非線形最小二乗法でのフィッティング値を示す.}
     \label{fig:prior_H}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.0\textwidth]{bayesian_results_scaled_loocv_20260119_063734/prior_distributions_B.png}
+    \includegraphics[width=1.0\textwidth]{prior_distributions_B.png}
     \caption{B形式モデルの事前分布. 赤点線は重み付き非線形最小二乗法でのフィッティング値を示す.}
     \label{fig:prior_B}
 \end{figure}
 
 \subsection{プログラムの全体フロー}
 図\ref{fig:flowchart_bayesian}にて, ベイズ推定を行うプログラムコードの全体フローチャートを示す. 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
     node distance=1cm,
@@ -413,7 +413,7 @@ Non-centered版では標準正規変数\(z_i\)がハイパーパラメータと�
 ベイズ推定により得られた事後分布を用いて, H形式モデルとB形式モデルの適合度を比較・評価する.
 本研究では, WAICとPSIS-LOO-CVの両方を採用した. それぞれ表\ref{tab:model_comparison}に示す特徴があり，補完的に利用することでモデル選択の信頼性を高めることができる.
 WAICのみ悪い場合は事後分布の形状に問題がある可能性があり, PSIS-LOO-CVのみ悪い場合は外れ値の影響が大きい可能性があることが示唆される.
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{モデル比較指標の特徴}
     \begin{tabular}{lcc}

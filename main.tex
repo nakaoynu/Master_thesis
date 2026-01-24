@@ -4,7 +4,8 @@
 % \usepackage[top=25truemm,bottom=25truemm,left=25truemm,right=25truemm]{geometry} % 余白2.5cm
 \usepackage[T1]{fontenc} 
 \usepackage{textcomp} % (推奨) T1と一緒に使うと警告が減ります
-\usepackage{hyperref} % ハイパーリンク用
+\usepackage[unicode=true]{hyperref} % unicodeオプションを念のため明示（なくてもpxjahyperが補正しますが、あると安心です）
+\usepackage{pxjahyper} % <--- これを追加！日本語のしおり文字化けを防ぐ
 
 % --- 数式用マクロ定義 ---
 \newcommand{\Ham}{\mathcal{H}}
@@ -14,13 +15,12 @@
 
 % 【重要】数式系パッケージ
 \usepackage{amsmath, amssymb} 
-\usepackage{bm}           % 太字ベクトル用
 \usepackage{physics}      % 【追加】量子力学用 (ket, bra, expval等)
 \usepackage{siunitx}      % 【追加】単位記述用 (例: \SI{10}{GHz})
 
 % 【重要】フォント系パッケージ
 \usepackage{newtxtext, newtxmath} % 英文・数式をTimes系にする
-\usepackage{graphicx}  % 画像挿入用
+\usepackage[dvipdfmx]{graphicx}  % 画像挿入用
 \usepackage{secdot}    % セクション番号の後のドット
 
 % --- フォント・レイアウト調整 ---
@@ -43,11 +43,11 @@
 % \includeonlyを使う場合はここに書く（後述）
 
 % 図の検索パスを指定しておくと便利
-\graphicspath{{figures/}}
+\graphicspath{{figures/}{bayesian_results_scaled_loocv_20260119_063734/}{global_fitting_results_B_v6/}{global_fitting_results_H_v6/}{global_fitting_results_comparison_v6/}}
 
 % --- 文書情報 ---
-\title{\(\text{Gd}_{3}\text{Ga}_{5}\text{O}_{12}\)のTHz磁気光学応答のベイズ統計的モデル比較に基づく超放射相転移の発現可能性の考察}
-\author{24NC230 中尾 太一\\指導教員: 馬場 基彰}
+\title{\(\text{Gd}_{3}\text{Ga}_{5}\text{O}_{12}\)のTHz磁気光学応答のベイズ統計的モデル\\比較に基づく超放射相転移の発現可能性の考察}
+\author{横浜国立大学大学院　24NC230　中尾 太一\\指導教員: 馬場 基彰}
 \date{\today}
 
 % Document Body
@@ -79,6 +79,6 @@
 
 \nocite{*}
 \bibliographystyle{naturemag} % 参考文献のスタイルを指定
-\bibliography{bib/reference} % .bibファイルのパスを正しく指定
+\bibliography{bib/test} % .bibファイルのパスを正しく指定
 
 \end{document}

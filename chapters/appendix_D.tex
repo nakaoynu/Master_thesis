@@ -44,28 +44,28 @@
 
 \section{磁気双極子相互作用}
 \section*{ハミルトニアンの定義}
-\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) は, ゼーマン・エネルギーの形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
+\(N\) 個の局在スピン \(\hat{\vb*{S}}_i\) と量子化磁場 \(\hat{\vb*{B}}\) との相互作用ハミルトニアン \(\hat{\mathcal{H}}_{\text{int}}\) はZeeman相互作用の形式（\(-\hat{\boldsymbol{\mu}} \cdot \hat{\vb*{B}}\)）で与えられる. 
 \begin{equation}
     \hat{\mathcal{H}}_{\text{int}} = - \sum_{i=1}^N \hat{\boldsymbol{\mu}}_i \cdot \hat{\vb*{B}}
 \end{equation}
-磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_L \mu_B \hat{\vb*{S}}_i\) である（\(g_L\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
+磁気モーメント演算子は \(\hat{\boldsymbol{\mu}}_i = -g_J \mu_B \hat{\vb*{S}}_i\) である（\(g_J\): ランデのg因子, \(\mu_B\): ボーア磁子）. 式(\ref{eq:B_field})を代入すると, 磁場が \(x\) 成分のみを持つため, スピンの \(x\) 成分のみが結合する. 
 \begin{equation}
-    \hat{\mathcal{H}}_{\text{int}} = g_L \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
+    \hat{\mathcal{H}}_{\text{int}} = g_J \mu_B B_{\text{vac}} \sum_{i=1}^N \hat{S}_x^i (\hat{a} + \hat{a}^\dagger)
 \end{equation}
 
 \section*{昇降演算子による展開と反回転項}
 スピン演算子の \(x\) 成分を昇降演算子 \(\hat{S}_\pm^i = \hat{S}_x^i \pm i \hat{S}_y^i\) を用いて \(\hat{S}_x^i = \frac{1}{2}(\hat{S}_+^i + \hat{S}_-^i)\) と書き換える. 
 さらに, 集団スピン演算子 \(\hat{J}_\pm = \sum_i \hat{S}_\pm^i\) を導入する. 
 \begin{align}
-    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_L \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
-    &= \frac{g_L \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{回転項}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{反回転項}} \right]
+    \hat{\mathcal{H}}_{\text{int}} &= \frac{g_J \mu_B B_{\text{vac}}}{2} (\hat{J}_+ + \hat{J}_-) (\hat{a} + \hat{a}^\dagger) \\
+    &= \frac{g_J \mu_B B_{\text{vac}}}{2} \left[ \underbrace{(\hat{a} \hat{J}_+ + \hat{a}^\dagger \hat{J}_-)}_{\text{回転項}} + \underbrace{(\hat{a} \hat{J}_- + \hat{a}^\dagger \hat{J}_+)}_{\text{反回転項}} \right]
 \end{align}
 この式変形により, エネルギー保存則を一見破るように見える項（光子生成かつスピン励起 \(\hat{a}^\dagger \hat{J}_+\), およびその逆過程）が自然に出現することがわかる. これらがUSC領域で重要となる反回転項である. 
 
 \section*{Dickeモデルハミルトニアン}
-単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_L \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g_{\text{eff}} = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
+単一スピン当たりの結合定数 \(\hbar g_0 = \frac{1}{2}g_J \mu_B B_{\text{vac}}\) を定義し, 集団増強された結合定数を \(g = g_0 \sqrt{N}\) とおくと, 全ハミルトニアンは以下のように求まる. 
 \begin{equation}
-    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g_{\text{eff}}}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-) \label{Dicke_Hamiltonian}
+    \hat{\mathcal{H}}_{\text{Dicke}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{J}_z + \frac{\hbar g}{\sqrt{N}} (\hat{a}^\dagger + \hat{a})(\hat{J}_+ + \hat{J}_-) \label{Dicke_Hamiltonian}
 \end{equation}
 ここで \(\omega_s\) は静磁場によるLarmor周波数である. 
 以上より, 直線偏光モードを持つキャビティ場とスピン系の磁気双極子相互作用から, 反回転項を含むDickeハミルトニアンが第一原理的に導出された. 
@@ -78,7 +78,7 @@
 \end{align}
 これらをDickeハミルトニアン(式\ref{Dicke_Hamiltonian})に代入し, 定数項を除くと, 以下の2次形式ボゾンハミルトニアン（Hopfieldハミルトニアン）が得られる. 
 \begin{equation}
-    \hat{\mathcal{H}}_{\text{Hop}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{b}^\dagger \hat{b} + \hbar g_{\text{eff}} (\hat{a}^\dagger + \hat{a})(\hat{b}^\dagger + \hat{b}) 
+    \hat{\mathcal{H}}_{\text{Hop}} = \hbar \omega_c \hat{a}^\dagger \hat{a} + \hbar \omega_s \hat{b}^\dagger \hat{b} + \hbar g (\hat{a}^\dagger + \hat{a})(\hat{b}^\dagger + \hat{b}) 
     \label{eq:Hopfield}
 \end{equation}
 式(\ref{eq:Hopfield})は, \(\hat{a}^\dagger \hat{b}^\dagger\)（光子・マグノンの同時生成）および\(\hat{a}\hat{b}\)（同時消滅）を含んでおり, RWAでは記述できない物理現象を示唆している. 
@@ -90,9 +90,9 @@
 \end{equation}
 Heisenbergの運動方程式に基づく行列形式の固有値問題を解くことで, Zeemanポラリトンの分散関係（固有エネルギー \(E_{\pm} = \hbar \Omega_{\pm}\)）は以下のように導出される. 
 \begin{equation}
-    \Omega_{\pm}^2 = \frac{1}{2} \left[ \omega_c^2 + \omega_s^2 \pm \sqrt{(\omega_c^2 - \omega_s^2)^2 + 16 g_{\text{eff}}^2 \omega_c \omega_s} \right]
+    \Omega_{\pm}^2 = \frac{1}{2} \left[ \omega_c^2 + \omega_s^2 \pm \sqrt{(\omega_c^2 - \omega_s^2)^2 + 16 g^2 \omega_c \omega_s} \right]
 \end{equation}
-この結果は, USC領域において固有振動数が結合強度\(g_{\text{eff}}\)に対して非線形に依存することを示している. 特に\(\Omega_-\)（Lower Polariton）は, Bloch-Siegertシフトを含んだエネルギー準位となる. 
+この結果は, USC領域において固有振動数が結合強度\(g\)に対して非線形に依存することを示している. 特に\(\Omega_-\)（Lower Polariton）は, Bloch-Siegertシフトを含んだエネルギー準位となる. 
 \section{基底状態の量子性}
 Dickeモデルにおける真の基底状態（USC真空）\(|G_{\text{USC}}\rangle\) は, ポラリトン消滅演算子に対し \(\hat{p}_k |G_{\text{USC}}\rangle = 0\) を満たす状態として定義される. しかし, 元の粒子演算子（\(\hat{a}, \hat{b}\)）に対しては真空ではない. 
 すなわち, 
