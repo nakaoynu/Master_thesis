@@ -14,19 +14,19 @@
 &= \hat{\mathcal{H}}_{\text{CF}} + \hat{\mathcal{H}}_{\text{Zeeman}} + \hat{\mathcal{H}}_{H,B}^{'} \label{H_total}
 \end{align}
 
-ここで, 式\ref{H_total}の第1項\(\hat{\mathcal{H}}_{\text{CF}}\)は結晶場ハミルトニアンである. 結晶場ハミルトニアン \(\hat{\mathcal{H}}_{CF}\) は Stevens演算子 \(O_k^q\) を基底として展開され, その展開係数である結晶場パラメータ \(B_k^q\) が相互作用の強度と対称性を決定する. 
+ここで, 式\eqref{H_total}の第1項\(\hat{\mathcal{H}}_{\text{CF}}\)は結晶場ハミルトニアンである. 結晶場ハミルトニアン \(\hat{\mathcal{H}}_{CF}\) は Stevens演算子 \(O_k^q\) を基底として展開され, その展開係数である結晶場パラメータ \(B_k^q\) が相互作用の強度と対称性を決定する. 
 詳細は付録\ref{chap:CF_theory}にて記載する. 
 \begin{equation}
 \hat{\mathcal{H}}_{\text{CF}} = B_4(\hat{O}_4^0 + 5\hat{O}_4^4) + B_6(\hat{O}_6^0 - 21\hat{O}_6^4)
 \label{eq:H_CF}
 \end{equation}
-式\ref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部静磁場\(\hat{\vb*{B}}_{\text{ext}}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
+式\eqref{H_total}の第2項\(\hat{\mathcal{H}}_{\text{Zeeman}}\)は, 外部静磁場\(\hat{\vb*{B}}_{\text{ext}}\)とスピン演算子\(\hat{\vb*{S}}\)の相互作用を表すゼーマン項である. 
 \begin{equation}
 \hat{\mathcal{H}}_{\text{Zeeman}} = g_{J} \mu_{B} \hat{\vb*{S}} \cdot \hat{\vb*{B}}_{\text{ext}}
 \label{eq:H_Zeeman}
 \end{equation}
 % ここで, \(g_{J}\)はg因子, \(\mu_{B}\)はボーア磁子である. \\ 前述しているため省略可能
-式\ref{H_total}の第3項\(\hat{\mathcal{H}}_{H,B}^{'}\)は, 式\ref{def:H_B}, 式\ref{def:H_H}で定義した\(\text{Gd}^{3+}\)イオンの磁気モーメントと振動磁場とのZeeman相互作用を表す摂動項である. 
+式\eqref{H_total}の第3項\(\hat{\mathcal{H}}_{H,B}^{'}\)は, 式\eqref{def:H_B}, 式\eqref{def:H_H}で定義した\(\text{Gd}^{3+}\)イオンの磁気モーメントと振動磁場とのZeeman相互作用を表す摂動項である. 
 
 \section{線形応答理論に基づく磁気感受率の導出}
 \label{sec:linear_response}
@@ -41,7 +41,7 @@
 \chi_{ij}(\omega) = - \frac{N \mu_{0}}{i \hbar} \int_{0}^{\infty} dt e^{i \omega t} \langle [\hat{d}_{i}(t), \hat{d}_{j}] \rangle
 \end{equation}
 
-式\ref{H_0}の無摂動ハミルトニアン\(\hat{\mathcal{H}}_{0}\)の固有エネルギー\(E_{n}\)と固有状態\(\ket{\psi_n}\)を用いて磁気感受率を計算すると, 以下の形式で与えられる. 
+式\eqref{H_0}の無摂動ハミルトニアン\(\hat{\mathcal{H}}_{0}\)の固有エネルギー\(E_{n}\)と固有状態\(\ket{\psi_n}\)を用いて磁気感受率を計算すると, 以下の形式で与えられる. 
 \begin{equation}
 \chi_{ij}(\omega) = - \frac{N \mu_{0}}{\hbar} \sum_{n, n'} (P_{n} - P_{n'}) \{ \frac{\langle \psi_{n}| \hat{d}_{i} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{j} | \psi_n \rangle}{\omega + i \gamma - \Delta \omega} - \frac{\langle \psi_{n}| \hat{d}_{j} | \psi_{n'} \rangle \langle \psi_{n'} | \hat{d}_{i} | \psi_n \rangle}{\omega + i \gamma + \Delta \omega} \}
 \label{eq:chi_linear}
@@ -57,7 +57,7 @@
 固有状態\(\ket{\psi_n}\)は, スピン\(s\)の磁気量子数\(m\)を用いて, 各準位\(\ket{m}\)の重ね合わせとして表される. この固有状態を用いて磁気感受率テンソルの各成分を詳細に計算した結果については, 付録\ref{chap:appendix_F}に示す.
 \subsubsection*{円偏光基底での磁気感受率テンソル}
 \label{subsubsec:theory_circular_basis}
-Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置（磁場 \(\vb*{B} \parallel \vb*{k} \parallel z\)）で透過スペクトルを測定している.\(^{\cite{Kritzell2024}}\) この配置では, 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)が重要となる. そこで, この直線偏光基底での磁気感受率テンソル(式\ref{eq:chi_linear})を, 円偏光基底に変換する. 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)は, 直線偏光基底の成分\(\chi_{xx}, \chi_{yy}, \chi_{xy}, \chi_{yx}\)を用いて以下のように表される. (詳細は付録\ref{chap:appendix_circular}参照)
+Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置（磁場 \(\vb*{B} \parallel \vb*{k} \parallel z\)）で透過スペクトルを測定している.\(^{\cite{Kritzell2024}}\) この配置では, 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)が重要となる. そこで, この直線偏光基底での磁気感受率テンソル(式\eqref{eq:chi_linear})を, 円偏光基底に変換する. 円偏光基底における磁気感受率テンソル\(\chi_{\pm}\)は, 直線偏光基底の成分\(\chi_{xx}, \chi_{yy}, \chi_{xy}, \chi_{yx}\)を用いて以下のように表される. (詳細は付録\ref{chap:appendix_circular}参照)
 \begin{equation}
 \chi_{\pm} = \chi_{xx} \pm i \chi_{xy}
 \end{equation}
@@ -66,7 +66,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \section{比透磁率の定式化}
 \label{sec:theory_permeability}
 本節では，前節で導出した線形応答理論に基づく磁気感受率\(\chi^{+}\)と電磁気学で用いられる磁気感受率\(\chi\)との対応関係を導出し，H形式およびB形式における比透磁率\(\mu_{r}^{(H,B)}\)の定式化について説明する.\\
-電磁気学では，一般に磁化\(\vb*{M}\)は磁場\(\vb*{H}\)に比例すると仮定される．本研究でも慣例に従い，式\ref{eq:M_H_form}の形で磁化\(\vb*{M}\)を記述する．
+電磁気学では，一般に磁化\(\vb*{M}\)は磁場\(\vb*{H}\)に比例すると仮定される．本研究でも慣例に従い，式\eqref{eq:M_H_form}の形で磁化\(\vb*{M}\)を記述する．
 \begin{equation}
 \label{def:susceptibility_LRT_EM}
 \vb*{M} = \chi \vb*{H} = \chi^{+} \vb*{H} 
@@ -81,7 +81,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \label{def:relation_H_B_M}
 \vb*{H} =\frac{\vb*{B}}{\mu_{0}} - \vb*{M}
 \end{equation}
-この関係式\ref{def:relation_H_B_M}を用いると，式\ref{def:susceptibility_LRT_EM}は以下のように書き換えられる.
+この関係式\eqref{def:relation_H_B_M}を用いると，式\eqref{def:susceptibility_LRT_EM}は以下のように書き換えられる.
 \begin{align*}
 \vb*{M} &= \chi \left( \frac{\vb*{B}}{\mu_{0}} - \vb*{M} \right)\\ 
 (1 + \chi) \vb*{M} &= \chi \frac{\vb*{B}}{\mu_{0}} \\
@@ -100,7 +100,7 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \section{転送行列法による透過スペクトルの計算方法}
 \label{sec:theory_transfer_matrix}
 転送行列法は, 多層構造を通過する電磁波の伝搬を解析するための強力な手法である. 本節では, GGG試料の透過スペクトルを計算するための転送行列法の基本的な考え方を説明する.
-まず, 各層における電磁波の伝搬を記述するために, 各層の特性インピーダンス\(Z\)と伝搬定数\(\beta\)を定義する. 次に, 各層の境界での電磁波の連続条件を適用し, 層間の転送行列を構築する. 最終的に, 全体の転送行列を用いて, 入射波と透過波の関係を導出し, 透過スペクトルを計算する.
+まず, 各層における電磁波の伝搬を記述するために, 各層の特性インピーダンス\(Z\)と位相差\(\delta\)を定義する. 次に, 各層の境界での電磁波の連続条件を適用し, 層間の転送行列を構築する. 最終的に, 全体の転送行列を用いて, 入射波と透過波の関係を導出し, 透過スペクトルを計算する.
 本節では, 図\ref{fig:ggg_tmm_model}に示すようなGGGの多層構造を考える.
 
 \begin{figure}[h]
@@ -120,10 +120,10 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
         \node at (\slabW/2, \h+\labelOffsetOne) {\textbf{Region 2} (GGG Slab)};
         \node at (\slabW+\textOffsetSide, \h+\labelOffsetOne) {\textbf{Region 3} (Vacuum)};
 
-        % --- 屈折率 (中段) ---
-        \node at (-\textOffsetSide, \h+\labelOffsetTwo) {$n_1$};
-        \node at (\slabW/2, \h+\labelOffsetTwo) {$n_2$};
-        \node at (\slabW+\textOffsetSide, \h+\labelOffsetTwo) {$n_3 = n_1$};
+        % --- インピーダンス (中段) ---
+        \node at (-\textOffsetSide, \h+\labelOffsetTwo) {$Z_1=1$};
+        \node at (\slabW/2, \h+\labelOffsetTwo) {$Z_2=Z$};
+        \node at (\slabW+\textOffsetSide, \h+\labelOffsetTwo) {$Z_3=1$};
 
         % --- スラブと界面の描画 ---
         \fill[cyan!10] (0, -\h) rectangle (\slabW, \h);
@@ -143,8 +143,8 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
         \draw[->, very thick, red!80] (0, 0.8) -- (\slabW, 0.8) node[midway, above, yshift=2pt] {$E_{slab}^+ e^{i\delta}$};
         \draw[<-, very thick, blue!80] (0, -0.8) -- (\slabW, -0.8) node[midway, below, yshift=-2pt] {$E_{slab}^- e^{-i\delta}$};
         
-        % 位相シフト表示
-        \draw[<->, dashed, darkgray] (0, 0) -- (\slabW, 0) node[midway, fill=cyan!10, align=center, inner sep=3pt] {Thickness $d$ \\ Phase $\delta=kn_2d$};
+        % 位相差表示    
+        \draw[<->, dashed, darkgray] (0, 0) -- (\slabW, 0) node[midway, fill=cyan!10, align=center, inner sep=3pt] {Thickness $d$ \\ Phase $\delta=n k_0 d$};
 
         % 透過 (Region 3)
         \draw[->, very thick, red] (\slabW, 0.8) -- (\slabW+\textOffsetSide, 2.0) node[midway, above, sloped, yshift=2pt] {$E_{out}^+$ (Transmitted)};
@@ -164,19 +164,20 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
     \end{tikzpicture}
     
     % --- キャプションとラベル ---
-    \caption{転送行列法によるGGGの多層構造の計算モデル\\屈折率\(n_1, n_2, n_3\)および厚さ\(d\)を持つGGGスラブを通過する電磁波の伝搬を解析するためのモデル図. 各界面での入射波、反射波、透過波、およびスラブ内部での多重反射波を示している. また, 下部には転送行列計算の概念図を示し, 入射波と透過波の関係を行列形式で表現していることを強調している.}
+    \caption{転送行列法によるGGGの多層構造の計算モデル\\特性インピーダンス\(Z_1, Z_2, Z_3\)および厚さ\(d\)を持つGGGスラブを通過する電磁波の伝搬を解析するためのモデル図. 各界面での入射波、反射波、透過波、およびスラブ内部での多重反射波を示している. 下部には転送行列計算の概念図を示し, 入射波と透過波の関係を行列形式で表現していることを強調している.}
     \label{fig:ggg_tmm_model}
 \end{figure}
 
 \subsection{問題設定}
+本解析では, 以下の3層構造を仮定し, 各領域の特性インピーダンス \(Z\) を定義する. 真空のインピーダンスで規格化を行い, \(Z_{vac} = 1\) とする.
 \begin{itemize}
-    \item \textbf{領域 1 (左側)}: 真空 (\(n_1 = 1\))
-    \item \textbf{領域 2 (薄膜)}: GGG (\(n_2\), 厚さ \(d\))
-    \item \textbf{領域 3 (右側)}: 真空 (\(n_3 = n_1 = 1\))
+    \item \textbf{領域 1 (左側)}: 真空 (\(Z_1 = 1\))
+    \item \textbf{領域 2 (薄膜)}: GGG (\(Z_2 = Z\), 厚さ \(d\))
+    \item \textbf{領域 3 (右側)}: 真空 (\(Z_3 = Z_1 = 1\))
 \end{itemize}
 
 \subsection{転送行列の定式化 (Backward Definition)}
-数学的な整合性を保つため, 標準的な光学テキスト（Born \& Wolf等）で採用されている\textbf{Backward転送行列}を使用する. これは, 出力側（右側）の場から入力側（左側）の場を逆算する形式である. 
+数学的な整合性を保つため, 標準的な光学テキスト（Born \& Wolf\(^{\cite{BornWolf1999}}\)）で採用されている\textbf{Backward転送行列}を使用する. これは, 出力側（右側）の場から入力側（左側）の場を逆算する形式である. 
 \begin{equation}
     \begin{pmatrix} E_{in}^+ \\ E_{in}^- \end{pmatrix} = \mathbf{M}_{total} \begin{pmatrix} E_{out}^+ \\ E_{out}^- \end{pmatrix}
 \end{equation}
@@ -190,60 +191,70 @@ Kritzellらの実験では等方性物質であるGGGを用いて, Faraday配置
 \subsubsection*{構成行列}
 
 \textbf{1. 界面行列（媒質 \(i \to j\)）:}
-フレネル係数を用いると, 界面における場の接続行列は以下のようになる. 
+各媒質の特性インピーダンスを \(Z_i, Z_j\) とする. 電磁気学的な境界条件に基づき, インピーダンスを用いたフレネル係数は以下のように定義される.
+\begin{equation}
+    r_{ij} = \frac{Z_j - Z_i}{Z_j + Z_i}, \quad t_{ij} = \frac{2Z_j}{Z_j + Z_i}
+\end{equation}
+本研究の系において, 界面1（真空 \(\to\) GGG）および界面2（GGG \(\to\) 真空）の係数は, 規格化インピーダンス \(Z\) を用いて次のように記述される.
+\begin{align}
+    \text{界面1:} & \quad r_{12} = \frac{Z-1}{Z+1}, \quad t_{12} = \frac{2Z}{Z+1} \\
+    \text{界面2:} & \quad r_{21} = \frac{1-Z}{1+Z} = -r_{12}, \quad t_{21} = \frac{2}{1+Z}
+\end{align}
+これらを用いると, 界面行列 \(\mathbf{M}_{ij}\) は次式となる.
 \begin{equation}
     \mathbf{M}_{ij} = \frac{1}{t_{ij}} \begin{pmatrix} 1 & r_{ij} \\ r_{ij} & 1 \end{pmatrix}
 \end{equation}
-ここで, 垂直入射におけるフレネル係数は次式で与えられる. 
-\begin{equation}
-    r_{ij} = \frac{n_i - n_j}{n_i + n_j}, \quad t_{ij} = \frac{2n_i}{n_i + n_j}
-\end{equation}
-対称性 \(r_{ji} = -r_{ij}\) およびストークスの関係式 \(t_{ij}t_{ji} = 1 - r_{ij}^2\) が成立することに注意する. 
 
 \textbf{2. 伝搬行列（媒質 \(j\) 内部）:}
-厚さ \(d\) の媒質内部での位相シフトを \(\delta = k_0 n_j d\) とする. 位置 \(z+d\) から \(z\) へ逆算する伝搬行列は以下の通りである. 
+厚さ \(d\) の媒質内部での位相差 \(\delta\) を定義する. 
+真空中の波数 \(k_0\) と屈折率 \(n\) を用いると, \(\delta\) は以下のように表される.
+\begin{equation}
+    \delta = n k_0 d
+\end{equation}
+ここで, GGGの比透磁率を \(\mu_r\), 比誘電率を \(\epsilon_r\) とすると, インピーダンスは \(Z = \sqrt{\mu_r / \epsilon_r}\), 屈折率は \(n = \sqrt{\mu_r \epsilon_r}\) である. したがって, 屈折率 \(n\) とインピーダンス \(Z\) は以下の関係にある.
+\begin{equation}
+    n = \frac{\mu_r}{Z}
+\end{equation}
+よって, 位相差\(\delta\)はインピーダンス\(Z\)を用いて次式で表される. 
+\begin{equation}
+  \delta = \frac{\mu_r k_0 d}{Z} 
+\end{equation}
+位置 \(z+d\) から \(z\) へ逆算する伝搬行列は以下の通りである. 
 \begin{equation}
     \mathbf{M}_{prop} = \begin{pmatrix} e^{-i\delta} & 0 \\ 0 & e^{i\delta} \end{pmatrix}
 \end{equation}
-（注：物理的な進行波 \(E^+\) は前方へ進むにつれ \(e^{i\delta}\) の位相を獲得する. したがって, 出力側から入力側へ「戻る」計算を行うBackward行列では, 逆位相 \(e^{-i\delta}\) を乗じる必要がある. ）
+（注：Backward行列のため, 進行波に対して逆位相 \(e^{-i\delta}\) を乗じている.）
+
 \subsection{全行列の計算}
 「真空 \(\to\) GGG \(\to\) 真空」系の全転送行列は, 物理的な配置の逆順に行列を掛け合わせることで得られる. 
 \begin{equation}
     \mathbf{M}_{GGG} = \mathbf{M}_{12} \cdot \mathbf{M}_{prop} \cdot \mathbf{M}_{21}
 \end{equation}
-成分を代入して計算する. 
+透過係数の導出に必要な \((1,1)\) 成分のみを計算すると, 以下のようになる.
 \begin{align}
-    \mathbf{M}_{GGG} &= \frac{1}{t_{12}} \begin{pmatrix} 1 & r_{12} \\ r_{12} & 1 \end{pmatrix}
-    \begin{pmatrix} e^{-i\delta} & 0 \\ 0 & e^{i\delta} \end{pmatrix}
-    \frac{1}{t_{21}} \begin{pmatrix} 1 & r_{21} \\ r_{21} & 1 \end{pmatrix} \\
-    &= \frac{1}{t_{12}t_{21}} \begin{pmatrix} 1 & r_{12} \\ r_{12} & 1 \end{pmatrix}
-    \begin{pmatrix} e^{-i\delta} & r_{21} e^{-i\delta} \\ r_{21} e^{i\delta} & e^{i\delta} \end{pmatrix}
+    (\mathbf{M}_{GGG})_{11} &= \frac{1}{t_{12}t_{21}} \left( e^{-i\delta} + r_{12} r_{21} e^{i\delta} \right)
 \end{align}
-ここで, \(r_{21} = -r_{12} \equiv -r\) と置き, 透過係数の導出に必要な \((1,1)\) 成分のみを計算する. 
+ここで, 定義したインピーダンス表現を代入して整理する. 
 \begin{align}
-    (\mathbf{M}_{GGG})_{11} &= \frac{1}{t_{12}t_{21}} \left[ 1 \cdot (e^{-i\delta}) + r_{12} \cdot (r_{21} e^{i\delta}) \right] \\
-    &= \frac{1}{1 - r^2} \left( e^{-i\delta} - r^2 e^{i\delta} \right)
+    \frac{1}{t_{12}t_{21}} &= \frac{(1+Z)^2}{4Z}, \quad r_{12} r_{21} = - \left( \frac{1-Z}{1+Z} \right)^2
 \end{align}
-ここでは恒等式 \(t_{12}t_{21} = 1 - r^2\) を用いた. 
+したがって, 
+\begin{equation}
+    (\mathbf{M}_{GGG})_{11} = \frac{(1+Z)^2}{4Z} e^{-i\delta} - \frac{(1-Z)^2}{4Z} e^{i\delta}
+\end{equation}
 
 \subsection{透過係数の導出と結論}
-スラブ全体の透過係数は次式で求まる. 
+スラブ全体の透過係数 \(t_{slab}\) は \(\frac{1}{(\mathbf{M}_{GGG})_{11}}\) で求まる.
+\begin{align}
+    t_{slab} &= \left[ \frac{(1+Z)^2}{4Z} e^{-i\delta} - \frac{(1-Z)^2}{4Z} e^{i\delta} \right]^{-1} \\
+    &= \frac{4Z}{(1+Z)^2 e^{-i\delta} - (1-Z)^2 e^{i\delta}}
+\end{align}
+標準的な形式に合わせるため, 分母・分子に \(e^{i\delta}\) を乗じて整理する.
 \begin{equation}
-    t_{slab} = \frac{1}{(\mathbf{M}_{GGG})_{11}} = \frac{1 - r^2}{e^{-i\delta} - r^2 e^{i\delta}}
+    t_{slab} = \frac{4Z e^{i\delta}}{(1+Z)^2 - (1-Z)^2 e^{2i\delta}}
 \end{equation}
+以上により, インピーダンス \(Z\) をパラメータとした透過係数の表式が導出された. この結果は, GGG試料の透過スペクトルを計算する際に用いられる.
 
-標準的なファブリ・ペローの公式と比較するため, 分母・分子に \(e^{i\delta}\) を乗じて整理する. 
-\begin{equation}
-    t_{slab} = \frac{(1 - r^2) e^{i\delta}}{1 - r^2 e^{2i\delta}}
-\end{equation}
-ここで, \(\delta = n_2 k_0 d = \frac{2\pi n_2 d}{\lambda}\) である. 
-
-\subsubsection*{インピーダンス\(Z\)による表現}
-この式を, インピーダンスパラメータ \(Z\)（ただし \(r = \frac{1-Z}{1+Z}\), \(Z=\sqrt{\frac{\mu_{r}}{\epsilon_{r}}}\)）を用いて書き直すと以下のようになる. 
-\begin{equation}
-    t_{slab} = \frac{ \frac{4Z}{(1+Z)^2} e^{i\delta} }{ 1 - \left(\frac{1-Z}{1+Z}\right)^2 e^{2i\delta} } 
-    = \frac{4Z e^{i\delta}}{(1+Z)^2 - (1-Z)^2 e^{2i\delta}}
-\end{equation}
 \section{ベイズ推定}
 \label{sec:method_bayesian}
 物理実験, 特にGGGの分光測定のような複雑な系においては, 観測データにノイズが含まれるだけでなく, 理論モデル自体にも不確実性が存在する. 従来の最小二乗法（最尤推定）による点推定では, パラメータ間の相関や多峰性を捉えきれず, 過学習のリスクも高い. 本章では, これらの問題を解決し, 厳密な不確実性評価を可能にするベイズ推定の枠組みを詳述する. 
@@ -270,7 +281,7 @@ p(\theta|D) = \frac{\mathcal{L}(\theta | D) p(\theta)}{p(D)} \label{equation_bay
 \end{equation}
 これは, パラメータ空間全体にわたって「モデルがデータを生成する平均的な能力」を積分した値である. モデル選択において極めて重要な指標であり, 例えば「H形式」と「B形式」のどちらがデータをより良く説明するかを比較する際の「ベイズ因子（Bayes Factor）」の算出に用いられる.
 \subsubsection*{事後分布}
-事後分布 \(p(\theta|D)\) は, 式\ref{equation_bayesian}にあるように, 観測データに基づいて更新されたパラメータの確率分布を表す. 事後分布は, 事前分布と尤度関数の積に比例し, 正規化定数 \(p(D)\) によって正規化される. 
+事後分布 \(p(\theta|D)\) は, 式\eqref{equation_bayesian}にあるように, 観測データに基づいて更新されたパラメータの確率分布を表す. 事後分布は, 事前分布と尤度関数の積に比例し, 正規化定数 \(p(D)\) によって正規化される. 
 事後分布からは, パラメータの最頻値（MAP推定値）, 平均値, 分散などの統計量を計算できる.
 事後分布の広がりが鋭いほど推定精度が高く, 分布が多峰性を示す場合は, モデル内のパラメータ間に強い相関が存在するか, あるいは物理モデルが現象を記述するのに不十分である可能性を示唆する.\\
 しかし, GGGのモデルのようにパラメータが多数存在し, モデルが非線形である場合, 事後分布を解析的に求めることは事実上不可能であり, 後述する数値計算手法（マルコフ連鎖モンテカルロ法や逐次モンテカルロ法など）が必要となる. 

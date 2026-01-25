@@ -1,0 +1,234 @@
+% =============================================================================
+% 修士論文：解析・結果章
+% ベイズ階層モデルによる常磁性強誘電体のテラヘルツ分光データ解析
+% =============================================================================
+
+\chapter{解析と結果}
+\label{chap:analysis_results}
+
+% =============================================================================
+\section{解析結果}  
+\label{sec:results}
+% =============================================================================
+
+\subsection{サンプリング結果の要約}
+
+表\ref{tab:sampling_summary}にSMCサンプリングの結果を示す．両形式とも収束診断は良好であった．
+
+\begin{table}[htbp]
+\centering
+\caption{SMCサンプリング結果の要約}
+\label{tab:sampling_summary}
+\begin{tabular}{lcc}
+\hline
+指標 & H形式 & B形式 \\
+\hline
+パラメータ数 & 40 & 40 \\
+Chain数 & 16 & 16 \\
+Draw数/Chain & 10,000 & 10,000 \\
+総サンプル数 & 160,000 & 160,000 \\
+平均\(\hat{R}\) & 1.0005 & 1.0075 \\
+平均ESS & 120,974 & 61,135 \\
+\hline
+\end{tabular}
+\end{table}
+
+\(\hat{R} < 1.01\)はMCMC収束の標準的な判定基準を満たしており，両モデルとも十分に収束したと判断できる．
+有効サンプルサイズ（ESS）も十分に大きく，事後分布の推定精度は高い．
+
+\subsection{推定パラメータ}
+\label{subsec:estimated_params}
+
+表\ref{tab:parameters_H}にH形式，表\ref{tab:parameters_B}にB形式の主要パラメータ推定結果を示す．
+
+\begin{table}[htbp]
+\centering
+\caption{H形式の推定パラメータ（事後分布の要約）}
+\label{tab:parameters_H}
+\begin{tabular}{lcccc}
+\hline
+パラメータ & 平均値 & 標準偏差 & 94\% HDI下限 & 94\% HDI上限 \\
+\hline
+\(g\) & 1.910 & --- & --- & --- \\
+\(a\) & 8.691 & 0.075 & 8.547 & 8.829 \\
+\(B_4\) [K] & 0.00894 & 0.021 & 0.0 & 0.044 \\
+\(B_6\) [K] & \(-2.45 \times 10^{-6}\) & 0.001 & \(-0.001\) & 0.001 \\
+\(\varepsilon_{\mathrm{bg}}\) & 13.80 & 0.148 & 13.79 & 13.82 \\
+\(\gamma_1\) [THz] & 0.023 & 0.001 & 0.022 & 0.024 \\
+\(\gamma_2\) [THz] & 0.147 & 0.007 & 0.133 & 0.160 \\
+\(\gamma_3\) [THz] & 0.144 & 0.010 & 0.126 & 0.163 \\
+\(\gamma_4\) [THz] & 0.144 & 0.013 & 0.119 & 0.169 \\
+\(\gamma_5\) [THz] & 0.011 & 0.001 & 0.008 & 0.013 \\
+\(\gamma_6\) [THz] & 0.009 & 0.002 & 0.006 & 0.013 \\
+\(\gamma_7\) [THz] & 0.011 & 0.017 & 0.002 & 0.018 \\
+\(\mu_\gamma\) [THz] & 0.054 & --- & --- & --- \\
+\(\sigma_\gamma\) & 0.899 & 0.098 & 0.717 & 1.082 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{B形式の推定パラメータ（事後分布の要約）}
+\label{tab:parameters_B}
+\begin{tabular}{lcccc}
+\hline
+パラメータ & 平均値 & 標準偏差 & 94\% HDI下限 & 94\% HDI上限 \\
+\hline
+\(g\) & 2.028 & --- & --- & --- \\
+\(a\) & 7.352 & 0.087 & 7.188 & 7.515 \\
+\(B_4\) [K] & 0.00287 & 0.004 & 0.0 & 0.009 \\
+\(B_6\) [K] & \(-1.68 \times 10^{-7}\) & 0.001 & \(-0.001\) & 0.001 \\
+\(\varepsilon_{\mathrm{bg}}\) & 13.84 & 0.230 & 13.79 & 13.86 \\
+\(\gamma_1\) [THz] & 0.039 & 0.001 & 0.037 & 0.041 \\
+\(\gamma_2\) [THz] & 0.172 & 0.008 & 0.157 & 0.187 \\
+\(\gamma_3\) [THz] & 0.010 & 0.0004 & 0.009 & 0.011 \\
+\(\gamma_4\) [THz] & 0.165 & 0.014 & 0.139 & 0.191 \\
+\(\gamma_5\) [THz] & 0.158 & 0.019 & 0.123 & 0.193 \\
+\(\gamma_6\) [THz] & 0.148 & 0.028 & 0.098 & 0.201 \\
+\(\gamma_7\) [THz] & 0.092 & 0.064 & 0.010 & 0.193 \\
+\(\mu_\gamma\) [THz] & 0.077 & --- & --- & --- \\
+\(\sigma_\gamma\) & 0.757 & 0.092 & 0.588 & 0.924 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{モデル比較結果}
+\label{subsec:model_comparison_results}
+
+表\ref{tab:waic_loo}にWAICとLOO-CVによるモデル評価結果を示す．
+
+\begin{table}[htbp]
+\centering
+\caption{WAICおよびLOO-CVによるモデル評価}
+\label{tab:waic_loo}
+\begin{tabular}{lcc}
+\hline
+指標 & H形式 & B形式 \\
+\hline
+\multicolumn{3}{l}{\textbf{WAIC}} \\
+\(\mathrm{elpd}_{\mathrm{WAIC}}\) & \(-2965.9\) & \(-3349.5\) \\
+SE & \(166.1\) & \(162.7\) \\
+\(p_{\mathrm{WAIC}}\) & \(61.4\) & \(77.3\) \\
+WAIC & \(5931.9\) & \(6699.0\) \\
+\hline
+\multicolumn{3}{l}{\textbf{LOO-CV}} \\
+\(\mathrm{elpd}_{\mathrm{LOO}}\) & \(-2966.1\) & \(-3348.9\) \\
+SE & \(166.1\) & \(162.7\) \\
+\(p_{\mathrm{LOO}}\) & \(61.6\) & \(76.7\) \\
+LOO & \(5932.2\) & \(6697.7\) \\
+\hline
+\multicolumn{3}{l}{\textbf{Pareto \(k\)診断}} \\
+良好 (\(k < 0.5\)) & 1711 & 1714 \\
+許容 (\(0.5 \leq k < 0.7\)) & 3 & 0 \\
+警告 (\(0.7 \leq k < 1.0\)) & 3 & 0 \\
+不良 (\(k \geq 1.0\)) & 23 & 26 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{モデル比較の統計的判定}
+
+H形式とB形式のelpd差を表\ref{tab:comparison}に示す．
+
+\begin{table}[htbp]
+\centering
+\caption{モデル比較結果}
+\label{tab:comparison}
+\begin{tabular}{lcc}
+\hline
+指標 & WAIC基準 & LOO-CV基準 \\
+\hline
+\(\Delta\mathrm{elpd}\) (H \( - \) B) & \(+383.6\) & \(+382.7\) \\
+\(\mathrm{SE}(\Delta\mathrm{elpd})\) & \(232.5\) & \(232.5\) \\
+\(|\Delta\mathrm{elpd}|/\mathrm{SE}\) & \(1.65\) & \(1.65\) \\
+判定 & 引き分け & 引き分け \\
+\hline
+\end{tabular}
+\end{table}
+
+\(\Delta\mathrm{elpd}/\mathrm{SE} = 1.65 < 2\)であるため，式\eqref{eq:significance}の有意差判定基準を満たさず，
+H形式とB形式の間に統計的に有意な差は認められなかった．
+ただし，H形式のelpd値がB形式より約384ポイント高く，また有効パラメータ数\(p_{\mathrm{WAIC}}\)も
+H形式の方が小さい（61.4 vs 77.3）ことから，H形式がやや優れたモデルである可能性が示唆される．
+
+\subsection{物理パラメータの解釈}
+\label{subsec:interpretation}
+
+推定されたパラメータについて物理的な観点から考察する．
+
+\subsubsection{\(g\)因子}
+
+H形式では\(g = 1.910\)，B形式では\(g = 2.028\)と推定された．
+Gd\(^{3+}\)イオンの理論値\(g = 2.0\)に対し，両形式とも妥当な範囲内にある．
+B形式の方が理論値に近いが，H形式もスピン軌道相互作用による補正を考慮すれば許容範囲である．
+
+\subsubsection{結晶場パラメータ}
+
+\(B_4\)はH形式で約8.9~mK，B形式で約2.9~mKと推定された．
+\(B_6\)は両形式ともほぼゼロに近い値を示した．
+これらの値は先行研究における典型的なGd系結晶場パラメータと整合する．
+
+\subsubsection{緩和率パラメータ}
+
+7つの緩和率\(\gamma_i\)は遷移ごとに異なる値を示した．
+特に基底状態付近の遷移（\(\gamma_1\), \(\gamma_5\), \(\gamma_6\), \(\gamma_7\)）は
+0.01--0.04~THz程度の小さな値を持ち，励起状態からの遷移（\(\gamma_2\), \(\gamma_3\), \(\gamma_4\)）は
+0.1--0.17~THz程度の大きな値を示した．
+この傾向は温度に依存したスピン緩和機構を反映していると考えられる．
+
+\subsection{収束診断の詳細}
+\label{subsec:convergence}
+
+表\ref{tab:rhat_detail}に各パラメータの\(\hat{R}\)統計量を示す．
+
+\begin{table}[htbp]
+\centering
+\caption{収束診断（\(\hat{R}\)統計量の詳細）}
+\label{tab:rhat_detail}
+\begin{tabular}{lcc}
+\hline
+パラメータ群 & H形式 \(\hat{R}\) & B形式 \(\hat{R}\) \\
+\hline
+\(g\), \(a\), \(B_4\), \(B_6\), \(\varepsilon\) & 1.00 & 1.00 \\
+\(\gamma_{\mathrm{raw}}\) (7個) & 1.00 & 1.01--1.03 \\
+\(\log\mu_\gamma\) & 1.00 & 1.03 \\
+\(\log\sigma_\gamma\) & 1.01 & 1.02 \\
+\hline
+\end{tabular}
+\end{table}
+
+H形式はすべてのパラメータで\(\hat{R} \leq 1.01\)を達成し，優れた収束性を示した．
+B形式では階層パラメータ（\(\log\mu_\gamma\)，\(\gamma_{\mathrm{raw}}\)）で若干収束が遅い傾向が見られたが，
+\(\hat{R} < 1.05\)であり実用上問題のない範囲である．
+
+% =============================================================================
+\section{本章のまとめ}
+\label{sec:analysis_summary}
+% =============================================================================
+
+本章では，テラヘルツ透過スペクトルに対するベイズ階層モデル解析の手法と結果を報告した．
+主な成果は以下の通りである：
+
+\begin{enumerate}
+    \item \textbf{ベイズ階層モデルの構築}：
+    7つの緩和率パラメータの識別不能性問題を解決するため，Non-centered Parameterizationに基づく階層モデルを構築した．
+    
+    \item \textbf{SMCサンプリングによる推定}：
+    Sequential Monte Carlo法により，H形式・B形式の両モデルで160,000サンプルを生成し，
+    \(\hat{R} < 1.01\)の収束基準を達成した．
+    
+    \item \textbf{モデル比較}：
+    WAICおよびLOO-CVによる評価の結果，H形式とB形式の間に統計的に有意な差は認められなかった
+    （\(|\Delta\mathrm{elpd}|/\mathrm{SE} = 1.65 < 2\)）．
+    ただし，H形式のelpd値がやや高く，有効パラメータ数も小さいことから，
+    H形式が若干優れたモデルである可能性が示唆された．
+    
+    \item \textbf{物理パラメータの推定}：
+    \(g\)因子，結晶場パラメータ\(B_4\), \(B_6\)，背景誘電率\(\varepsilon_{\mathrm{bg}}\)，
+    および7つの緩和率\(\gamma_i\)の事後分布を得た．
+    推定値は先行研究の知見と整合する妥当な範囲にあった．
+\end{enumerate}
+
+本解析により，磁気ポラリトンを示す常磁性強誘電体のテラヘルツ応答を記述する物理パラメータを，
+不確実性を定量化しつつ推定することに成功した．

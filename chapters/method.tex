@@ -6,7 +6,7 @@
 本研究では, 取得されたTHz帯透過スペクトルの解析にあたり, 物理モデルに基づくパラメータ推定を行う. 解析は三段階で構成される. 第一に, 重み付き非線形最小二乗法を用いて大域的な最適解近傍を探索し, 第二に, その結果を事前情報として組み込んだベイズ推定を行うことで, パラメータの不確実性と相関を評価する. 第三に, WAIC及びPSISを用いたLOOCVにより, モデルの汎化性能を2つの情報規準に基づき評価する. 以下, 各手法の詳細について述べる.
 
 \section{各準位の緩和係数}
-磁気感受率は式\ref{eq:chi_linear}によって計算される. GGGは8準位あるので, 全\(8 \times 7 = 56\)個の遷移ペア( \(n \leftrightarrow n'\) )の寄与を考える必要がある. 計算コストの観点から, 本研究では, 式\ref{eq:gamma_approximation}を仮定し, 表\ref{tab:gamma_transition}で示すように, 56個の遷移の緩和係数を7個の緩和係数で記述する. 以下, この仮定に基づく緩和係数を共有\(\gamma\)モデルと呼称する. 
+磁気感受率は式\eqref{eq:chi_linear}によって計算される. GGGは8準位あるので, 全\(8 \times 7 = 56\)個の遷移ペア( \(n \leftrightarrow n'\) )の寄与を考える必要がある. 計算コストの観点から, 本研究では, 式\eqref{eq:gamma_approximation}を仮定し, 表\ref{tab:gamma_transition}で示すように, 56個の遷移の緩和係数を7個の緩和係数で記述する. 以下, この仮定に基づく緩和係数を共有\(\gamma\)モデルと呼称する. 
 \begin{equation}
     \gamma (n, n') = \gamma_{\text{min}} (n, n')
     \label{eq:gamma_approximation}
